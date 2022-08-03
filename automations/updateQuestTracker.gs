@@ -52,13 +52,13 @@
     }
 
     // for each quest
+    let masterclasserQuests = [];
+    let otherQuests = [];
+    let unlockableQuests = [];
     let eggQuests = [];
     let hatchingPotionQuests = [];
     let petQuests = [];
     let mountQuests = [];
-    let unlockableQuests = [];
-    let masterclasserQuests = [];
-    let otherQuests = [];
     for (quest of Object.values(content.data.quests)) {
 
       // if not a world boss
@@ -149,6 +149,8 @@
           masterclasserQuests.push(questInfo);
         } else if (quest.text == "The Basi-List" || quest.text == "The Feral Dust Bunnies") {
           otherQuests.push(questInfo);
+        } else if (quest.category == "unlockable") {
+          unlockableQuests.push(questInfo);
         } else if (rewardType == "egg") {
           eggQuests.push(questInfo);
         } else if (["hatchingPotion", "wackyPotion"].includes(rewardType)) {
@@ -157,8 +159,6 @@
           petQuests.push(questInfo);
         } else if (rewardType == "mount") {
           mountQuests.push(questInfo);
-        } else if (quest.category == "unlockable") {
-          unlockableQuests.push(questInfo);
         }
       }
     }
@@ -216,7 +216,7 @@
     log("Updating Quest Tracker");
 
     // clear sheet
-    let generatedContent = sheet.getRange(2, 1, Math.max(sheet.getLastRow(), 2), Math.max(sheet.getLastColumn(), 1));
+    let generatedContent = sheet.getRange(2, 1, 999, Math.max(sheet.getLastColumn(), 1));
     generatedContent.clearContent().setBackground(null).breakApart();
 
     // get list of usernames
