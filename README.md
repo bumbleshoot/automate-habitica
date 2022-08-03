@@ -75,6 +75,7 @@ Make sure you read the [Before Installing](#before-installing) section above, an
 12. Paste your Web App URL inside the quotations where it says `const WEB_APP_URL = "";`.
 13. Click the drop-down menu to the right of the "Debug" button, near the top of the page. Select "install" from the drop-down.
 14. Click the "Run" button to the left of the "Debug" button. Wait for it to say "Execution completed".
+
 You're all done! If you need to change the settings or uninstall the script at some point, follow the steps below.
 
 ## Changing the Settings
