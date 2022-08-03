@@ -43,10 +43,15 @@ function onTrigger() {
 function doPost(e) {
   try {
 
-    // add to queue & process queue
+    // add to queue
     let postData = JSON.parse(e.postData.contents);
     scriptProperties.setProperty("processWebhook", postData.type || postData.webhookType);
-    processQueue();
+
+    // create temporary trigger to process queue
+    ScriptApp.newTrigger("processQueue")
+      .timeBased()
+      .after(1)
+      .create();
 
   } catch (e) {
     MailApp.sendEmail(
@@ -232,6 +237,13 @@ function processWebhook(webhookType) {
  */
 function processQueue() {
   try {
+
+    // delete temporary triggers
+    ScriptApp.getProjectTriggers().forEach(trigger => {
+      if (trigger.getHandlerFunction() === "processQueue") {
+        ScriptApp.deleteTrigger(trigger);
+      }
+    });
 
     // prevent multiple instances from running at once
     let lock = LockService.getScriptLock();
