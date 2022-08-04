@@ -15,13 +15,14 @@ Sends a [private message](https://habitica.fandom.com/wiki/Private_Messaging) to
 Stat points are automatically allocated to your chosen [stat](https://habitica.fandom.com/wiki/Character_Stats).
 
 ### Auto cast skills
-Strategically casts your [skills](https://habitica.fandom.com/wiki/Skills) for you. Ensures no mana is wasted, and no mana is lost at [cron](https://habitica.fandom.com/wiki/Cron). In order from highest to lowest priority:
-1. Heals you and your [party](https://habitica.fandom.com/wiki/Party) ([healer](https://habitica.fandom.com/wiki/Healer))
-2. Casts Stealth to hide you from any [missed dailies](https://habitica.fandom.com/wiki/Dailies#Uncompleted_Dailies) ([rogue](https://habitica.fandom.com/wiki/Rogue))
-3. Freezes your [streaks](https://habitica.fandom.com/wiki/Streaks) with Chilling Frost ([mage](https://habitica.fandom.com/wiki/Mage))
-4. Defeats [bosses](https://habitica.fandom.com/wiki/Boss) with Burst of Flames ([mage](https://habitica.fandom.com/wiki/Mage)) or Brutal Smash ([warrior](https://habitica.fandom.com/wiki/Warrior))
-5. Buffs your [class](https://habitica.fandom.com/wiki/Class_System)'s primary [stat](https://habitica.fandom.com/wiki/Character_Stats)
-6. Gives extra [mana](https://habitica.fandom.com/wiki/Mana_Points) to your party just before your cron ([mage](https://habitica.fandom.com/wiki/Mage))
+Strategically casts your [skills](https://habitica.fandom.com/wiki/Skills) for you. Ensures no [mana](https://habitica.fandom.com/wiki/Mana_Points) is wasted, and no mana is lost at [cron](https://habitica.fandom.com/wiki/Cron). In order from highest to lowest priority:
+1. Heals you and your [party](https://habitica.fandom.com/wiki/Party) as needed ([healer](https://habitica.fandom.com/wiki/Healer))
+2. Casts Stealth to hide you from any [missed dailies](https://habitica.fandom.com/wiki/Dailies#Uncompleted_Dailies) just before your [day start time](https://habitica.fandom.com/wiki/Custom_Day_Start) ([rogue](https://habitica.fandom.com/wiki/Rogue))
+3. Freezes your [streaks](https://habitica.fandom.com/wiki/Streaks) with Chilling Frost just before your day start time ([mage](https://habitica.fandom.com/wiki/Mage))
+4. Defeats [bosses](https://habitica.fandom.com/wiki/Boss) with Burst of Flames (mage) or Brutal Smash ([warrior](https://habitica.fandom.com/wiki/Warrior)) just before your day start time
+5. Reserves enough mana to start each day with as much mana as possible, then uses all your mana to buff your [class](https://habitica.fandom.com/wiki/Class_System)'s primary [stat](https://habitica.fandom.com/wiki/Character_Stats) just after cron
+6. Buffs your class's primary stat whenever extra mana is available (reserves mana for the items listed above)
+7. Gives any leftover mana to your party with Ethereal Surge (mage) or uses it to cast more buffs (other classes) just before your day start time
 
 ### Auto pause/resume damage
 Automatically checks you into the [inn](https://habitica.fandom.com/wiki/Rest_in_the_Inn) if the current [boss](https://habitica.fandom.com/wiki/Boss) will do more than `MAX_PLAYER_DAMAGE` to you, or `MAX_PARTY_DAMAGE` to your [party](https://habitica.fandom.com/wiki/Party), or enough damage to [kill](https://habitica.fandom.com/wiki/Death_Mechanics) you or one of your party members. Checks you out of the inn otherwise.
