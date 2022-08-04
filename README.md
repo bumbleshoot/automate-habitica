@@ -77,7 +77,7 @@ Make sure you read the [Before Installing](#before-installing) section above, an
 13. Paste your Web App URL inside the quotations where it says `const WEB_APP_URL = "";`.
 14. Click the drop-down menu to the right of the "Debug" button, near the top of the page. Select "install" from the drop-down.
 15. Click the "Run" button to the left of the "Debug" button. Wait for it to say "Execution completed".
-16. If you're using the Quest Tracker, you can now link to the Quest Tracker spreadsheet in your party's description [like so](https://habitica.fandom.com/wiki/Markdown_Cheat_Sheet#Links,_Images_and_Emoji).
+16. If you're using the Quest Tracker, you can now [update your party's description](https://habitica.fandom.com/wiki/Party#Customizing_a_Party) to [include a link](https://habitica.fandom.com/wiki/Markdown_Cheat_Sheet#Links,_Images_and_Emoji) to the Quest Tracker spreadsheet.
 
 You're all done! If you need to change the settings or uninstall the script at some point, follow the steps below.
 
