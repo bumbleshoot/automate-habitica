@@ -22,7 +22,7 @@ Strategically casts your [skills](https://habitica.fandom.com/wiki/Skills) for y
 4. Defeats [bosses](https://habitica.fandom.com/wiki/Boss) with Burst of Flames (mage) or Brutal Smash ([warrior](https://habitica.fandom.com/wiki/Warrior)) just before your day start time
 5. Reserves enough mana to start each day with as much mana as possible, then uses all your mana to buff your [class](https://habitica.fandom.com/wiki/Class_System)'s primary [stat](https://habitica.fandom.com/wiki/Character_Stats) just after cron
 6. Buffs your class's primary stat whenever extra mana is available (reserves mana for the items listed above)
-7. Gives any leftover mana to your party with Ethereal Surge (mage) or uses it to cast more buffs (other classes) just before your day start time
+7. Gives any extra mana to your party with Ethereal Surge (mage) or uses it to cast more buffs (other classes) just before your day start time
 
 ### Auto pause/resume damage
 Automatically checks you into the [inn](https://habitica.fandom.com/wiki/Rest_in_the_Inn) if the current [boss](https://habitica.fandom.com/wiki/Boss) will do more than `MAX_PLAYER_DAMAGE` to you, or `MAX_PARTY_DAMAGE` to your [party](https://habitica.fandom.com/wiki/Party), or enough damage to [kill](https://habitica.fandom.com/wiki/Death_Mechanics) you or one of your party members. Checks you out of the inn otherwise.
