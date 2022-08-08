@@ -46,7 +46,7 @@ Automatically updates a [Google Sheet](https://www.google.ca/sheets/about/) in t
 
 ## Before Installing
 First you must uninstall any scripts that do the same thing(s) as Automate Habitica. For example, if you are running the [Auto Accept Quests](https://habitica.fandom.com/wiki/Google_Apps_Script#Auto_Accept_Quests) script, you need to uninstall it, because Automate Habitica also auto accepts quest invites, and these two scripts will conflict with each other. To uninstall a script:
-1. Click [here](https://script.google.com/home) to see a list of your scripts. If you're not already signed into your Google account, you will be asked to sign in.
+1. Click [here](https://script.google.com/home) to see a list of your scripts. If you're not already signed into your Google account, click the "Start Scripting" button and sign in. Then click on "My Projects" in the main menu on the left.
 2. Click on the script you want to uninstall.
 3. Click the blue "Deploy" button near the top of the page, then click "Manage deployments".
 4. Click the "Archive" button (looks like a box with a down arrow inside), then click the "Done" button. If the script has no deployments, there will be no archive button, and you will see the message "This project has not been deployed yet". In this case, just click "Cancel".
