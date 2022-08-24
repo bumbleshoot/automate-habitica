@@ -4,8 +4,8 @@
  * Calculates pending damage to player & party based on player's
  * incomplete dailies & the current boss. Checks player into the
  * inn if pending damage to player or party exceed MAX_PLAYER_DAMAGE
- * or MAX_PARTY_DAMAGE or player's hp, checks player out of inn 
- * otherwise.
+ * or MAX_PARTY_DAMAGE or player's hp or party members' hp, checks 
+ * player out of inn otherwise.
  * 
  * Run this function whenever the player is invited to a quest, and 
  * periodically throughout the day.
