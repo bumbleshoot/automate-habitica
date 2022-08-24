@@ -5,7 +5,7 @@ const PARAMS = {
     "x-client": "35c3fb6f-fb98-4bc3-b57a-ac01137d0847-AutomateHabitica"
   },
   "muteHttpExceptions": true
-}
+};
 const GET_PARAMS = Object.assign({ "method": "get" }, PARAMS);
 const POST_PARAMS = Object.assign({ "method": "post" }, PARAMS);
 const DELETE_PARAMS = Object.assign({ "method": "delete" }, PARAMS);

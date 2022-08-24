@@ -92,6 +92,13 @@ You're all done! If you need to change the settings or uninstall the script at s
 8. Click the drop-down menu to the right of the "Debug" button, near the top of the page. Select "install" from the drop-down.
 9. Click the "Run" button to the left of the "Debug" button. Wait for it to say "Execution completed".
 
+## Updating the Script
+1. Follow the steps in [Uninstalling the Script](#uninstalling-the-script) below.
+2. Copy & paste your settings (`const`s) in a text editor so you can reference them while setting up the new version.
+3. In the main menu on the left, click on "Overview" (looks like a lowercase letter i inside a circle).
+4. Click the "Remove project" button (looks like a trash can).
+5. Follow the [Setup Instructions](#setup-instructions) above. You don't have to make a new Quest Tracker spreadsheet, just use your existing one.
+
 ## Uninstalling the Script
 1. [Click here](https://script.google.com/home) to see a list of your scripts. If you're not already signed into your Google account, click the "Start Scripting" button and sign in.  Then click on "My Projects" in the main menu on the left.
 2. Click on "Automate Habitica".
