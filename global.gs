@@ -91,8 +91,8 @@ function processTrigger() {
       scriptProperties.setProperty("beforeCron", "true");
       scriptProperties.setProperty("LAST_BEFORE_CRON", now);
 
-    // if auto cron and player hasn't cronned today
-    } else if (AUTO_CRON === true && lastDayStart.getTime() - lastCron.getTime() > 0) {
+    // if auto cron and player needs cron
+    } else if (AUTO_CRON === true && user.data.needsCron === true) {
       scriptProperties.setProperty("runCron", "true");
       if (AUTO_CAST_SKILLS === true) {
         scriptProperties.setProperty("afterCron", "true");
