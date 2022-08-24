@@ -77,11 +77,7 @@ function processTrigger() {
     // get times
     let now = new Date();
     let dayStart = getUser().data.preferences.dayStart;
-    let lastDayStart = new Date(now.toDateString());
-    lastDayStart.setHours(dayStart);
-    if (dayStart > now.getHours()) {
-      lastDayStart.setDate(lastDayStart.getDate() - 1);
-    }
+    let needsCron = user.data.needsCron;
     let lastCron = new Date(user.data.auth.timestamps.loggedin);
     let lastBeforeCron = new Date(scriptProperties.getProperty("LAST_BEFORE_CRON"));
     let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
@@ -91,8 +87,8 @@ function processTrigger() {
       scriptProperties.setProperty("beforeCron", "true");
       scriptProperties.setProperty("LAST_BEFORE_CRON", now);
 
-    // if auto cron and player needs cron
-    } else if (AUTO_CRON === true && user.data.needsCron === true) {
+    // if auto cron and player hasn't cronned today
+    } else if (AUTO_CRON === true && needsCron === true) {
       scriptProperties.setProperty("runCron", "true");
       if (AUTO_CAST_SKILLS === true) {
         scriptProperties.setProperty("afterCron", "true");
@@ -100,7 +96,7 @@ function processTrigger() {
       }
 
     // if player has cronned today and after cron hasn't run since cron
-    } else if (AUTO_CAST_SKILLS === true && lastCron.getTime() - lastDayStart.getTime() >= 0 && lastCron.getTime() - lastAfterCron.getTime() > 0) {
+    } else if (AUTO_CAST_SKILLS === true && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
       scriptProperties.setProperty("afterCron", "true");
       scriptProperties.setProperty("LAST_AFTER_CRON", now);
     
