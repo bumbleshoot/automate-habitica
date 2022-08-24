@@ -82,7 +82,7 @@ function processTrigger() {
     if (dayStart > now.getHours()) {
       lastDayStart.setDate(lastDayStart.getDate() - 1);
     }
-    let lastCron = new Date(user.data.lastCron);
+    let lastCron = new Date(user.data.auth.timestamps.loggedin);
     let lastBeforeCron = new Date(scriptProperties.getProperty("LAST_BEFORE_CRON"));
     let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
 
