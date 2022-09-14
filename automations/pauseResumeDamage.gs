@@ -20,7 +20,6 @@
  */
 function pauseResumeDamage() {
 
-  // for each task
   let damageToPlayer = 0;
   let damageToParty = 0;
   let stealth = getUser(true).data.stats.buffs.stealth;
@@ -29,6 +28,15 @@ function pauseResumeDamage() {
   if (quest !== null) {
     boss = getContent().data.quests[quest].boss;
   }
+  let bossHp = 3000;
+  let bossStr = 4;
+  if (typeof boss !== "undefined") {
+    bossHp = boss.hp;
+    bossStr = boss.str;
+  }
+  let con = getTotalStat("con");
+
+  // for each task
   for (task of getTasks().data) {
 
     // if due & incomplete
@@ -40,10 +48,10 @@ function pauseResumeDamage() {
         continue;
       }
 
-      // calculate task value
+      // calculate value
       let taskValue = Math.min(Math.max(task.value, -47.27), 21.27);
 
-      // calculate task damage value
+      // calculate damage value
       let delta = Math.abs(Math.pow(0.9747, taskValue));
       if (task.checklist.length > 0) {
         let subtasksDone = 0;
@@ -55,17 +63,17 @@ function pauseResumeDamage() {
         delta *= (1 - subtasksDone / task.checklist.length);
       }
 
-      // if party is fighting a boss, calculate damage to party
-      if (typeof boss !== "undefined") {
+      // if fighting a boss or not on a quest, calculate damage to party
+      if (typeof boss !== "undefined" || quest === null) {
         let bossDelta = delta;
         if (task.priority < 1) {
             bossDelta *= task.priority;
         }
-        damageToParty += bossDelta * boss.str;
+        damageToParty += bossDelta * bossStr;
       }
 
       // calculate damage to player
-      damageToPlayer += Math.round(delta * task.priority * 2 * Math.max(0.1, 1 - (getTotalStat("con") / 250)) * 10) / 10;
+      damageToPlayer += Math.round(delta * task.priority * 2 * Math.max(0.1, 1 - (con / 250)) * 10) / 10;
     }
   }
 
@@ -77,12 +85,12 @@ function pauseResumeDamage() {
   console.log("Pending damage to player: " + damageTotal);
   console.log("Pending damage to party: " + damageToParty);
 
-  // if fighting a boss
+  // if fighting a boss or not on a quest
   let hp = user.data.stats.hp;
-  if (typeof boss !== "undefined") {
+  if (typeof boss !== "undefined" || quest === null) {
 
     // if enough pending damage to defeat boss
-    if (user.data.party.quest.progress.up >= boss.hp) {
+    if (user.data.party.quest.progress.up >= bossHp) {
 
       // if damage to player greater than threshold or hp, sleep, otherwise wake up
       if (damageToPlayer > MAX_PLAYER_DAMAGE || damageToPlayer >= hp) {
@@ -110,7 +118,7 @@ function pauseResumeDamage() {
       }
     }
 
-  // if not fighting a boss
+  // if on a collection quest
   } else {
 
     // if player damage greater than threshold or hp, sleep, otherwise wake up
@@ -127,7 +135,10 @@ function pauseResumeDamage() {
       console.log("Going to sleep");
 
       fetch("https://habitica.com/api/v3/user/sleep", POST_PARAMS);
+
+      // update user data
       user.data.preferences.sleep = false;
+
     } else {
 
       console.log("Staying asleep");
@@ -141,7 +152,10 @@ function pauseResumeDamage() {
       console.log("Waking up");
 
       fetch("https://habitica.com/api/v3/user/sleep", POST_PARAMS);
+
+      // update user data
       user.data.preferences.sleep = true;
+
     } else {
 
       console.log("Staying awake");
