@@ -27,6 +27,9 @@ Strategically casts your [skills](https://habitica.fandom.com/wiki/Skills) for y
 ### Auto pause/resume damage
 Automatically checks you into the [inn](https://habitica.fandom.com/wiki/Rest_in_the_Inn) if the current [boss](https://habitica.fandom.com/wiki/Boss) will do more than `MAX_PLAYER_DAMAGE` to you, or `MAX_PARTY_DAMAGE` to your [party](https://habitica.fandom.com/wiki/Party), or enough damage to [kill](https://habitica.fandom.com/wiki/Death_Mechanics) you or one of your party members. Checks you out of the inn otherwise.
 
+### Auto purchase gems
+Automatically purchases [gems](https://habitica.fandom.com/wiki/Gems) with [gold](https://habitica.fandom.com/wiki/Gold_Points) each month. Note that you must [cron](https://habitica.fandom.com/wiki/Cron) at least once during a month in order to buy gems for that month. Only [subscribers](https://habitica.fandom.com/wiki/Subscription) can run this automation.
+
 ### Auto purchase armoires
 Any [gold](https://habitica.fandom.com/wiki/Gold_Points) you earn over `RESERVE_GOLD` will automatically be spent on [enchanted armoires](https://habitica.fandom.com/wiki/Enchanted_Armoire).
 

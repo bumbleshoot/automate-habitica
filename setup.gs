@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.15.0 (beta) by @bumbleshoot
+ * Automate Habitica v0.16.0 (beta) by @bumbleshoot
  * 
  * See wiki page for info & setup instructions:
  * https://habitica.fandom.com/wiki/Automate_Habitica
@@ -23,6 +23,8 @@ const AUTO_CAST_SKILLS = false;
 const AUTO_PAUSE_RESUME_DAMAGE = true;
 const MAX_PLAYER_DAMAGE = 20;
 const MAX_PARTY_DAMAGE = 5;
+
+const AUTO_PURCHASE_GEMS = false;
 
 const AUTO_PURCHASE_ARMOIRES = false;
 const RESERVE_GOLD = 50000;
@@ -70,6 +72,9 @@ function install() {
     }
     if (AUTO_ALLOCATE_STAT_POINTS === true) {
       scriptProperties.setProperty("allocateStatPoints", "true");
+    }
+    if (AUTO_PURCHASE_GEMS === true) {
+      scriptProperties.setProperty("purchaseGems", "true");
     }
     if (AUTO_SELL_EGGS === true) {
       scriptProperties.setProperty("sellExtraEggs", "true");
@@ -176,6 +181,18 @@ function validateConstants() {
 
     if (typeof MAX_PARTY_DAMAGE !== "number" || MAX_PARTY_DAMAGE < 0 || MAX_PARTY_DAMAGE >= 50) {
       console.log("ERROR: MAX_PARTY_DAMAGE must be a positive number less than 50.\n\neg. const MAX_PARTY_DAMAGE = 0;\n    const MAX_PARTY_DAMAGE = 22.5;");
+      valid = false;
+    }
+  }
+
+  if (AUTO_PURCHASE_GEMS !== true && AUTO_PURCHASE_GEMS !== false) {
+    console.log("ERROR: AUTO_PURCHASE_GEMS must equal either true or false.\n\neg. const AUTO_PURCHASE_GEMS = true;\n    const AUTO_PURCHASE_GEMS = false;");
+    valid = false;
+  }
+
+  if (AUTO_PURCHASE_GEMS === true) {
+    if (getUser().data.purchased.plan.consecutive.count === 0) {
+      console.log("ERROR: Only subscribers can purchase gems with gold. Since you are not a subscriber, you should set AUTO_PURCHASE_GEMS to false.\n\neg. const AUTO_PURCHASE_GEMS = false;");
       valid = false;
     }
   }
@@ -318,7 +335,7 @@ function createTrigger() {
   deleteTriggers();
   
   // create trigger if needed for enabled automations
-  if (AUTO_CRON === true || AUTO_CAST_SKILLS === true || AUTO_ACCEPT_QUEST_INVITES === true || AUTO_START_QUESTS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_ARMOIRES === true) {
+  if (AUTO_CRON === true || AUTO_CAST_SKILLS === true || AUTO_ACCEPT_QUEST_INVITES === true || AUTO_START_QUESTS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true) {
 
     console.log("Creating trigger");
 
@@ -350,7 +367,7 @@ function createWebhooks() {
 
   // create webhooks for enabled automations
   let webhooks = [];
-  if (AUTO_CAST_SKILLS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
+  if (AUTO_CAST_SKILLS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
     webhooks.push({
       "type": "taskActivity",
       "options": {
@@ -377,7 +394,7 @@ function createWebhooks() {
       "questStarted": true
     });
   }
-  if (NOTIFY_ON_QUEST_END === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true || AUTO_UPDATE_QUEST_TRACKER === true) {
+  if (NOTIFY_ON_QUEST_END === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true || AUTO_UPDATE_QUEST_TRACKER === true) {
     Object.assign(questActivityOptions, {
       "questFinished": true
     });

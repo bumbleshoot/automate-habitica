@@ -87,13 +87,13 @@ function processTrigger() {
   // if auto cron and player hasn't cronned today
   } else if (AUTO_CRON === true && needsCron === true) {
     scriptProperties.setProperty("runCron", "true");
-    if (AUTO_CAST_SKILLS === true) {
+    if (AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) {
       scriptProperties.setProperty("afterCron", "true");
       scriptProperties.setProperty("LAST_AFTER_CRON", now);
     }
 
   // if player has cronned today and after cron hasn't run since cron
-  } else if (AUTO_CAST_SKILLS === true && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
+  } else if ((AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
     scriptProperties.setProperty("afterCron", "true");
     scriptProperties.setProperty("LAST_AFTER_CRON", now);
   
@@ -139,6 +139,9 @@ function processWebhook(webhookType) {
     }
     if (AUTO_PAUSE_RESUME_DAMAGE === true && getUser(true).data.preferences.sleep) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
+    }
+    if (AUTO_PURCHASE_GEMS === true) {
+      scriptProperties.setProperty("purchaseGems", "true");
     }
     if (AUTO_PURCHASE_ARMOIRES === true) {
       scriptProperties.setProperty("purchaseArmoires", "true");
@@ -192,6 +195,9 @@ function processWebhook(webhookType) {
   } else if (webhookType == "questFinished") {
     if (NOTIFY_ON_QUEST_END === true) {
       scriptProperties.setProperty("notifyQuestEnded", "true");
+    }
+    if (AUTO_PURCHASE_GEMS === true) {
+      scriptProperties.setProperty("purchaseGems", "true");
     }
     if (AUTO_PURCHASE_ARMOIRES === true) {
       scriptProperties.setProperty("purchaseArmoires", "true");
@@ -289,6 +295,11 @@ function processQueue() {
           scriptProperties.deleteProperty("afterCron");
           continue;
         }
+        if (scriptProperties.getProperty("purchaseGems") !== null) {
+          purchaseGems();
+          scriptProperties.deleteProperty("purchaseGems");
+          continue;
+        }
         if (scriptProperties.getProperty("forceStartQuest") !== null) {
           forceStartQuest();
           scriptProperties.deleteProperty("forceStartQuest");
@@ -375,15 +386,20 @@ function beforeCron() {
  * just after the player's cron.
  */
 function afterCron() {
-  let playerClass = getPlayerClass();
-  if (playerClass == "warrior") {
-    castValorousPresence(false);
-  } else if (playerClass == "mage") {
-    castEarthquake(false);
-  } else if (playerClass == "healer") {
-    castProtectiveAura(false);
-  } else if (playerClass == "rogue") {
-    castToolsOfTheTrade(false);
+  if (AUTO_CAST_SKILLS === true) {
+    let playerClass = getPlayerClass();
+    if (playerClass == "warrior") {
+      castValorousPresence(false);
+    } else if (playerClass == "mage") {
+      castEarthquake(false);
+    } else if (playerClass == "healer") {
+      castProtectiveAura(false);
+    } else if (playerClass == "rogue") {
+      castToolsOfTheTrade(false);
+    }
+  }
+  if (AUTO_PURCHASE_GEMS === true) {
+    scriptProperties.setProperty("purchaseGems", "true");
   }
 }
 
