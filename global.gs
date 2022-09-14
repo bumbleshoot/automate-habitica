@@ -30,7 +30,6 @@ function onTrigger() {
       DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
       e.stack
     );
-    log(e);
     throw e;
   }
 }
@@ -59,7 +58,6 @@ function doPost(e) {
       DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
       e.stack
     );
-    log(e);
     throw e;
   }
 }
@@ -72,60 +70,54 @@ function doPost(e) {
  * periodically.
  */
 function processTrigger() {
-  try {
 
-    // get times
-    let now = new Date();
-    let dayStart = getUser().data.preferences.dayStart;
-    let needsCron = user.data.needsCron;
-    let lastCron = new Date(user.data.auth.timestamps.loggedin);
-    let lastBeforeCron = new Date(scriptProperties.getProperty("LAST_BEFORE_CRON"));
-    let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
+  // get times
+  let now = new Date();
+  let dayStart = getUser().data.preferences.dayStart;
+  let needsCron = user.data.needsCron;
+  let lastCron = new Date(user.data.auth.timestamps.loggedin);
+  let lastBeforeCron = new Date(scriptProperties.getProperty("LAST_BEFORE_CRON"));
+  let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
 
-    // if just before day start time
-    if (now.getHours() == dayStart-1 && 39 <= now.getMinutes() && now.getMinutes() < 54 && (lastBeforeCron.toDateString() !== now.toDateString() || lastBeforeCron.getHours() !== now.getHours())) {
-      scriptProperties.setProperty("beforeCron", "true");
-      scriptProperties.setProperty("LAST_BEFORE_CRON", now);
+  // if just before day start time
+  if (now.getHours() == dayStart-1 && 39 <= now.getMinutes() && now.getMinutes() < 54 && (lastBeforeCron.toDateString() !== now.toDateString() || lastBeforeCron.getHours() !== now.getHours())) {
+    scriptProperties.setProperty("beforeCron", "true");
+    scriptProperties.setProperty("LAST_BEFORE_CRON", now);
 
-    // if auto cron and player hasn't cronned today
-    } else if (AUTO_CRON === true && needsCron === true) {
-      scriptProperties.setProperty("runCron", "true");
-      if (AUTO_CAST_SKILLS === true) {
-        scriptProperties.setProperty("afterCron", "true");
-        scriptProperties.setProperty("LAST_AFTER_CRON", now);
-      }
-
-    // if player has cronned today and after cron hasn't run since cron
-    } else if (AUTO_CAST_SKILLS === true && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
+  // if auto cron and player hasn't cronned today
+  } else if (AUTO_CRON === true && needsCron === true) {
+    scriptProperties.setProperty("runCron", "true");
+    if (AUTO_CAST_SKILLS === true) {
       scriptProperties.setProperty("afterCron", "true");
       scriptProperties.setProperty("LAST_AFTER_CRON", now);
-    
-    // in case GAS execution time limit was reached
-    } else if (AUTO_CAST_SKILLS === true) {
-      scriptProperties.setProperty("useExcessMana", "true");
     }
 
-    if (AUTO_ACCEPT_QUEST_INVITES === true) {
-      scriptProperties.setProperty("acceptQuestInvite", "true");
-    }
-    if (AUTO_START_QUESTS === true) {
-      scriptProperties.setProperty("forceStartQuest", "true");
-    }
-    if (AUTO_CAST_SKILLS === true && getPlayerClass() == "healer") {
-      scriptProperties.setProperty("healParty", "true");
-    }
-    if (AUTO_PAUSE_RESUME_DAMAGE === true) {
-      scriptProperties.setProperty("pauseResumeDamage", "true");
-    }
+  // if player has cronned today and after cron hasn't run since cron
+  } else if (AUTO_CAST_SKILLS === true && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
+    scriptProperties.setProperty("afterCron", "true");
+    scriptProperties.setProperty("LAST_AFTER_CRON", now);
+  
+  // in case GAS execution time limit was reached
+  } else if (AUTO_CAST_SKILLS === true) {
+    scriptProperties.setProperty("useExcessMana", "true");
+  }
 
-    // in case GAS execution time limit was reached
-    if (AUTO_PURCHASE_ARMOIRES === true) {
-      scriptProperties.setProperty("purchaseArmoires", "true");
-    }
+  if (AUTO_ACCEPT_QUEST_INVITES === true) {
+    scriptProperties.setProperty("acceptQuestInvite", "true");
+  }
+  if (AUTO_START_QUESTS === true) {
+    scriptProperties.setProperty("forceStartQuest", "true");
+  }
+  if (AUTO_CAST_SKILLS === true && getPlayerClass() == "healer") {
+    scriptProperties.setProperty("healParty", "true");
+  }
+  if (AUTO_PAUSE_RESUME_DAMAGE === true) {
+    scriptProperties.setProperty("pauseResumeDamage", "true");
+  }
 
-  } catch (e) {
-    log(e);
-    throw e;
+  // in case GAS execution time limit was reached
+  if (AUTO_PURCHASE_ARMOIRES === true) {
+    scriptProperties.setProperty("purchaseArmoires", "true");
   }
 }
 
@@ -138,7 +130,7 @@ function processTrigger() {
 function processWebhook(webhookType) {
 
   // log webhook type
-  log("Webhook type: " + webhookType);
+  console.log("Webhook type: " + webhookType);
 
   // when a task is scored
   if (webhookType == "scored") {
@@ -350,7 +342,6 @@ function processQueue() {
   
   } catch (e) {
     if (!e.stack.includes("There are too many LockService operations against the same script")) {
-      log(e);
       throw e;
     }
   }
@@ -365,22 +356,15 @@ function processQueue() {
  * run time).
  */
 function beforeCron() {
-  try {
-
-    let playerClass = getPlayerClass();
-    if (playerClass == "warrior") {
-      smashBossAndDumpMana();
-    } else if (playerClass == "mage") {
-      burnBossAndDumpMana();
-    } else if (playerClass == "healer") {
-      castProtectiveAura(true);
-    } else if (playerClass == "rogue") {
-      castStealthAndDumpMana();
-    }
-
-  } catch (e) {
-    log(e);
-    throw e;
+  let playerClass = getPlayerClass();
+  if (playerClass == "warrior") {
+    smashBossAndDumpMana();
+  } else if (playerClass == "mage") {
+    burnBossAndDumpMana();
+  } else if (playerClass == "healer") {
+    castProtectiveAura(true);
+  } else if (playerClass == "rogue") {
+    castStealthAndDumpMana();
   }
 }
 
@@ -391,22 +375,15 @@ function beforeCron() {
  * just after the player's cron.
  */
 function afterCron() {
-  try {
-
-    let playerClass = getPlayerClass();
-    if (playerClass == "warrior") {
-      castValorousPresence(false);
-    } else if (playerClass == "mage") {
-      castEarthquake(false);
-    } else if (playerClass == "healer") {
-      castProtectiveAura(false);
-    } else if (playerClass == "rogue") {
-      castToolsOfTheTrade(false);
-    }
-
-  } catch (e) {
-    log(e);
-    throw e;
+  let playerClass = getPlayerClass();
+  if (playerClass == "warrior") {
+    castValorousPresence(false);
+  } else if (playerClass == "mage") {
+    castEarthquake(false);
+  } else if (playerClass == "healer") {
+    castProtectiveAura(false);
+  } else if (playerClass == "rogue") {
+    castToolsOfTheTrade(false);
   }
 }
 
@@ -417,16 +394,9 @@ function afterCron() {
  * property.
  */
 function saveQuestName() {
-  try {
-
-    let quest = getParty(true).data.quest.key;
-    if (typeof quest !== "undefined") {
-      scriptProperties.setProperty("QUEST_NAME", getContent().data.quests[quest].text);
-    }
-
-  } catch (e) {
-    log(e);
-    throw e;
+  let quest = getParty(true).data.quest.key;
+  if (typeof quest !== "undefined") {
+    scriptProperties.setProperty("QUEST_NAME", getContent().data.quests[quest].text);
   }
 }
 
@@ -438,22 +408,15 @@ function saveQuestName() {
  * damage to the quest boss.
  */
 function useExcessMana() {
-  try {
-
-    let playerClass = getPlayerClass();
-    if (playerClass == "warrior") {
-      castValorousPresence(true);
-    } else if (playerClass == "mage") {
-      castEarthquake(true);
-    } else if (playerClass == "healer") {
-      castProtectiveAura(false);
-    } else if (playerClass == "rogue") {
-      castToolsOfTheTrade(true);
-    }
-
-  } catch (e) {
-    log(e);
-    throw e;
+  let playerClass = getPlayerClass();
+  if (playerClass == "warrior") {
+    castValorousPresence(true);
+  } else if (playerClass == "mage") {
+    castEarthquake(true);
+  } else if (playerClass == "healer") {
+    castProtectiveAura(false);
+  } else if (playerClass == "rogue") {
+    castToolsOfTheTrade(true);
   }
 }
 
@@ -504,70 +467,6 @@ function fetch(url, params) {
 }
 
 /**
- * log(output)
- * 
- * Logs output to the console and, if LOG_SCRIPT_OUTPUT is 
- * true, to the spreadsheet.
- */
-let firstFunction = "";
-let printedFirstFunction = false;
-let logSpreadsheet;
-let logSheet;
-function log(output) {
-  try {
-
-    // if string, log to console & continue
-    if (typeof output != "object") {
-      console.log(output);
-
-    // if error & last function on stack, continue
-    } else if (new Error().stack.split("\n").length == 4) {
-      output = output.stack;
-    } else {
-      return;
-    }
-
-    if (typeof LOG_SCRIPT_OUTPUT !== "undefined" && LOG_SCRIPT_OUTPUT === true) {
-
-      // open spreadsheet & sheet if not already open
-      if (typeof logSpreadsheet === "undefined" || typeof logSheet === "undefined") {
-        logSpreadsheet = SpreadsheetApp.openById(LOG_SPREADSHEET_URL.match(/[^\/]{44}/)[0]);
-        logSheet = logSpreadsheet.getSheetByName(LOG_SPREADSHEET_TAB_NAME);
-      }
-
-      // get first function if not printed already
-      if (!printedFirstFunction) {
-        if (firstFunction === "") {
-          firstFunction = new Error().stack.split("\n    at ");
-          firstFunction = firstFunction[firstFunction.length - 2].split(" ")[0];
-        }
-        printedFirstFunction = true;
-      } else {
-        firstFunction = "";
-      }
-
-      // generate timestamp
-      let timestamp = new Date();
-      timestamp = timestamp.toLocaleString("en-US", { month: "short", day: "2-digit", year: "numeric", hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }).replaceAll(",", "").replace(" AM", "").replace(" PM", "") + " GMT" + (-timestamp.getTimezoneOffset()/60);
-
-      // print to log spreadsheet
-      logSheet.insertRowBefore(1);
-      logSheet.getRange(1, 1, 1, 3).setValues([[timestamp, firstFunction, output]]);
-
-      // delete all rows after LOG_SPREADSHEET_MAX_ROWS
-      logSheet.getRange(LOG_SPREADSHEET_MAX_ROWS+1, 1, Math.max(1, logSheet.getLastRow()-LOG_SPREADSHEET_MAX_ROWS), logSheet.getLastColumn()).clearContent();
-    }
-
-  } catch (e) {
-    MailApp.sendEmail(
-      Session.getEffectiveUser().getEmail(),
-      DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
-      e.stack
-    );
-  }
-}
-
-/**
  * getPlayerClass()
  * 
  * Returns the player's current class. If the player's class has 
@@ -576,45 +475,39 @@ function log(output) {
  */
 let playerClass;
 function getPlayerClass() {
-  try {
 
-    // return player class if already checked during this instance
-    if (typeof playerClass !== "undefined") {
-      return playerClass;
-    }
-
-    // get saved player class
-    let savedPlayerClass = scriptProperties.getProperty("PLAYER_CLASS");
-
-    // get current player class
-    playerClass = getUser().data.stats.class;
-    if (playerClass == "wizard") {
-      playerClass = "mage";
-    }
-
-    // if player class has changed
-    if (playerClass != savedPlayerClass) {
-
-      if (savedPlayerClass !== null) {
-        log("Player class changed to " + playerClass + ", saving new class");
-      }
-
-      // save current player class
-      scriptProperties.setProperty("PLAYER_CLASS", playerClass);
-
-      // allocate stat points
-      if (AUTO_ALLOCATE_STAT_POINTS === true) {
-        allocateStatPoints();
-      }
-    }
-
-    // return current player class
+  // return player class if already checked during this instance
+  if (typeof playerClass !== "undefined") {
     return playerClass;
-
-  } catch (e) {
-    log(e);
-    throw e;
   }
+
+  // get saved player class
+  let savedPlayerClass = scriptProperties.getProperty("PLAYER_CLASS");
+
+  // get current player class
+  playerClass = getUser().data.stats.class;
+  if (playerClass == "wizard") {
+    playerClass = "mage";
+  }
+
+  // if player class has changed
+  if (playerClass != savedPlayerClass) {
+
+    if (savedPlayerClass !== null) {
+      console.log("Player class changed to " + playerClass + ", saving new class");
+    }
+
+    // save current player class
+    scriptProperties.setProperty("PLAYER_CLASS", playerClass);
+
+    // allocate stat points
+    if (AUTO_ALLOCATE_STAT_POINTS === true) {
+      allocateStatPoints();
+    }
+  }
+
+  // return current player class
+  return playerClass;
 }
 
 /**

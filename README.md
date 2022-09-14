@@ -69,7 +69,7 @@ Make sure you read the [Before Installing](#before-installing) section above, an
 5. Click [here](https://habitica.com/user/settings/api) to open your API Settings. Highlight and copy your User ID (it looks something like this: `35c3fb6f-fb98-4bc3-b57a-ac01137d0847`). In the Automate Habitica script, paste your User ID between the quotations where it says `const USER_ID = "";`. It should now look something like this: `const USER_ID = "35c3fb6f-fb98-4bc3-b57a-ac01137d0847";`
 6. On the same page where you copied your User ID, click the "Show API Token" button, and copy your API Token. In the Automate Habitica script, paste your API Token between the quotations where it says `const API_TOKEN = "";`. It should now look something like this: `const API_TOKEN = "35c3fb6f-fb98-4bc3-b57a-ac01137d0847";`
 7. If you want to use the [Quest Tracker](#update-quest-tracker), [create a new Google Sheet](https://sheets.google.com/create) and name it something like "[Party Name] Quest Tracker". Click the "Share" button near the top right corner of the page (looks like a little person). Click the dropdown under "General access", and select "Anyone with the link". Then click the "Copy link" button. You can paste this next to `QUEST_TRACKER_SPREADSHEET_URL` in the next step.
-8. Skip the line that says `const WEB_APP_URL = "";`. We will come back to that later. Edit all the other settings (`const`s) in the script to your liking. Only edit in between the `=` and the `;`. If there are quotations `""` in between the `=` and the `;`, just type in between the quotations. Ignore the section that says `FOR DEBUGGING ONLY`.
+8. Skip the line that says `const WEB_APP_URL = "";`. We will come back to that later. Edit all the other settings (`const`s) in the script to your liking. Only edit in between the `=` and the `;`. If there are quotations `""` in between the `=` and the `;`, just type in between the quotations.
 9. Click the "Save project" button near the top of the page (looks like a floppy disk).
 10. Click the blue "Deploy" button near the top of the page, then click "New deployment". Under "Description", type "Automate Habitica" (without the quotes). Then click the "Deploy" button.
 11. Click the "Authorize access" button and select your Google account. Click on "Advanced", then "Go to Automate Habitica (unsafe)". (Don't worry, it is safe!) Then click the "Allow" button.
@@ -92,13 +92,6 @@ You're all done! If you need to change the settings or uninstall the script at s
 8. Click the drop-down menu to the right of the "Debug" button, near the top of the page. Select "install" from the drop-down.
 9. Click the "Run" button to the left of the "Debug" button. Wait for it to say "Execution completed".
 
-## Updating the Script
-1. Follow the steps in [Uninstalling the Script](#uninstalling-the-script) below.
-2. Copy & paste your settings (`const`s) in a text editor so you can reference them while setting up the new version.
-3. In the main menu on the left, click on "Overview" (looks like a lowercase letter i inside a circle).
-4. Click the "Remove project" button (looks like a trash can).
-5. Follow the [Setup Instructions](#setup-instructions) above. You don't have to make a new Quest Tracker spreadsheet, just use your existing one.
-
 ## Uninstalling the Script
 1. [Click here](https://script.google.com/home) to see a list of your scripts. If you're not already signed into your Google account, click the "Start Scripting" button and sign in.  Then click on "My Projects" in the main menu on the left.
 2. Click on "Automate Habitica".
@@ -106,6 +99,13 @@ You're all done! If you need to change the settings or uninstall the script at s
 4. Click the "Run" button to the left of the "Debug" button. Wait for it to say "Execution completed".
 5. Click the blue "Deploy" button near the top of the page, then click "Manage deployments".
 6. Click the "Archive" button (looks like a box with a down arrow inside). Then click the "Done" button.
+
+## Updating the Script
+1. Follow the steps in [Uninstalling the Script](#uninstalling-the-script) above.
+2. Copy & paste your settings (`const`s) in a text editor so you can reference them while setting up the new version.
+3. In the main menu on the left, click on "Overview" (looks like a lowercase letter i inside a circle).
+4. Click the "Remove project" button (looks like a trash can).
+5. Follow the [Setup Instructions](#setup-instructions) above. You don't have to make a new Quest Tracker spreadsheet, just use your existing one.
 
 ## Contact
 :grey_question: Questions: [https://github.com/bumbleshoot/automate-habitica/discussions/categories/q-a](https://github.com/bumbleshoot/automate-habitica/discussions/categories/q-a)  
