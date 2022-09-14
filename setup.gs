@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.16.3 (beta) by @bumbleshoot
+ * Automate Habitica v0.16.4 (beta) by @bumbleshoot
  * 
  * See wiki page for info & setup instructions:
  * https://habitica.fandom.com/wiki/Automate_Habitica
@@ -191,7 +191,7 @@ function validateConstants() {
   }
 
   if (AUTO_PURCHASE_GEMS === true) {
-    if (getUser().data.purchased.plan.consecutive.count === 0) {
+    if (getUser().purchased.plan.consecutive.count === 0) {
       console.log("ERROR: Only subscribers can purchase gems with gold. Since you are not a subscriber, you should set AUTO_PURCHASE_GEMS to false.\n\neg. const AUTO_PURCHASE_GEMS = false;");
       valid = false;
     }
@@ -262,7 +262,7 @@ function validateConstants() {
 
   if (AUTO_START_QUESTS === true) {
 
-    if (getParty().data.leader.id !== USER_ID) {
+    if (getParty().leader.id !== USER_ID) {
       console.log("ERROR: AUTO_START_QUESTS can only be run by the party leader.");
       valid = false;
     }
@@ -280,7 +280,7 @@ function validateConstants() {
 
   if (AUTO_UPDATE_QUEST_TRACKER === true) {
 
-    if (getParty().data.leader.id !== USER_ID) {
+    if (getParty().leader.id !== USER_ID) {
       console.log("WARNING: AUTO_UPDATE_QUEST_TRACKER should only be run by one party member (preferably the party leader).");
     }
 
@@ -349,7 +349,7 @@ function createTrigger() {
 function deleteWebhooks() {
 
   let logged = false;
-  JSON.parse(fetch("https://habitica.com/api/v3/user/webhook", GET_PARAMS)).data.forEach(webhook => {
+  JSON.parse(fetch("https://habitica.com/api/v3/user/webhook", GET_PARAMS)).forEach(webhook => {
     if (webhook.url == WEB_APP_URL) {
       if (!logged) {
         console.log("Deleting webhooks");

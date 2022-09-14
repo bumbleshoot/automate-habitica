@@ -18,31 +18,31 @@
 function castEarthquake(saveMana) {
     
   // if lvl >= 12
-  if (getUser(true).data.stats.lvl >= 12) {
+  if (getUser(true).stats.lvl >= 12) {
 
-    console.log("Mana: " + user.data.stats.mp);
+    console.log("Mana: " + user.stats.mp);
 
     // calculate number of earthquakes to cast
     let numEarthquakes = 0;
     let numSurges = 0;
     if (saveMana) {
-      let int = (user.data.stats.maxMP - 30) / 2;
-      let maxManaAfterCron = ((int - user.data.stats.buffs.int + Math.min(Math.ceil(user.data.stats.lvl / 2), 50)) * 2 + 30) * 0.9;
-      let chillingFrostMana = user.data.stats.lvl >= 14 && calculatePerfectDayBuff() === 0 ? 40 : 0;
-      let finishBossMana = Math.max(Math.ceil((3000 - user.data.party.quest.progress.up) / Math.ceil(int / 10)) * 10, 0);
+      let int = (user.stats.maxMP - 30) / 2;
+      let maxManaAfterCron = ((int - user.stats.buffs.int + Math.min(Math.ceil(user.stats.lvl / 2), 50)) * 2 + 30) * 0.9;
+      let chillingFrostMana = user.stats.lvl >= 14 && calculatePerfectDayBuff() === 0 ? 40 : 0;
+      let finishBossMana = Math.max(Math.ceil((3000 - user.party.quest.progress.up) / Math.ceil(int / 10)) * 10, 0);
       let reserve = maxManaAfterCron + chillingFrostMana + finishBossMana;
 
       console.log("Reserving no more than " + maxManaAfterCron + " (maxManaAfterCron) + " + chillingFrostMana + " (chillingFrostMana) + " + finishBossMana + " (finishBossMana) = " + reserve + " mana");
 
-      numEarthquakes = Math.max(Math.ceil((user.data.stats.mp - reserve) / 35), 0);
-      numSurges = Math.max(Math.ceil((user.data.stats.mp - reserve) / 30), 0);
+      numEarthquakes = Math.max(Math.ceil((user.stats.mp - reserve) / 35), 0);
+      numSurges = Math.max(Math.ceil((user.stats.mp - reserve) / 30), 0);
     } else {
-      numEarthquakes = Math.floor(user.data.stats.mp / 35);
-      numSurges = Math.floor(user.data.stats.mp / 30);
+      numEarthquakes = Math.floor(user.stats.mp / 35);
+      numSurges = Math.floor(user.stats.mp / 30);
     }
     
     // if lvl > 12, cast earthquake
-    if (user.data.stats.lvl > 12) {
+    if (user.stats.lvl > 12) {
 
       console.log("Casting Earthquake " + numEarthquakes + " time(s)");
 
@@ -53,7 +53,7 @@ function castEarthquake(saveMana) {
     // if lvl 12, cast ethereal surge
     } else {
 
-      console.log("Player level " + user.data.stats.lvl + ", casting Ethereal Surge " + numSurges + " time(s)");
+      console.log("Player level " + user.stats.lvl + ", casting Ethereal Surge " + numSurges + " time(s)");
 
       for (let i=0; i<numSurges; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/mpheal", POST_PARAMS);
@@ -62,7 +62,7 @@ function castEarthquake(saveMana) {
 
   // if lvl < 12, nothing to cast
   } else {
-    console.log("Player level " + user.data.stats.lvl + ", no skills to cast");
+    console.log("Player level " + user.stats.lvl + ", no skills to cast");
   }
 }
 
@@ -79,16 +79,16 @@ function castEarthquake(saveMana) {
 function burnBossAndDumpMana() {
 
   // if lvl >= 11
-  if (getUser(true).data.stats.lvl >= 11) {
+  if (getUser(true).stats.lvl >= 11) {
 
     let int = getTotalStat("int");
-    let mana = user.data.stats.mp;
+    let mana = user.stats.mp;
     let perfectDayBuff = calculatePerfectDayBuff();
 
     console.log("Mana: " + mana);
 
     // if imperfect day & enough mana & streaks not already frozen & lvl >= 14, cast chilling frost
-    if (perfectDayBuff === 0 && mana >= 40 && !user.data.stats.buffs.streaks && user.data.stats.lvl >= 14) {
+    if (perfectDayBuff === 0 && mana >= 40 && !user.stats.buffs.streaks && user.stats.lvl >= 14) {
 
       console.log("Imperfect day, casting Chilling Frost");
 
@@ -96,29 +96,29 @@ function burnBossAndDumpMana() {
       mana -= 40;
     }
 
-    // if party is currently fighting a boss and user has tasks
-    if (getParty(true).data.quest.progress.hp !== undefined && getTasks().data.length > 0) {
+    // if party is currently fighting a boss and user has non-challenge tasks
+    if (getParty(true).quest.progress.hp !== undefined && getTasks().length > 0) {
 
-      console.log("Boss HP: " + party.data.quest.progress.hp);
-      console.log("Pending damage: " + user.data.party.quest.progress.up);
+      console.log("Boss HP: " + party.quest.progress.hp);
+      console.log("Pending damage: " + user.party.quest.progress.up);
 
       // calculate number of burst of flames to cast
-      let numBursts = Math.min(Math.max(Math.ceil((party.data.quest.progress.hp - user.data.party.quest.progress.up) / Math.ceil(int / 10)), 0), Math.floor(mana / 10));
+      let numBursts = Math.min(Math.max(Math.ceil((party.quest.progress.hp - user.party.quest.progress.up) / Math.ceil(int / 10)), 0), Math.floor(mana / 10));
 
       // if casting at least 1 burst of flames
       if (numBursts > 0) {
 
-        // get bluest task
+        // get bluest non-challenge task
         let bluestTask = {
-          id: tasks.data[0]._id,
-          value: tasks.data[0].value,
-          text: tasks.data[0].text
+          id: tasks[0]._id,
+          value: tasks[0].value,
+          text: tasks[0].text
         };
-        for (let i=1; i<tasks.data.length; i++) {
-          if (tasks.data[i].value > bluestTask.value) {
-            bluestTask.id = tasks.data[i]._id;
-            bluestTask.value = tasks.data[i].value;
-            bluestTask.text = tasks.data[i].text;
+        for (let i=1; i<tasks.length; i++) {
+          if (tasks[i].value > bluestTask.value) {
+            bluestTask.id = tasks[i]._id;
+            bluestTask.value = tasks[i].value;
+            bluestTask.text = tasks[i].text;
           }
         }
 
@@ -131,20 +131,20 @@ function burnBossAndDumpMana() {
         }
 
         // if sleeping and on quest, pause or resume damage
-        if (AUTO_PAUSE_RESUME_DAMAGE === true && user.data.preferences.sleep && typeof party.data.quest.key !== "undefined") {
+        if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && typeof party.quest.key !== "undefined") {
           scriptProperties.setProperty("pauseResumeDamage", "true");
         }
       }
 
     } else {
-      console.log("No boss fight or user has no tasks");
+      console.log("No boss fight or user has no non-challenge tasks");
     }
 
     // if lvl >= 12
-    if (user.data.stats.lvl >= 12) {
+    if (user.stats.lvl >= 12) {
 
       // calculate number of ethereal surges to cast
-      let maxManaAfterCron = ((int - user.data.stats.buffs.int + perfectDayBuff) * 2 + 30) * 0.9;
+      let maxManaAfterCron = ((int - user.stats.buffs.int + perfectDayBuff) * 2 + 30) * 0.9;
 
       console.log("Reserving no more than " + maxManaAfterCron + " (maxManaAfterCron) mana");
 
@@ -160,6 +160,6 @@ function burnBossAndDumpMana() {
 
   // if lvl < 11, nothing to cast
   } else {
-    console.log("Player level " + user.data.stats.lvl + ", no skills to cast");
+    console.log("Player level " + user.stats.lvl + ", no skills to cast");
   }
 }

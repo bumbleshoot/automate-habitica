@@ -9,9 +9,9 @@
 function acceptQuestInvite() {
 
   // if pending quest & unaccepted invite
-  if (typeof getParty(true).data.quest.key !== "undefined" && !party.data.quest.active && party.data.quest.members[USER_ID] === null) {
+  if (typeof getParty(true).quest.key !== "undefined" && !party.quest.active && party.quest.members[USER_ID] === null) {
 
-    console.log("Accepting invite to pending quest \"" + getContent().data.quests[party.data.quest.key].text + "\"");
+    console.log("Accepting invite to pending quest \"" + getContent().quests[party.quest.key].text + "\"");
   
     // accept quest invite
     fetch("https://habitica.com/api/v3/groups/party/quests/accept", POST_PARAMS);

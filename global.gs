@@ -92,9 +92,9 @@ function processTrigger() {
 
   // get times
   let now = new Date();
-  let dayStart = getUser().data.preferences.dayStart;
-  let needsCron = user.data.needsCron;
-  let lastCron = new Date(user.data.auth.timestamps.loggedin);
+  let dayStart = getUser().preferences.dayStart;
+  let needsCron = user.needsCron;
+  let lastCron = new Date(user.auth.timestamps.loggedin);
   let lastBeforeCron = new Date(scriptProperties.getProperty("LAST_BEFORE_CRON"));
   let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
 
@@ -158,7 +158,7 @@ function processWebhook(webhookData, noLogging) {
     if (AUTO_CAST_SKILLS === true) {
       scriptProperties.setProperty("useExcessMana", "true");
     }
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && getUser(true).data.preferences.sleep) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && getUser(true).preferences.sleep) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
     if (AUTO_PURCHASE_GEMS === true) {
@@ -186,8 +186,8 @@ function processWebhook(webhookData, noLogging) {
     if (AUTO_ALLOCATE_STAT_POINTS === true) {
       scriptProperties.setProperty("allocateStatPoints", "true");
     }
-    let lvl = getUser(true).data.stats.lvl;
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && user.data.preferences.sleep && lvl <= 100 && lvl % 2 == 0) {
+    let lvl = getUser(true).stats.lvl;
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && lvl <= 100 && lvl % 2 == 0) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
 
@@ -502,7 +502,7 @@ function getPlayerClass() {
   let savedPlayerClass = scriptProperties.getProperty("PLAYER_CLASS");
 
   // get current player class
-  playerClass = getUser().data.stats.class;
+  playerClass = getUser().stats.class;
   if (playerClass == "wizard") {
     playerClass = "mage";
   }
@@ -538,21 +538,21 @@ function getTotalStat(stat) {
 
   // INT is easy to calculate with a simple formula
   if (stat == "int") {
-    return (getUser(true).data.stats.maxMP - 30) / 2;
+    return (getUser(true).stats.maxMP - 30) / 2;
   }
 
   // calculate stat from level, buffs, allocated
-  let levelStat = Math.min(Math.floor(getUser(true).data.stats.lvl / 2), 50);
+  let levelStat = Math.min(Math.floor(getUser(true).stats.lvl / 2), 50);
   let equipmentStat = 0;
-  let buffsStat = user.data.stats.buffs[stat];
-  let allocatedStat = user.data.stats[stat];
+  let buffsStat = user.stats.buffs[stat];
+  let allocatedStat = user.stats[stat];
 
   // calculate stat from equipment
-  for (equipped of Object.values(user.data.items.gear.equipped)) {
-    let equipment = getContent().data.gear.flat[equipped];
+  for (equipped of Object.values(user.items.gear.equipped)) {
+    let equipment = getContent().gear.flat[equipped];
     if (equipment != undefined) { 
       equipmentStat += equipment[stat];
-      if (equipment.klass == user.data.stats.class || ((equipment.klass == "special") && (equipment.specialClass == user.data.stats.class))) {
+      if (equipment.klass == user.stats.class || ((equipment.klass == "special") && (equipment.specialClass == user.stats.class))) {
         equipmentStat += equipment[stat] / 2;
       }
     }
@@ -569,12 +569,12 @@ function getTotalStat(stat) {
  * https://habitica.fandom.com/wiki/Perfect_Day
  */
 function calculatePerfectDayBuff() {
-  for (task of getTasks().data) {
-    if (task.type == "daily" && task.isDue && !task.completed) {
+  for (daily of getDailies()) {
+    if (daily.isDue && !daily.completed) {
       return 0;
     }
   }
-  return Math.min(Math.ceil(getUser().data.stats.lvl / 2), 50);
+  return Math.min(Math.ceil(getUser().stats.lvl / 2), 50);
 }
 
 /**
@@ -587,24 +587,52 @@ function calculatePerfectDayBuff() {
 let user;
 function getUser(updated) {
   if (updated || typeof user === "undefined") {
-    user = JSON.parse(fetch("https://habitica.com/api/v3/user", GET_PARAMS));
+    user = JSON.parse(fetch("https://habitica.com/api/v3/user", GET_PARAMS)).data;
   }
   return user;
 }
 
 /**
- * getTasks(updated)
+ * getTasks()
  * 
- * Fetches task data from the Habitica API if it hasn't already 
- * been fetched during this execution, or if updated is set to 
- * true.
+ * Fetches task data from the Habitica API if it hasn't 
+ * already been fetched during this execution. Removes 
+ * challenge tasks and rewards from the task list, and 
+ * stores daily data in a separate object.
  */
 let tasks;
-function getTasks(updated) {
-  if (updated || typeof tasks === "undefined") {
-    tasks = JSON.parse(fetch("https://habitica.com/api/v3/tasks/user", GET_PARAMS));
+function getTasks() {
+  if (typeof tasks === "undefined") {
+    tasks = JSON.parse(fetch("https://habitica.com/api/v3/tasks/user", GET_PARAMS)).data;
+    dailies = [];
+    for (let i=0; i<tasks.length; i++) {
+      if (tasks[i].type == "daily") {
+        dailies.push(tasks[i]);
+      } else if (tasks[i].type == "reward") {
+        tasks.splice(i, 1);
+        i--;
+      }
+      if (typeof tasks[i].challenge.id !== "undefined") {
+        tasks.splice(i, 1);
+        i--;
+      }
+    }
   }
   return tasks;
+}
+
+/**
+* getDailies()
+*
+* Fetches daily data from the Habitica API if it hasn't 
+* already been fetched during this execution.
+*/
+let dailies;
+function getDailies() {
+  if (typeof dailies === "undefined") {
+    getTasks();
+  }
+  return dailies;
 }
 
 /**
@@ -617,7 +645,7 @@ function getTasks(updated) {
 let party;
 function getParty(updated) {
   if (updated || typeof party === "undefined") {
-    party = JSON.parse(fetch("https://habitica.com/api/v3/groups/party", GET_PARAMS));
+    party = JSON.parse(fetch("https://habitica.com/api/v3/groups/party", GET_PARAMS)).data;
   }
   return party;
 }
@@ -632,7 +660,7 @@ function getParty(updated) {
 let members;
 function getMembers(updated) {
   if (updated || typeof members === "undefined") {
-    members = JSON.parse(fetch("https://habitica.com/api/v3/groups/party/members?includeAllPublicFields=true", GET_PARAMS));
+    members = JSON.parse(fetch("https://habitica.com/api/v3/groups/party/members?includeAllPublicFields=true", GET_PARAMS)).data;
   }
   return members;
 }
@@ -647,7 +675,7 @@ function getMembers(updated) {
 let content;
 function getContent(updated) {
   if (updated || typeof content === "undefined") {
-    content = JSON.parse(fetch("https://habitica.com/api/v3/content", GET_PARAMS));
+    content = JSON.parse(fetch("https://habitica.com/api/v3/content", GET_PARAMS)).data;
   }
   return content;
 }

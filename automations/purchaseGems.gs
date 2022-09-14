@@ -12,8 +12,8 @@
 function purchaseGems() {
 
   // calculate number of gems to buy
-  let plan = getUser(true).data.purchased.plan;
-  let gemsToBuy = Math.min(25 + plan.consecutive.gemCapExtra - plan.gemsBought, Math.floor(user.data.stats.gp / 20));
+  let plan = getUser(true).purchased.plan;
+  let gemsToBuy = Math.min(25 + plan.consecutive.gemCapExtra - plan.gemsBought, Math.floor(user.stats.gp / 20));
 
   // buy gems
   if (gemsToBuy > 0) {

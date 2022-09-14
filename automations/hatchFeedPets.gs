@@ -17,7 +17,7 @@ function hatchFeedPets() {
   // get # each egg & hatching potion needed
   let numEachEggNeededTotal = {};
   let numEachPotionNeededTotal = {};
-  let nonWackyNonSpecialPets = Object.keys(getContent().data.pets).concat(Object.keys(content.data.premiumPets)).concat(Object.keys(content.data.questPets));
+  let nonWackyNonSpecialPets = Object.keys(getContent().pets).concat(Object.keys(content.premiumPets)).concat(Object.keys(content.questPets));
   for (pet of nonWackyNonSpecialPets) {
     pet = pet.split("-");
     let species = pet[0];
@@ -33,7 +33,7 @@ function hatchFeedPets() {
       numEachPotionNeededTotal[color] = 2;
     }
   }
-  let wackyPets = Object.keys(content.data.wackyPets);
+  let wackyPets = Object.keys(content.wackyPets);
   for (pet of wackyPets) {
     pet = pet.split("-");
     let species = pet[0];
@@ -51,10 +51,10 @@ function hatchFeedPets() {
   }
 
   // get # each egg & hatching potion owned/used, pets & mounts owned, # each food type needed, # extra food needed
-  let numEachEggOwnedUsed = getUser(true).data.items.eggs;
-  let numEachPotionOwnedUsed = user.data.items.hatchingPotions;
+  let numEachEggOwnedUsed = getUser(true).items.eggs;
+  let numEachPotionOwnedUsed = user.items.hatchingPotions;
   let petsOwned = [];
-  for ([pet, amount] of Object.entries(user.data.items.pets)) {
+  for ([pet, amount] of Object.entries(user.items.pets)) {
     if (amount > 0) { // 5 = newly hatched pet, >5 = fed pet, -1 = mount but no pet
       petsOwned.push(pet);
       pet = pet.split("-");
@@ -72,14 +72,14 @@ function hatchFeedPets() {
       }
     }
   }
-  let mountsOwned = Object.keys(user.data.items.mounts);
+  let mountsOwned = Object.keys(user.items.mounts);
   let numEachFoodTypeNeededTotal = Object.keys(numEachEggNeededTotal).length * 9;
-  let basicColors = Object.keys(content.data.dropHatchingPotions);
+  let basicColors = Object.keys(content.dropHatchingPotions);
   let numEachFoodTypeNeeded = {};
   for (color of basicColors) {
     numEachFoodTypeNeeded[color] = numEachFoodTypeNeededTotal;
   }
-  let numExtraFoodNeeded = Object.keys(content.data.premiumHatchingPotions).length * Object.keys(content.data.dropEggs).length * 9;
+  let numExtraFoodNeeded = Object.keys(content.premiumHatchingPotions).length * Object.keys(content.dropEggs).length * 9;
   for (mount of mountsOwned) {
     mount = mount.split("-");
     let species = mount[0];
@@ -103,9 +103,9 @@ function hatchFeedPets() {
 
   // get # each food type owned
   let numEachFoodTypeOwned = {};
-  for ([food, amount] of Object.entries(user.data.items.food)) {
-    if (!(ONLY_USE_DROP_FOOD === true && !content.data.food[food].canDrop)) {
-      let target = content.data.food[food].target;
+  for ([food, amount] of Object.entries(user.items.food)) {
+    if (!(ONLY_USE_DROP_FOOD === true && !content.food[food].canDrop)) {
+      let target = content.food[food].target;
       if (typeof target !== "undefined") { // ignore saddle
         if (numEachFoodTypeOwned.hasOwnProperty(target)) {
           numEachFoodTypeOwned[target] = numEachFoodTypeOwned[target] + amount;
@@ -155,7 +155,7 @@ function hatchFeedPets() {
 
         // get pet hunger
         if (hunger == 50) {
-          let fed = user.data.items.pets[pet];
+          let fed = user.items.pets[pet];
           if (typeof fed !== "undefined" && fed > 0) {
             hunger -= fed;
           }
@@ -172,13 +172,13 @@ function hatchFeedPets() {
             let feedingsNeeded = Math.ceil(hunger / 5);
 
             // for each food in inventory
-            for ([foodType, amount] of Object.entries(user.data.items.food)) {
+            for ([foodType, amount] of Object.entries(user.items.food)) {
 
               // if player has more than 0 & not special food/not saving special food
-              if (amount > 0 && !(ONLY_USE_DROP_FOOD === true && !content.data.food[foodType].canDrop)) {
+              if (amount > 0 && !(ONLY_USE_DROP_FOOD === true && !content.food[foodType].canDrop)) {
 
                 // if correct food type
-                if (content.data.food[foodType].target == color) {
+                if (content.food[foodType].target == color) {
 
                   // calculate feedings
                   let feedings = Math.min(feedingsNeeded, amount);
@@ -187,7 +187,7 @@ function hatchFeedPets() {
                   console.log("Feeding " + pet + " " + feedings + " " + foodType);
                   fetch("https://habitica.com/api/v3/user/feed/" + pet + "/" + foodType + "?amount=" + feedings, POST_PARAMS);
                   feedingsNeeded -= feedings;
-                  user.data.items.food[foodType] -= feedings;
+                  user.items.food[foodType] -= feedings;
 
                   // stop feeding if full
                   if (feedingsNeeded <= 0) {
@@ -234,13 +234,13 @@ function hatchFeedPets() {
   function feedExtraFood(pet, feedingsNeeded) {
 
     // for each food in inventory
-    for ([foodType, amount] of Object.entries(user.data.items.food)) {
+    for ([foodType, amount] of Object.entries(user.items.food)) {
 
       // if player has more than 0 & not special food/not saving special food
-      if (amount > 0 && !(ONLY_USE_DROP_FOOD === true && !content.data.food[foodType].canDrop)) {
+      if (amount > 0 && !(ONLY_USE_DROP_FOOD === true && !content.food[foodType].canDrop)) {
 
         // if extra
-        let extra = numEachFoodTypeOwned[content.data.food[foodType].target] - numEachFoodTypeNeeded[content.data.food[foodType].target];
+        let extra = numEachFoodTypeOwned[content.food[foodType].target] - numEachFoodTypeNeeded[content.food[foodType].target];
         if (extra > 0) {
 
           // calculate feedings
@@ -250,8 +250,8 @@ function hatchFeedPets() {
           console.log("Feeding " + pet + " " + feedings + " " + foodType);
           fetch("https://habitica.com/api/v3/user/feed/" + pet + "/" + foodType + "?amount=" + feedings, POST_PARAMS);
           feedingsNeeded -= feedings;
-          user.data.items.food[foodType] -= feedings;
-          numEachFoodTypeOwned[content.data.food[foodType].target] -= feedings;
+          user.items.food[foodType] -= feedings;
+          numEachFoodTypeOwned[content.food[foodType].target] -= feedings;
 
           // stop feeding if full
           if (feedingsNeeded <= 0) {

@@ -11,12 +11,12 @@
 function forceStartQuest() {
 
   // if pending quest
-  if (typeof getParty(true).data.quest.key !== "undefined" && !party.data.quest.active) {
+  if (typeof getParty(true).quest.key !== "undefined" && !party.quest.active) {
 
     // if key matches
-    if (scriptProperties.getProperty("PENDING_QUEST_KEY") === party.data.quest.key) {
+    if (scriptProperties.getProperty("PENDING_QUEST_KEY") === party.quest.key) {
 
-      console.log("Quest \"" + getContent().data.quests[party.data.quest.key].text + "\" already discovered " + scriptProperties.getProperty("INVITATION_DISCOVERED"));
+      console.log("Quest \"" + getContent().quests[party.quest.key].text + "\" already discovered " + scriptProperties.getProperty("INVITATION_DISCOVERED"));
 
       // if AUTO_START_QUESTS_AFTER_HOURS_MIN hours have passed
       if ((new Date().getTime() - new Date(scriptProperties.getProperty("INVITATION_DISCOVERED")).getTime()) / 3600000 >= AUTO_START_QUESTS_AFTER_HOURS_MIN) {
@@ -45,9 +45,9 @@ function forceStartQuest() {
     // if new pending quest, set variables
     } else {
 
-      console.log("New quest \"" + content.data.quests[party.data.quest.key].text + "\", saving quest info");
+      console.log("New quest \"" + content.quests[party.quest.key].text + "\", saving quest info");
 
-      scriptProperties.setProperty("PENDING_QUEST_KEY", party.data.quest.key);
+      scriptProperties.setProperty("PENDING_QUEST_KEY", party.quest.key);
       scriptProperties.setProperty("INVITATION_DISCOVERED", new Date().toString());
     }
   

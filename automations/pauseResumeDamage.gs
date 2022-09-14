@@ -22,11 +22,11 @@ function pauseResumeDamage() {
 
   let damageToPlayer = 0;
   let damageToParty = 0;
-  let stealth = getUser(true).data.stats.buffs.stealth;
-  let quest = user.data.party.quest.key;
+  let stealth = getUser(true).stats.buffs.stealth;
+  let quest = user.party.quest.key;
   let boss;
   if (quest !== null) {
-    boss = getContent().data.quests[quest].boss;
+    boss = getContent().quests[quest].boss;
   }
   let bossHp = 3000;
   let bossStr = 4;
@@ -36,44 +36,44 @@ function pauseResumeDamage() {
   }
   let con = getTotalStat("con");
 
-  // for each task
-  for (task of getTasks().data) {
+  // for each daily
+  for (daily of getDailies()) {
 
     // if due & incomplete
-    if (task.isDue && !task.completed) {
+    if (daily.isDue && !daily.completed) {
 
-      // if stealth remaining, skip task
+      // if stealth remaining, skip daily
       if (stealth > 0) {
         stealth--;
         continue;
       }
 
       // calculate value
-      let taskValue = Math.min(Math.max(task.value, -47.27), 21.27);
+      let taskValue = Math.min(Math.max(daily.value, -47.27), 21.27);
 
       // calculate damage value
       let delta = Math.abs(Math.pow(0.9747, taskValue));
-      if (task.checklist.length > 0) {
+      if (daily.checklist.length > 0) {
         let subtasksDone = 0;
-        for (subtask of task.checklist) {
+        for (subtask of daily.checklist) {
           if (subtask.completed) {
             subtasksDone++;
           }
         }
-        delta *= (1 - subtasksDone / task.checklist.length);
+        delta *= (1 - subtasksDone / daily.checklist.length);
       }
 
       // if fighting a boss or not on a quest, calculate damage to party
       if (typeof boss !== "undefined" || quest === null) {
         let bossDelta = delta;
-        if (task.priority < 1) {
-            bossDelta *= task.priority;
+        if (daily.priority < 1) {
+            bossDelta *= daily.priority;
         }
         damageToParty += bossDelta * bossStr;
       }
 
       // calculate damage to player
-      damageToPlayer += Math.round(delta * task.priority * 2 * Math.max(0.1, 1 - (con / 250)) * 10) / 10;
+      damageToPlayer += Math.round(delta * daily.priority * 2 * Math.max(0.1, 1 - (con / 250)) * 10) / 10;
     }
   }
 
@@ -86,11 +86,11 @@ function pauseResumeDamage() {
   console.log("Pending damage to party: " + damageToParty);
 
   // if fighting a boss or not on a quest
-  let hp = user.data.stats.hp;
+  let hp = user.stats.hp;
   if (typeof boss !== "undefined" || quest === null) {
 
     // if enough pending damage to defeat boss
-    if (user.data.party.quest.progress.up >= bossHp) {
+    if (user.party.quest.progress.up >= bossHp) {
 
       // if damage to player greater than threshold or hp, sleep, otherwise wake up
       if (damageToPlayer > MAX_PLAYER_DAMAGE || damageToPlayer >= hp) {
@@ -104,7 +104,7 @@ function pauseResumeDamage() {
 
       // get lowest party member health
       let lowestHealth = 50;
-      for (member of getMembers(true).data) {
+      for (member of getMembers(true)) {
         if (member.stats.hp < lowestHealth) {
           lowestHealth = member.stats.hp;
         }
@@ -130,14 +130,14 @@ function pauseResumeDamage() {
   }
 
   function sleep() {
-    if (!user.data.preferences.sleep) {
+    if (!user.preferences.sleep) {
 
       console.log("Going to sleep");
 
       fetch("https://habitica.com/api/v3/user/sleep", POST_PARAMS);
 
       // update user data
-      user.data.preferences.sleep = false;
+      user.preferences.sleep = false;
 
     } else {
 
@@ -147,14 +147,14 @@ function pauseResumeDamage() {
   }
 
   function wakeUp() {
-    if (user.data.preferences.sleep) {
+    if (user.preferences.sleep) {
 
       console.log("Waking up");
 
       fetch("https://habitica.com/api/v3/user/sleep", POST_PARAMS);
 
       // update user data
-      user.data.preferences.sleep = true;
+      user.preferences.sleep = true;
 
     } else {
 

@@ -17,13 +17,13 @@
 function castToolsOfTheTrade(saveMana) {
 
   // if lvl >= 11
-  if (getUser(true).data.stats.lvl >= 11) {
+  if (getUser(true).stats.lvl >= 11) {
 
     let numTools = 0;
     let numPickpockets = 0;
     let numBackstabs = 0;
 
-    console.log("Mana: " + user.data.stats.mp);
+    console.log("Mana: " + user.stats.mp);
 
     // if saving mana
     if (saveMana) {
@@ -33,23 +33,23 @@ function castToolsOfTheTrade(saveMana) {
 
       // calculate mana reserve
       let int = getTotalStat("int");
-      let maxManaAfterCron = ((int - user.data.stats.buffs.int + Math.min(Math.ceil(user.data.stats.lvl / 2), 50)) * 2 + 30) * 0.9;
+      let maxManaAfterCron = ((int - user.stats.buffs.int + Math.min(Math.ceil(user.stats.lvl / 2), 50)) * 2 + 30) * 0.9;
       let reserve = maxManaAfterCron + stealthMana;
 
       console.log("Reserving no more than " + maxManaAfterCron + " (maxManaAfterCron) + " + stealthMana + " (stealthMana) = " + reserve + " mana");
 
       // calculate number of casts
-      numTools = Math.max(Math.ceil((user.data.stats.mp - reserve) / 25), 0);
-      numBackstabs = Math.max(Math.ceil((user.data.stats.mp - reserve) / 15), 0);
-      numPickpockets = Math.max(Math.ceil((user.data.stats.mp - reserve) / 10), 0);
+      numTools = Math.max(Math.ceil((user.stats.mp - reserve) / 25), 0);
+      numBackstabs = Math.max(Math.ceil((user.stats.mp - reserve) / 15), 0);
+      numPickpockets = Math.max(Math.ceil((user.stats.mp - reserve) / 10), 0);
     } else {
-      numTools = Math.floor(user.data.stats.mp / 25);
-      numBackstabs = Math.floor(user.data.stats.mp / 15);
-      numPickpockets = Math.floor(user.data.stats.mp / 10);
+      numTools = Math.floor(user.stats.mp / 25);
+      numBackstabs = Math.floor(user.stats.mp / 15);
+      numPickpockets = Math.floor(user.stats.mp / 10);
     }
     
     // if lvl >= 13, cast tools of the trade
-    if (user.data.stats.lvl >= 13) {
+    if (user.stats.lvl >= 13) {
 
       console.log("Casting Tools of the Trade " + numTools + " time(s)");
 
@@ -58,9 +58,9 @@ function castToolsOfTheTrade(saveMana) {
       }
     
     // if lvl == 12, cast backstab
-    } else if (user.data.stats.lvl == 12) {
+    } else if (user.stats.lvl == 12) {
 
-      console.log("Player level " + user.data.stats.lvl + ", casting Backstab " + numBackstabs + " time(s)");
+      console.log("Player level " + user.stats.lvl + ", casting Backstab " + numBackstabs + " time(s)");
 
       for (let i=0; i<numBackstabs; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/backStab", POST_PARAMS);
@@ -69,7 +69,7 @@ function castToolsOfTheTrade(saveMana) {
     // if lvl < 12, cast pickpocket
     } else {
 
-      console.log("Player level " + user.data.stats.lvl + ", casting Pickpocket " + numPickpockets + " time(s)");
+      console.log("Player level " + user.stats.lvl + ", casting Pickpocket " + numPickpockets + " time(s)");
 
       for (let i=0; i<numPickpockets; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/pickPocket", POST_PARAMS);
@@ -78,7 +78,7 @@ function castToolsOfTheTrade(saveMana) {
   
   // if lvl < 11, nothing to cast
   } else {
-    console.log("Player level " + user.data.stats.lvl + ", no skills to cast");
+    console.log("Player level " + user.stats.lvl + ", no skills to cast");
     return 0;
   }
 }
@@ -95,7 +95,7 @@ function castToolsOfTheTrade(saveMana) {
 function castStealthAndDumpMana() {
 
   // get number of stealth casts
-  let numStealths = Math.min(numStealthsNeeded(), Math.floor(getUser(true).data.stats.mp / 45));
+  let numStealths = Math.min(numStealthsNeeded(), Math.floor(getUser(true).stats.mp / 45));
 
   console.log("Casting Stealth " + numStealths + " time(s)");
 
@@ -105,7 +105,7 @@ function castStealthAndDumpMana() {
   }
 
   // if sleeping & cast stealth, pause or resume damage
-  if (AUTO_PAUSE_RESUME_DAMAGE === true && user.data.preferences.sleep && numStealths > 0) {
+  if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && numStealths > 0) {
     scriptProperties.setProperty("pauseResumeDamage", "true");
   }
 
@@ -123,22 +123,18 @@ function castStealthAndDumpMana() {
 function numStealthsNeeded() {
 
   // if lvl >= 14
-  if (getUser(true).data.stats.lvl >= 14) {
+  if (getUser(true).stats.lvl >= 14) {
 
     // count damaging dailies
-    let stealth = user.data.stats.buffs.stealth;
-    let numDailies = 0;
+    let stealth = user.stats.buffs.stealth;
     let numDamagingDailies = 0;
-    for (task of getTasks().data) {
-      if (task.type == "daily") {
-        numDailies++;
-        if (task.isDue && !task.completed) {
-          if (stealth > 0) {
-            stealth--;
-            continue;
-          }
-          numDamagingDailies++;
+    for (daily of getDailies()) {
+      if (daily.isDue && !daily.completed) {
+        if (stealth > 0) {
+          stealth--;
+          continue;
         }
+        numDamagingDailies++;
       }
     }
 
@@ -146,14 +142,14 @@ function numStealthsNeeded() {
 
     // calculate num dailies dodged per cast
     let totalPer = getTotalStat("per");
-    let numDodged = Math.ceil(0.64 * numDailies * totalPer / (totalPer + 55));
+    let numDodged = Math.ceil(0.64 * getDailies().length * totalPer / (totalPer + 55));
 
     // return num stealths needed
     return Math.ceil(numDamagingDailies / numDodged);
 
   // if lvl < 14, return 0
   } else {
-    console.log("Player lvl " + user.data.stats.lvl + ", cannot cast Stealth");
+    console.log("Player lvl " + user.stats.lvl + ", cannot cast Stealth");
     return 0;
   }
 }

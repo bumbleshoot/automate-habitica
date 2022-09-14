@@ -11,7 +11,7 @@
 function purchaseArmoires() {
 
   // calculate number of armoires to buy
-  let gold = getUser(true).data.stats.gp;
+  let gold = getUser(true).stats.gp;
   let numArmoires = Math.max(Math.floor((gold - RESERVE_GOLD) / 100), 0);
 
   console.log("Player gold: " + gold);

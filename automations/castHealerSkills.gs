@@ -18,20 +18,20 @@
 function castProtectiveAura(beforeCron) {
 
   // if lvl >= 13
-  if (getUser(true).data.stats.lvl >= 13) {
+  if (getUser(true).stats.lvl >= 13) {
 
-    console.log("Mana: " + user.data.stats.mp);
+    console.log("Mana: " + user.stats.mp);
 
     // calculate number of protective auras to cast
     let int = getTotalStat("int");
     let con = getTotalStat("con");
     let healPartyMana = (Math.ceil(50 / ((con + int + 5) * 0.04)) * 25) * 16;
     let reserveMessage = "Reserving " + healPartyMana + " mana for healing the party";
-    let numProtectiveAuras = Math.max(Math.floor((user.data.stats.mp - healPartyMana) / 30), 0);
+    let numProtectiveAuras = Math.max(Math.floor((user.stats.mp - healPartyMana) / 30), 0);
     if (beforeCron) {
-      let maxManaAfterCron = ((int - user.data.stats.buffs.int + Math.min(Math.ceil(user.data.stats.lvl / 2), 50)) * 2 + 30) * 0.9;
+      let maxManaAfterCron = ((int - user.stats.buffs.int + Math.min(Math.ceil(user.stats.lvl / 2), 50)) * 2 + 30) * 0.9;
       if (maxManaAfterCron < healPartyMana) {
-        numProtectiveAuras = Math.ceil((user.data.stats.mp - maxManaAfterCron) / 30);
+        numProtectiveAuras = Math.ceil((user.stats.mp - maxManaAfterCron) / 30);
         reserveMessage = "Reserving no more than " + maxManaAfterCron + " mana for after cron";
       }
     }
@@ -46,7 +46,7 @@ function castProtectiveAura(beforeCron) {
 
   // if lvl < 13, nothing to cast
   } else {
-    console.log("Player level " + user.data.stats.lvl + ", cannot cast Protective Aura");
+    console.log("Player level " + user.stats.lvl + ", cannot cast Protective Aura");
   }
 }
 
@@ -62,22 +62,22 @@ function castProtectiveAura(beforeCron) {
 function healParty() {
     
   // if lvl >= 11
-  if (getUser(true).data.stats.lvl >= 11) {
+  if (getUser(true).stats.lvl >= 11) {
 
     let con = getTotalStat("con");
     let int = getTotalStat("int");
-    let mana = user.data.stats.mp;
-    let playerDamage = 50 - user.data.stats.hp;
+    let mana = user.stats.mp;
+    let playerDamage = 50 - user.stats.hp;
 
     console.log("Mana: " + mana);
 
     // if lvl >= 14
     let numBlessings = 0;
-    if (user.data.stats.lvl >= 14) {
+    if (user.stats.lvl >= 14) {
 
       // get lowest party member health (excluding player)
       let lowestMemberHealth = 50;
-      for (member of getMembers().data) {
+      for (member of getMembers()) {
         if (member._id !== USER_ID && member.stats.hp < lowestMemberHealth) {
           lowestMemberHealth = member.stats.hp;
         }
@@ -103,7 +103,7 @@ function healParty() {
     
     // if lvl < 14, nothing to cast
     } else {
-      console.log("Player level " + user.data.stats.lvl + ", cannot cast Blessing");
+      console.log("Player level " + user.stats.lvl + ", cannot cast Blessing");
     }
 
     // calculate number of healing lights to cast
@@ -118,12 +118,12 @@ function healParty() {
     }
 
     // if sleeping & healed, pause or resume damage
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && user.data.preferences.sleep && (numBlessings > 0 || numHealingLights > 0)) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && (numBlessings > 0 || numHealingLights > 0)) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
 
   // if lvl < 11, nothing to cast
   } else {
-    console.log("Player level " + user.data.stats.lvl + ", cannot cast healing spells");
+    console.log("Player level " + user.stats.lvl + ", cannot cast healing spells");
   }
 }

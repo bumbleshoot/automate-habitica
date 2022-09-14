@@ -34,19 +34,19 @@
   console.log("Getting quest data");
 
   // get party member data
-  let members = getMembers(true).data;
+  let members = getMembers(true);
 
   // get lists of premium eggs, premium hatching potions & wacky hatching potions
   let premiumEggs = [];
-  for (egg of Object.values(getContent().data.questEggs)) {
+  for (egg of Object.values(getContent().questEggs)) {
     premiumEggs.push(egg.key);
   }
   let premiumHatchingPotions = [];
-  for (potion of Object.values(content.data.premiumHatchingPotions)) {
+  for (potion of Object.values(content.premiumHatchingPotions)) {
     premiumHatchingPotions.push(potion.key);
   }
   let wackyHatchingPotions = [];
-  for (potion of Object.values(content.data.wackyHatchingPotions)) {
+  for (potion of Object.values(content.wackyHatchingPotions)) {
     wackyHatchingPotions.push(potion.key);
   }
 
@@ -58,7 +58,7 @@
   let hatchingPotionQuests = [];
   let petQuests = [];
   let mountQuests = [];
-  for (quest of Object.values(content.data.quests)) {
+  for (quest of Object.values(content.quests)) {
 
     // if not a world boss
     if (quest.category != "world") {
