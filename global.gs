@@ -42,9 +42,19 @@ function onTrigger() {
 function doPost(e) {
   try {
 
-    // add to queue
+    // get relevant data from webhook
     let postData = JSON.parse(e.postData.contents);
-    scriptProperties.setProperty("processWebhook", postData.type || postData.webhookType);
+    let webhookData = {
+      webhookType: postData.type || postData.webhookType
+    };
+    if (webhookData.webhookType == "questFinished") {
+      Object.assign(webhookData, {
+        questKey: postData.quest.key
+      });
+    }
+
+    // add to queue
+    scriptProperties.setProperty("processWebhook", webhookData);
 
     // create temporary trigger to process queue
     let triggerNeeded = true;
@@ -131,18 +141,20 @@ function processTrigger() {
 }
 
 /**
- * processWebhook(webhookType)
+ * processWebhook(webhookData, noLogging)
  * 
- * Logs webhook type and adds functions to the queue depending
- * on webhook type.
+ * Logs webhook type (unless noLogging is set to true) and adds 
+ * functions to the queue depending on the webhook type.
  */
-function processWebhook(webhookType) {
+function processWebhook(webhookData, noLogging) {
 
   // log webhook type
-  console.log("Webhook type: " + webhookType);
+  if (!noLogging) {
+    console.log("Webhook type: " + webhookData.webhookType);
+  }
 
   // when a task is scored
-  if (webhookType == "scored") {
+  if (webhookData.webhookType == "scored") {
     if (AUTO_CAST_SKILLS === true) {
       scriptProperties.setProperty("useExcessMana", "true");
     }
@@ -169,7 +181,7 @@ function processWebhook(webhookType) {
     }
 
   // when player levels up
-  } else if (webhookType == "leveledUp") {
+  } else if (webhookData.webhookType == "leveledUp") {
     processWebhook("scored"); // scored webhook doesn't fire if scoring a task causes level up (submitted bug report for this 2021-12-05)
     if (AUTO_ALLOCATE_STAT_POINTS === true) {
       scriptProperties.setProperty("allocateStatPoints", "true");
@@ -180,10 +192,7 @@ function processWebhook(webhookType) {
     }
 
   // when player is invited to a quest
-  } else if (webhookType == "questInvited") {
-    if (AUTO_ACCEPT_QUEST_INVITES === true || AUTO_START_QUESTS === true || NOTIFY_ON_QUEST_END === true) {
-      scriptProperties.setProperty("saveQuestName", "true");
-    }
+  } else if (webhookData.webhookType == "questInvited") {
     if (AUTO_ACCEPT_QUEST_INVITES === true) {
       scriptProperties.setProperty("acceptQuestInvite", "true");
     }
@@ -195,15 +204,15 @@ function processWebhook(webhookType) {
     }
 
   // when a quest is started
-  } else if (webhookType == "questStarted") {
+  } else if (webhookData.webhookType == "questStarted") {
     if (AUTO_START_QUESTS === true) {
       scriptProperties.setProperty("forceStartQuest", "true");
     }
 
   // when a quest is finished
-  } else if (webhookType == "questFinished") {
+  } else if (webhookData.webhookType == "questFinished") {
     if (NOTIFY_ON_QUEST_END === true) {
-      scriptProperties.setProperty("notifyQuestEnded", "true");
+      scriptProperties.setProperty("notifyQuestEnded", webhookData.questKey);
     }
     if (AUTO_PURCHASE_GEMS === true) {
       scriptProperties.setProperty("purchaseGems", "true");
@@ -278,15 +287,10 @@ function processQueue() {
           scriptProperties.deleteProperty("beforeCron");
           continue;
         }
-        let webhookType = scriptProperties.getProperty("processWebhook");
-        if (webhookType !== null) {
-          processWebhook(webhookType);
+        let webhookData = scriptProperties.getProperty("processWebhook");
+        if (webhookData !== null) {
+          processWebhook(webhookData);
           scriptProperties.deleteProperty("processWebhook");
-          continue;
-        }
-        if (scriptProperties.getProperty("saveQuestName") !== null) {
-          saveQuestName();
-          scriptProperties.deleteProperty("saveQuestName");
           continue;
         }
         if (scriptProperties.getProperty("acceptQuestInvite") !== null) {
@@ -314,8 +318,9 @@ function processQueue() {
           scriptProperties.deleteProperty("forceStartQuest");
           continue;
         }
-        if (scriptProperties.getProperty("notifyQuestEnded") !== null) {
-          notifyQuestEnded();
+        let questKey = scriptProperties.getProperty("notifyQuestEnded");
+        if (questKey !== null) {
+          notifyQuestEnded(questKey);
           scriptProperties.deleteProperty("notifyQuestEnded");
           continue;
         }
@@ -409,19 +414,6 @@ function afterCron() {
   }
   if (AUTO_PURCHASE_GEMS === true) {
     scriptProperties.setProperty("purchaseGems", "true");
-  }
-}
-
-/**
- * saveQuestName()
- * 
- * Saves the name of the party's current quest in a script 
- * property.
- */
-function saveQuestName() {
-  let quest = getParty(true).data.quest.key;
-  if (typeof quest !== "undefined") {
-    scriptProperties.setProperty("QUEST_NAME", getContent().data.quests[quest].text);
   }
 }
 

@@ -16,7 +16,7 @@ function forceStartQuest() {
     // if key matches
     if (scriptProperties.getProperty("PENDING_QUEST_KEY") === party.data.quest.key) {
 
-      console.log("Quest \"" + scriptProperties.getProperty("QUEST_NAME") + "\" already discovered " + scriptProperties.getProperty("INVITATION_DISCOVERED"));
+      console.log("Quest \"" + getContent().data.quests[party.data.quest.key].text + "\" already discovered " + scriptProperties.getProperty("INVITATION_DISCOVERED"));
 
       // if AUTO_START_QUESTS_AFTER_HOURS_MIN hours have passed
       if ((new Date().getTime() - new Date(scriptProperties.getProperty("INVITATION_DISCOVERED")).getTime()) / 3600000 >= AUTO_START_QUESTS_AFTER_HOURS_MIN) {
@@ -45,7 +45,7 @@ function forceStartQuest() {
     // if new pending quest, set variables
     } else {
 
-      console.log("New quest \"" + scriptProperties.getProperty("QUEST_NAME") + "\", saving quest info");
+      console.log("New quest \"" + content.data.quests[party.data.quest.key].text + "\", saving quest info");
 
       scriptProperties.setProperty("PENDING_QUEST_KEY", party.data.quest.key);
       scriptProperties.setProperty("INVITATION_DISCOVERED", new Date().toString());
