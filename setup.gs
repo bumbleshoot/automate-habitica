@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.16.0 (beta) by @bumbleshoot
+ * Automate Habitica v0.16.1 (beta) by @bumbleshoot
  * 
  * See wiki page for info & setup instructions:
  * https://habitica.fandom.com/wiki/Automate_Habitica
@@ -323,9 +323,9 @@ function deleteTriggers() {
 
     console.log("Deleting triggers");
 
-    triggers.forEach(trigger => {
+    for (trigger of triggers) {
       ScriptApp.deleteTrigger(trigger);
-    });
+    }
   }
 }
 

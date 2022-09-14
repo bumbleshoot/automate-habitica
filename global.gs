@@ -47,10 +47,19 @@ function doPost(e) {
     scriptProperties.setProperty("processWebhook", postData.type || postData.webhookType);
 
     // create temporary trigger to process queue
-    ScriptApp.newTrigger("processQueue")
-      .timeBased()
-      .after(1)
-      .create();
+    let triggerNeeded = true;
+    for (trigger of ScriptApp.getProjectTriggers()) {
+      if (trigger.getHandlerFunction() === "processQueue") {
+        triggerNeeded = false;
+        break;
+      }
+    }
+    if (triggerNeeded) {
+      ScriptApp.newTrigger("processQueue")
+        .timeBased()
+        .after(1)
+        .create();
+    }
 
   } catch (e) {
     MailApp.sendEmail(
@@ -233,11 +242,11 @@ function processQueue() {
   try {
 
     // delete temporary triggers
-    ScriptApp.getProjectTriggers().forEach(trigger => {
+    for (trigger of ScriptApp.getProjectTriggers()) {
       if (trigger.getHandlerFunction() === "processQueue") {
         ScriptApp.deleteTrigger(trigger);
       }
-    });
+    }
 
     // prevent multiple instances from running at once
     let lock = LockService.getScriptLock();
