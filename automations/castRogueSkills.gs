@@ -57,22 +57,68 @@ function castToolsOfTheTrade(saveMana) {
         fetch("https://habitica.com/api/v3/user/class/cast/toolsOfTrade", POST_PARAMS);
       }
     
-    // if lvl == 12, cast backstab
+    // if lvl 12, cast backstab
     } else if (user.stats.lvl == 12) {
 
-      console.log("Player level " + user.stats.lvl + ", casting Backstab " + numBackstabs + " time(s)");
+      // if player has non-challenge tasks
+      if (getTasks().length > 0) {
 
-      for (let i=0; i<numBackstabs; i++) {
-        fetch("https://habitica.com/api/v3/user/class/cast/backStab", POST_PARAMS);
+        // get bluest non-challenge task
+        let bluestTask = {
+          id: tasks[0]._id,
+          value: tasks[0].value,
+          text: tasks[0].text
+        };
+        for (let i=1; i<tasks.length; i++) {
+          if (tasks[i].value > bluestTask.value) {
+            bluestTask.id = tasks[i]._id;
+            bluestTask.value = tasks[i].value;
+            bluestTask.text = tasks[i].text;
+          }
+        }
+
+        console.log("Player level 12, casting Backstab " + numBackstabs + " time(s) on bluest task \"" + bluestTask.text + "\"");
+
+        // cast backstabs
+        for (let i=0; i<numBackstabs; i++) {
+          fetch("https://habitica.com/api/v3/user/class/cast/backStab?targetId=" + bluestTask.id, POST_PARAMS);
+        }
+
+      // if player has no non-challenge tasks
+      } else {
+        console.log("Player level 12 and player has no non-challenge tasks, no skills to cast");
       }
 
-    // if lvl < 12, cast pickpocket
+    // if lvl 11, cast pickpocket
     } else {
 
-      console.log("Player level " + user.stats.lvl + ", casting Pickpocket " + numPickpockets + " time(s)");
+      // if player has non-challenge tasks
+      if (getTasks().length > 0) {
 
-      for (let i=0; i<numPickpockets; i++) {
-        fetch("https://habitica.com/api/v3/user/class/cast/pickPocket", POST_PARAMS);
+        // get bluest non-challenge task
+        let bluestTask = {
+          id: tasks[0]._id,
+          value: tasks[0].value,
+          text: tasks[0].text
+        };
+        for (let i=1; i<tasks.length; i++) {
+          if (tasks[i].value > bluestTask.value) {
+            bluestTask.id = tasks[i]._id;
+            bluestTask.value = tasks[i].value;
+            bluestTask.text = tasks[i].text;
+          }
+        }
+
+        console.log("Player level 11, casting Pickpocket " + numPickpockets + " time(s) on bluest task \"" + bluestTask.text + "\"");
+
+        // cast pickpockets
+        for (let i=0; i<numPickpockets; i++) {
+          fetch("https://habitica.com/api/v3/user/class/cast/pickPocket?targetId=" + bluestTask.id, POST_PARAMS);
+        }
+
+      // if player has no non-challenge tasks
+      } else {
+        console.log("Player level 11 and player has no non-challenge tasks, no skills to cast");
       }
     }
   
