@@ -239,15 +239,16 @@ function processWebhook(webhookData, noLogging) {
 }
 
 /**
- * processQueue()
+ * processQueue(wait)
  * 
  * Loops through the queue, running functions in order of priority,
  * until there are no more functions left in the queue. Script lock 
  * ensures only one instance can run the queue at a time. All API 
- * calls & logging are kept within the queue (script lock), to 
- * prevent collisions.
+ * calls are kept within the queue (script lock), to prevent 
+ * collisions. If wait is set to true, will wait until the script 
+ * lock is released, then process the queue.
  */
-function processQueue() {
+function processQueue(wait) {
   try {
 
     // delete temporary triggers
@@ -259,7 +260,7 @@ function processQueue() {
 
     // prevent multiple instances from running at once
     let lock = LockService.getScriptLock();
-    if (lock.tryLock(0)) {
+    if (lock.tryLock(0) || (wait && lock.tryLock(360000))) {
 
       while (true) {
         if (scriptProperties.getProperty("allocateStatPoints") !== null) {

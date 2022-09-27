@@ -1,8 +1,8 @@
 /**
- * Automate Habitica v0.16.5 (beta) by @bumbleshoot
+ * Automate Habitica v0.16.6 (beta) by @bumbleshoot
  * 
- * See wiki page for info & setup instructions:
- * https://habitica.fandom.com/wiki/Automate_Habitica
+ * See GitHub page for info & setup instructions:
+ * https://github.com/bumbleshoot/automate-habitica
  */
 
 const USER_ID = "";
@@ -61,37 +61,22 @@ function install() {
   // if settings are valid
   if (validateConstants()) {
 
-    // create trigger & webhooks
-    createTrigger();
-    createWebhooks();
+    // delete triggers & webhooks
+    deleteTriggers();
+    deleteWebhooks();
 
     // run enabled automations
     processTrigger();
-    if (AUTO_ACCEPT_QUEST_INVITES === true || AUTO_START_QUESTS === true || NOTIFY_ON_QUEST_END === true) {
-      scriptProperties.setProperty("saveQuestName", "true");
-    }
-    if (AUTO_ALLOCATE_STAT_POINTS === true) {
-      scriptProperties.setProperty("allocateStatPoints", "true");
-    }
-    if (AUTO_PURCHASE_GEMS === true) {
-      scriptProperties.setProperty("purchaseGems", "true");
-    }
-    if (AUTO_SELL_EGGS === true) {
-      scriptProperties.setProperty("sellExtraEggs", "true");
-    }
-    if (AUTO_SELL_HATCHING_POTIONS === true) {
-      scriptProperties.setProperty("sellExtraHatchingPotions", "true");
-    }
-    if (AUTO_SELL_FOOD === true) {
-      scriptProperties.setProperty("sellExtraFood", "true");
-    }
-    if (AUTO_HATCH_FEED_PETS === true) {
-      scriptProperties.setProperty("hatchFeedPets", "true");
-    }
-    if (AUTO_UPDATE_QUEST_TRACKER === true) {
-      scriptProperties.setProperty("updateQuestTracker", "true");
-    }
-    processQueue();
+    processWebhook("scored", true);
+    processWebhook("leveledUp", true);
+    processWebhook("questInvited", true);
+    processWebhook("questStarted", true);
+    processWebhook("questFinished", true);
+    processQueue(true);
+
+    // create trigger & webhooks
+    createTrigger();
+    createWebhooks();
 
     console.log("Success!");
   }
@@ -99,7 +84,7 @@ function install() {
 
 function uninstall() {
 
-  // delete trigger & webhooks
+  // delete triggers & webhooks
   deleteTriggers();
   deleteWebhooks();
 
@@ -317,7 +302,6 @@ function validateConstants() {
 }
 
 function deleteTriggers() {
-
   let triggers = ScriptApp.getProjectTriggers();
   if (triggers.length > 0) {
 
@@ -330,9 +314,6 @@ function deleteTriggers() {
 }
 
 function createTrigger() {
-
-  // delete existing trigger for this script
-  deleteTriggers();
   
   // create trigger if needed for enabled automations
   if (AUTO_CRON === true || AUTO_CAST_SKILLS === true || AUTO_ACCEPT_QUEST_INVITES === true || AUTO_START_QUESTS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true) {
@@ -347,25 +328,22 @@ function createTrigger() {
 }
 
 function deleteWebhooks() {
+  let webhooks = JSON.parse(fetch("https://habitica.com/api/v3/user/webhook", GET_PARAMS)).data;
+  if (webhooks.length > 0) {
 
-  let logged = false;
-  JSON.parse(fetch("https://habitica.com/api/v3/user/webhook", GET_PARAMS)).forEach(webhook => {
-    if (webhook.url == WEB_APP_URL) {
-      if (!logged) {
-        console.log("Deleting webhooks");
-        logged = true;
+    console.log("Deleting webhooks");
+
+    for (webhook of webhooks) {
+      if (webhook.url == WEB_APP_URL) {
+        fetch("https://habitica.com/api/v3/user/webhook/" + webhook.id, DELETE_PARAMS);
       }
-      fetch("https://habitica.com/api/v3/user/webhook/" + webhook.id, DELETE_PARAMS);
     }
-  });
+  }
 }
 
 function createWebhooks() {
 
-  // delete existing webhooks for this script
-  deleteWebhooks();
-
-  // create webhooks for enabled automations
+  // task scored
   let webhooks = [];
   if (AUTO_CAST_SKILLS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
     webhooks.push({
@@ -375,6 +353,8 @@ function createWebhooks() {
       }
     });
   }
+
+  // level up
   if (AUTO_ALLOCATE_STAT_POINTS === true || AUTO_PAUSE_RESUME_DAMAGE === true) { // scored webhook doesn't fire if scoring a task causes level up (submitted bug report for this 2021-12-05)
     webhooks.push({
       "type": "userActivity",
@@ -383,17 +363,24 @@ function createWebhooks() {
       }
     });
   }
+
   let questActivityOptions = {};
+
+  // quest invited
   if (AUTO_ACCEPT_QUEST_INVITES === true || AUTO_START_QUESTS === true || NOTIFY_ON_QUEST_END === true || AUTO_PAUSE_RESUME_DAMAGE === true) {
     Object.assign(questActivityOptions, {
       "questInvited": true
     });
   }
+
+  // quest started
   if (AUTO_START_QUESTS === true) {
     Object.assign(questActivityOptions, {
       "questStarted": true
     });
   }
+
+  // quest finished
   if (NOTIFY_ON_QUEST_END === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true || AUTO_UPDATE_QUEST_TRACKER === true) {
     Object.assign(questActivityOptions, {
       "questFinished": true
@@ -405,6 +392,8 @@ function createWebhooks() {
       "options": questActivityOptions
     });
   }
+
+  // create webhooks
   if (webhooks.length > 0) {
     
     console.log("Creating webhooks");
