@@ -89,39 +89,25 @@ function pauseResumeDamage() {
   let hp = user.stats.hp;
   if (typeof boss !== "undefined" || quest === null) {
 
-    // if enough pending damage to defeat boss
-    if (user.party.quest.progress.up >= bossHp) {
-
-      // if damage to player greater than threshold or hp, sleep, otherwise wake up
-      if (damageToPlayer > MAX_PLAYER_DAMAGE || damageToPlayer >= hp) {
-        sleep();
-      } else {
-        wakeUp();
+    // get lowest party member health
+    let lowestHealth = 50;
+    for (member of getMembers(true)) {
+      if (member.stats.hp < lowestHealth) {
+        lowestHealth = member.stats.hp;
       }
-    
-    // if not enough pending damage to defeat boss
+    }
+
+    // if damage to party greater than threshold or lowest hp, or total damage greater than threshold or hp, sleep, otherwise wake up
+    if (damageToParty > MAX_PARTY_DAMAGE || damageToParty >= lowestHealth || damageTotal > MAX_PLAYER_DAMAGE || damageTotal >= hp) {
+      sleep();
     } else {
-
-      // get lowest party member health
-      let lowestHealth = 50;
-      for (member of getMembers(true)) {
-        if (member.stats.hp < lowestHealth) {
-          lowestHealth = member.stats.hp;
-        }
-      }
-
-      // if damage to party greater than threshold or lowest hp, or total damage greater than threshold or hp, sleep, otherwise wake up
-      if (damageToParty > MAX_PARTY_DAMAGE || damageToParty >= lowestHealth || damageTotal > MAX_PLAYER_DAMAGE || damageTotal >= hp) {
-        sleep();
-      } else {
-        wakeUp();
-      }
+      wakeUp();
     }
 
   // if on a collection quest
   } else {
 
-    // if player damage greater than threshold or hp, sleep, otherwise wake up
+    // if damage to player greater than threshold or hp, sleep, otherwise wake up
     if (damageToPlayer > Math.min(MAX_PLAYER_DAMAGE, hp)) {
       sleep();
     } else {
