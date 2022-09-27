@@ -26,7 +26,7 @@ function castEarthquake(saveMana) {
     let numEarthquakes = 0;
     let numSurges = 0;
     if (saveMana) {
-      let int = (user.stats.maxMP - 30) / 2;
+      let int = getTotalStat("int");
       let maxManaAfterCron = ((int - user.stats.buffs.int + Math.min(Math.ceil(user.stats.lvl / 2), 50)) * 2 + 30) * 0.9;
       let chillingFrostMana = user.stats.lvl >= 14 && calculatePerfectDayBuff() === 0 ? 40 : 0;
       let finishBossMana = Math.max(Math.ceil((3000 - user.party.quest.progress.up) / Math.ceil(int / 10)) * 10, 0);
@@ -53,7 +53,7 @@ function castEarthquake(saveMana) {
     // if lvl 12, cast ethereal surge
     } else {
 
-      console.log("Player level " + user.stats.lvl + ", casting Ethereal Surge " + numSurges + " time(s)");
+      console.log("Player level 12, casting Ethereal Surge " + numSurges + " time(s)");
 
       for (let i=0; i<numSurges; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/mpheal", POST_PARAMS);

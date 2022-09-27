@@ -27,20 +27,20 @@ function castProtectiveAura(beforeCron) {
     let con = getTotalStat("con");
     let healPartyMana = (Math.ceil(50 / ((con + int + 5) * 0.04)) * 25) * 16;
     let reserveMessage = "Reserving " + healPartyMana + " mana for healing the party";
-    let numProtectiveAuras = Math.max(Math.floor((user.stats.mp - healPartyMana) / 30), 0);
+    let numAuras = Math.max(Math.floor((user.stats.mp - healPartyMana) / 30), 0);
     if (beforeCron) {
       let maxManaAfterCron = ((int - user.stats.buffs.int + Math.min(Math.ceil(user.stats.lvl / 2), 50)) * 2 + 30) * 0.9;
       if (maxManaAfterCron < healPartyMana) {
-        numProtectiveAuras = Math.ceil((user.stats.mp - maxManaAfterCron) / 30);
+        numAuras = Math.ceil((user.stats.mp - maxManaAfterCron) / 30);
         reserveMessage = "Reserving no more than " + maxManaAfterCron + " mana for after cron";
       }
     }
 
     console.log(reserveMessage);
-    console.log("Casting Protective Aura " + numProtectiveAuras + " time(s)");
+    console.log("Casting Protective Aura " + numAuras + " time(s)");
 
     // cast protective aura
-    for (let i=0; i<numProtectiveAuras; i++) {
+    for (let i=0; i<numAuras; i++) {
       fetch("https://habitica.com/api/v3/user/class/cast/protectAura", POST_PARAMS);
     }
 
@@ -107,18 +107,18 @@ function healParty() {
     }
 
     // calculate number of healing lights to cast
-    let numHealingLights = Math.min(Math.max(Math.ceil((playerDamage) / ((con + int + 5) * 0.075)), 0), Math.floor(mana / 15));
+    let numLights = Math.min(Math.max(Math.ceil((playerDamage) / ((con + int + 5) * 0.075)), 0), Math.floor(mana / 15));
 
     console.log("Player damage: " + playerDamage);
-    console.log("Casting Healing Light " + numHealingLights + " time(s)");
+    console.log("Casting Healing Light " + numLights + " time(s)");
 
     // cast healing light
-    for (let i=0; i<numHealingLights; i++) {
+    for (let i=0; i<numLights; i++) {
       fetch("https://habitica.com/api/v3/user/class/cast/heal", POST_PARAMS);
     }
 
     // if sleeping & healed, pause or resume damage
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && (numBlessings > 0 || numHealingLights > 0)) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && (numBlessings > 0 || numLights > 0)) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
 

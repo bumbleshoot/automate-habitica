@@ -52,7 +52,7 @@ function castValorousPresence(saveMana) {
     // if lvl 12, cast defensive stance
     } else {
 
-      console.log("Player level " + user.stats.lvl + ", casting Defensive Stance " + numStances + " time(s)");
+      console.log("Player level 12, casting Defensive Stance " + numStances + " time(s)");
 
       for (let i=0; i<numStances; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/defensiveStance", POST_PARAMS);
@@ -118,7 +118,7 @@ function smashBossAndDumpMana() {
           mana -= 10;
         }
 
-        console.log("Remaining mana: " + mana);
+        console.log("Mana remaining: " + mana);
 
         // if sleeping and on quest, pause or resume damage
         if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && typeof party.quest.key !== "undefined") {
