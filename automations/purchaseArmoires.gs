@@ -8,10 +8,12 @@
  * task is scored, and whenever a quest is completed:
  * https://habitica.fandom.com/wiki/Gold_Points
  */
-function purchaseArmoires() {
+function purchaseArmoires(gold) {
 
   // calculate number of armoires to buy
-  let gold = getUser(true).stats.gp;
+  if (typeof gold === "undefined") {
+    gold = getUser(true).stats.gp;
+  }
   let numArmoires = Math.max(Math.floor((gold - RESERVE_GOLD) / 100), 0);
 
   console.log("Player gold: " + gold);

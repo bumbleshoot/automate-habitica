@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.16.8 (beta) by @bumbleshoot
+ * Automate Habitica v0.17.0 (beta) by @bumbleshoot
  * 
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -67,11 +67,18 @@ function install() {
 
     // run enabled automations
     processTrigger();
-    processWebhook("scored", true);
-    processWebhook("leveledUp", true);
-    processWebhook("questInvited", true);
-    processWebhook("questStarted", true);
-    processWebhook("questFinished", true);
+    processWebhook({
+      webhookType: "leveledUp",
+      taskType: "daily",
+      isDue: true,
+      gp: getUser(true).stats.gp,
+      dropType: "All",
+      statPoints: user.stats.points,
+      lvl: user.stats.lvl
+    });
+    processWebhook({ webhookType: "questInvited" });
+    processWebhook({ webhookType: "questStarted" });
+    processWebhook({ webhookType: "questFinished" });
     processQueue(true);
 
     // create trigger & webhooks

@@ -7,13 +7,16 @@
  * the leveledUp webhook, and whenever the player's class changes:
  * https://habitica.fandom.com/wiki/Character_Stats
  */
-function allocateStatPoints() {
+function allocateStatPoints(unusedStatPoints, lvl) {
 
-  // get unused stat points
-  let unusedStatPoints = getUser(true).stats.points;
+  // get user data
+  if (typeof unusedStatPoints === "undefined") {
+    unusedStatPoints = getUser(true).stats.points;
+    lvl = user.stats.lvl;
+  }
 
   // if unused stat points & user at least lvl 10
-  if (unusedStatPoints > 0 && user.stats.lvl >= 10) {
+  if (unusedStatPoints > 0 && lvl >= 10) {
 
     console.log("Allocating " + unusedStatPoints + " unused stat points to " + STAT_TO_ALLOCATE);
 

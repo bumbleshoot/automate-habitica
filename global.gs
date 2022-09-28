@@ -20,8 +20,8 @@ let scriptProperties = PropertiesService.getScriptProperties();
 function onTrigger() {
   try {
 
-    // add to queue & process queue
-    scriptProperties.setProperty("processTrigger", "true");
+    // process trigger & queue
+    processTrigger();
     processQueue();
 
   } catch (e) {
@@ -47,14 +47,30 @@ function doPost(e) {
     let webhookData = {
       webhookType: postData.type || postData.webhookType
     };
-    if (webhookData.webhookType == "questFinished") {
+    if (webhookData.webhookType == "scored" || webhookData.webhookType == "leveledUp") {
+      Object.assign(webhookData, {
+        taskType: postData.task.type,
+        isDue: postData.task.isDue,
+        gp: postData.user.stats.gp,
+        dropType: postData.user._tmp.drop.type || null
+      });
+      if (webhookData.webhookType == "leveledUp") {
+        Object.assign(webhookData, {
+          statPoints: postData.user.stats.points,
+          lvl: postData.user._tmp.leveledUp.newLvl
+        });
+      }
+    } else if (webhookData.webhookType == "questFinished") {
       Object.assign(webhookData, {
         questKey: postData.quest.key
       });
     }
 
-    // add to queue
-    scriptProperties.setProperty("processWebhook", webhookData);
+    // log webhook type
+    console.log("Webhook type: " + webhookData.webhookType);
+
+    // process webhook
+    processWebhook(webhookData);
 
     // create temporary trigger to process queue
     let triggerNeeded = true;
@@ -141,53 +157,47 @@ function processTrigger() {
 }
 
 /**
- * processWebhook(webhookData, noLogging)
+ * processWebhook(webhookData)
  * 
- * Logs webhook type (unless noLogging is set to true) and adds 
- * functions to the queue depending on the webhook type.
+ * Adds functions to the queue depending on the webhook data.
  */
-function processWebhook(webhookData, noLogging) {
-
-  // log webhook type
-  if (!noLogging) {
-    console.log("Webhook type: " + webhookData.webhookType);
-  }
+function processWebhook(webhookData) {
 
   // when a task is scored
   if (webhookData.webhookType == "scored") {
     if (AUTO_CAST_SKILLS === true) {
       scriptProperties.setProperty("useExcessMana", "true");
     }
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && getUser(true).preferences.sleep) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.taskType == "daily" && webhookData.isDue === true && getUser().preferences.sleep === true) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
-    if (AUTO_PURCHASE_GEMS === true) {
+    if (AUTO_PURCHASE_GEMS === true && webhookData.gp >= 20) {
       scriptProperties.setProperty("purchaseGems", "true");
     }
-    if (AUTO_PURCHASE_ARMOIRES === true) {
-      scriptProperties.setProperty("purchaseArmoires", "true");
+    if (AUTO_PURCHASE_ARMOIRES === true && webhookData.gp >= RESERVE_GOLD + 100) {
+      scriptProperties.setProperty("purchaseArmoires", webhookData.gp);
     }
-    if (AUTO_SELL_EGGS === true) {
+    if (AUTO_SELL_EGGS === true && (webhookData.dropType === "Egg" || webhookData.dropType === "All")) {
       scriptProperties.setProperty("sellExtraEggs", "true");
     }
-    if (AUTO_SELL_HATCHING_POTIONS === true) {
+    if (AUTO_SELL_HATCHING_POTIONS === true && (webhookData.dropType === "HatchingPotion" || webhookData.dropType === "All")) {
       scriptProperties.setProperty("sellExtraHatchingPotions", "true");
     }
-    if (AUTO_SELL_FOOD === true) {
+    if (AUTO_SELL_FOOD === true && (webhookData.dropType === "Food" || webhookData.dropType === "All")) {
       scriptProperties.setProperty("sellExtraFood", "true");
     }
-    if (AUTO_HATCH_FEED_PETS === true) {
+    if (AUTO_HATCH_FEED_PETS === true && ["Egg", "HatchingPotion", "Food", "All"].includes(webhookData.dropType)) {
       scriptProperties.setProperty("hatchFeedPets", "true");
     }
 
   // when player levels up
   } else if (webhookData.webhookType == "leveledUp") {
-    processWebhook("scored"); // scored webhook doesn't fire if scoring a task causes level up (submitted bug report for this 2021-12-05)
-    if (AUTO_ALLOCATE_STAT_POINTS === true) {
-      scriptProperties.setProperty("allocateStatPoints", "true");
+    webhookData.webhookType = "scored";
+    processWebhook(webhookData); // scored webhook doesn't fire if scoring a task causes level up (submitted bug report for this 2021-12-05)
+    if (AUTO_ALLOCATE_STAT_POINTS === true && webhookData.statPoints > 0 && webhookData.lvl >= 10) {
+      scriptProperties.setProperty("allocateStatPoints", webhookData);
     }
-    let lvl = getUser(true).stats.lvl;
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && lvl <= 100 && lvl % 2 == 0) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.lvl <= 100 && getUser().preferences.sleep === true) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
 
@@ -211,7 +221,7 @@ function processWebhook(webhookData, noLogging) {
 
   // when a quest is finished
   } else if (webhookData.webhookType == "questFinished") {
-    if (NOTIFY_ON_QUEST_END === true) {
+    if (NOTIFY_ON_QUEST_END === true && typeof webhookData.questKey !== "undefined") {
       scriptProperties.setProperty("notifyQuestEnded", webhookData.questKey);
     }
     if (AUTO_PURCHASE_GEMS === true) {
@@ -263,8 +273,10 @@ function processQueue(wait) {
     if (lock.tryLock(0) || (wait && lock.tryLock(360000))) {
 
       while (true) {
-        if (scriptProperties.getProperty("allocateStatPoints") !== null) {
-          allocateStatPoints();
+        let webhookData = scriptProperties.getProperty("allocateStatPoints");
+        if (webhookData !== null) {
+          webhookData = JSON.parse(webhookData);
+          allocateStatPoints(webhookData.points, webhookData.lvl);
           scriptProperties.deleteProperty("allocateStatPoints");
           continue;
         }
@@ -278,20 +290,9 @@ function processQueue(wait) {
           scriptProperties.deleteProperty("pauseResumeDamage");
           continue;
         }
-        if (scriptProperties.getProperty("processTrigger") !== null) {
-          processTrigger();
-          scriptProperties.deleteProperty("processTrigger");
-          continue;
-        }
         if (scriptProperties.getProperty("beforeCron") !== null) {
           beforeCron();
           scriptProperties.deleteProperty("beforeCron");
-          continue;
-        }
-        let webhookData = scriptProperties.getProperty("processWebhook");
-        if (webhookData !== null) {
-          processWebhook(webhookData);
-          scriptProperties.deleteProperty("processWebhook");
           continue;
         }
         if (scriptProperties.getProperty("acceptQuestInvite") !== null) {
@@ -330,8 +331,13 @@ function processQueue(wait) {
           scriptProperties.deleteProperty("useExcessMana");
           continue;
         }
-        if (scriptProperties.getProperty("purchaseArmoires") !== null) {
-          purchaseArmoires();
+        let gold = scriptProperties.getProperty("purchaseArmoires");
+        if (gold !== null) {
+          if (gold === "true") {
+            purchaseArmoires();
+          } else {
+            purchaseArmoires(Number(gold));
+          }
           scriptProperties.deleteProperty("purchaseArmoires");
           continue;
         }
