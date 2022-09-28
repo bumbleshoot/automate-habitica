@@ -32,6 +32,37 @@ function forceStartQuest() {
           }
         }
 
+        if (NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST === true) {
+
+          // get list of members who failed to join the quest
+          let membersMissingQuest = [];
+          for ([id, joined] of Object.entries(party.quest.members)) {
+            if (!joined) {
+              for (member of getMembers()) {
+                if (member._id === id) {
+                  membersMissingQuest.push(member.auth.local.username);
+                  break;
+                }
+              }
+            }
+          }
+
+          // send list to player in a private message
+          if (membersMissingQuest.length > 0) {
+            let params = Object.assign(
+              POST_PARAMS,
+              {
+                "contentType": "application/json",
+                "payload": JSON.stringify({
+                  "message": "The following party members failed to join the quest " + getContent().quests[party.quest.key].text + ": " + membersMissingQuest.join(", "),
+                  "toUserId": USER_ID
+                })
+              }
+            );
+            fetch("https://habitica.com/api/v3/members/send-private-message", params);
+          }
+        }
+
         console.log("Deleting quest info");
 
         // delete variables

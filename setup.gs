@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.17.1 (beta) by @bumbleshoot
+ * Automate Habitica v0.18.0 (beta) by @bumbleshoot
  * 
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -47,6 +47,7 @@ const ONLY_USE_DROP_FOOD = false;
 
 const AUTO_START_QUESTS = false;
 const AUTO_START_QUESTS_AFTER_HOURS_MIN = 4; // eg. if set to 1, quests will auto start in 1-2 hours
+const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = true;
 
 const AUTO_UPDATE_QUEST_TRACKER = false;
 const QUEST_TRACKER_SPREADSHEET_URL = "";
@@ -261,6 +262,11 @@ function validateConstants() {
 
     if (typeof AUTO_START_QUESTS_AFTER_HOURS_MIN !== "number" || !Number.isInteger(AUTO_START_QUESTS_AFTER_HOURS_MIN) || AUTO_START_QUESTS_AFTER_HOURS_MIN < 1) {
       console.log("ERROR: AUTO_START_QUESTS_AFTER_HOURS_MIN must be a whole number greater than 0.\n\neg. const AUTO_START_QUESTS_AFTER_HOURS_MIN = 1;\n    const AUTO_START_QUESTS_AFTER_HOURS_MIN = 8;");
+      valid = false;
+    }
+
+    if (NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST !== true && NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST !== false) {
+      console.log("ERROR: NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST must equal either true or false.\n\neg. const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = true;\n    const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = false;");
       valid = false;
     }
   }
