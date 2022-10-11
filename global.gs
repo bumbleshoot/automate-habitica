@@ -52,7 +52,7 @@ function doPost(e) {
         taskType: postData.task.type,
         isDue: postData.task.isDue,
         gp: postData.user.stats.gp,
-        dropType: postData.user._tmp.drop.type || null
+        dropType: postData.user._tmp.drop?.type || null
       });
       if (webhookData.webhookType == "leveledUp") {
         Object.assign(webhookData, {
