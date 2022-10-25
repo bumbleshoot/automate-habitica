@@ -8,34 +8,28 @@
  * https://habitica.fandom.com/wiki/Eggs
  */
 function sellExtraEggs() {
-  try {
 
-    let logged = false;
+  let logged = false;
 
-    // for each egg in the player's inventory
-    for ([egg, amount] of Object.entries(getUser(true).data.items.eggs)) {
+  // for each egg in the player's inventory
+  for ([egg, amount] of Object.entries(getUser(true).items.eggs)) {
 
-      // if player has more than RESERVE_EGGS
-      if (amount > RESERVE_EGGS) {
+    // if player has more than RESERVE_EGGS
+    if (amount > RESERVE_EGGS) {
 
-        if (!logged) {
-          log("Selling extra eggs");
-          logged = true;
-        }
+      if (!logged) {
+        console.log("Selling extra eggs");
+        logged = true;
+      }
 
-        // sell extra eggs
-        fetch("https://habitica.com/api/v3/user/sell/eggs/" + egg + "?amount=" + (amount - RESERVE_EGGS), POST_PARAMS);
+      // sell extra eggs
+      fetch("https://habitica.com/api/v3/user/sell/eggs/" + egg + "?amount=" + (amount - RESERVE_EGGS), POST_PARAMS);
 
-        // if done selling extra items, purchase armoires
-        if (AUTO_PURCHASE_ARMOIRES === true && scriptProperties.getProperty("sellExtraHatchingPotions") === null && scriptProperties.getProperty("sellExtraFood") === null) {
-          scriptProperties.setProperty("purchaseArmoires", "true");
-        }
+      // if done selling extra items, purchase armoires
+      if (AUTO_PURCHASE_ARMOIRES === true && scriptProperties.getProperty("sellExtraHatchingPotions") === null && scriptProperties.getProperty("sellExtraFood") === null) {
+        scriptProperties.setProperty("purchaseArmoires", "true");
       }
     }
-
-  } catch (e) {
-    log(e);
-    throw e;
   }
 }
 
@@ -50,34 +44,28 @@ function sellExtraEggs() {
  * https://habitica.fandom.com/wiki/Hatching_Potions
  */
 function sellExtraHatchingPotions() {
-  try {
 
-    let logged = false;
+  let logged = false;
 
-    // for each hatching potion in the player's inventory
-    for ([potion, amount] of Object.entries(getUser(true).data.items.hatchingPotions)) {
+  // for each hatching potion in the player's inventory
+  for ([potion, amount] of Object.entries(getUser(true).items.hatchingPotions)) {
 
-      // if player has more than RESERVE_HATCHING_POTIONS
-      if (amount > RESERVE_HATCHING_POTIONS) {
+    // if player has more than RESERVE_HATCHING_POTIONS
+    if (amount > RESERVE_HATCHING_POTIONS) {
 
-        if (!logged) {
-          log("Selling extra hatching potions");
-          logged = true;
-        }
+      if (!logged) {
+        console.log("Selling extra hatching potions");
+        logged = true;
+      }
 
-        // sell extra hatching potions
-        fetch("https://habitica.com/api/v3/user/sell/hatchingPotions/" + potion + "?amount=" + (amount - RESERVE_HATCHING_POTIONS), POST_PARAMS);
+      // sell extra hatching potions
+      fetch("https://habitica.com/api/v3/user/sell/hatchingPotions/" + potion + "?amount=" + (amount - RESERVE_HATCHING_POTIONS), POST_PARAMS);
 
-        // if done selling extra items, purchase armoires
-        if (AUTO_PURCHASE_ARMOIRES === true && scriptProperties.getProperty("sellExtraEggs") === null && scriptProperties.getProperty("sellExtraFood") === null) {
-          scriptProperties.setProperty("purchaseArmoires", "true");
-        }
+      // if done selling extra items, purchase armoires
+      if (AUTO_PURCHASE_ARMOIRES === true && scriptProperties.getProperty("sellExtraEggs") === null && scriptProperties.getProperty("sellExtraFood") === null) {
+        scriptProperties.setProperty("purchaseArmoires", "true");
       }
     }
-
-  } catch (e) {
-    log(e);
-    throw e;
   }
 }
 
@@ -92,33 +80,27 @@ function sellExtraHatchingPotions() {
  * https://habitica.fandom.com/wiki/Food#How_To_Obtain_A_Food_Item
  */
 function sellExtraFood() {
-  try {
 
-    let logged = false;
+  let logged = false;
 
-    // for each food in the player's inventory
-    for ([food, amount] of Object.entries(getUser(true).data.items.food)) {
+  // for each food in the player's inventory
+  for ([food, amount] of Object.entries(getUser(true).items.food)) {
 
-      // if player has more than RESERVE_FOOD
-      if (food != "Saddle" && amount > RESERVE_FOOD) {
+    // if player has more than RESERVE_FOOD
+    if (food != "Saddle" && amount > RESERVE_FOOD) {
 
-        if (!logged) {
-          log("Selling extra food");
-          logged = true;
-        }
+      if (!logged) {
+        console.log("Selling extra food");
+        logged = true;
+      }
 
-        // sell extra food
-        fetch("https://habitica.com/api/v3/user/sell/food/" + food + "?amount=" + (amount - RESERVE_FOOD), POST_PARAMS);
+      // sell extra food
+      fetch("https://habitica.com/api/v3/user/sell/food/" + food + "?amount=" + (amount - RESERVE_FOOD), POST_PARAMS);
 
-        // if done selling extra items, purchase armoires
-        if (AUTO_PURCHASE_ARMOIRES === true && scriptProperties.getProperty("sellExtraEggs") === null && scriptProperties.getProperty("sellExtraHatchingPotions") === null) {
-          scriptProperties.setProperty("purchaseArmoires", "true");
-        }
+      // if done selling extra items, purchase armoires
+      if (AUTO_PURCHASE_ARMOIRES === true && scriptProperties.getProperty("sellExtraEggs") === null && scriptProperties.getProperty("sellExtraHatchingPotions") === null) {
+        scriptProperties.setProperty("purchaseArmoires", "true");
       }
     }
-
-  } catch (e) {
-    log(e);
-    throw e;
   }
 }

@@ -7,22 +7,16 @@
  * function every 10 mins in case the webhook fails.
  */
 function acceptQuestInvite() {
-  try {
 
-    // if pending quest & unaccepted invite
-    if (getParty(true).data.quest.key != undefined && !party.data.quest.active && party.data.quest.members[USER_ID] === null) {
+  // if pending quest & unaccepted invite
+  if (typeof getParty(true).quest.key !== "undefined" && !party.quest.active && party.quest.members[USER_ID] === null) {
 
-      log("Accepting invite to pending quest \"" + scriptProperties.getProperty("QUEST_NAME") + "\"");
-    
-      // accept quest invite
-      fetch("https://habitica.com/api/v3/groups/party/quests/accept", POST_PARAMS);
+    console.log("Accepting invite to pending quest \"" + getContent().quests[party.quest.key].text + "\"");
+  
+    // accept quest invite
+    fetch("https://habitica.com/api/v3/groups/party/quests/accept", POST_PARAMS);
 
-    } else {
-      log("No quest invite to accept");
-    }
-
-  } catch (e) {
-    log(e);
-    throw e;
+  } else {
+    console.log("No quest invite to accept");
   }
 }

@@ -20,8 +20,8 @@ let scriptProperties = PropertiesService.getScriptProperties();
 function onTrigger() {
   try {
 
-    // add to queue & process queue
-    scriptProperties.setProperty("processTrigger", "true");
+    // process trigger & queue
+    processTrigger();
     processQueue();
 
   } catch (e) {
@@ -30,7 +30,6 @@ function onTrigger() {
       DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
       e.stack
     );
-    log(e);
     throw e;
   }
 }
@@ -43,15 +42,50 @@ function onTrigger() {
 function doPost(e) {
   try {
 
-    // add to queue
+    // get relevant data from webhook
     let postData = JSON.parse(e.postData.contents);
-    scriptProperties.setProperty("processWebhook", postData.type || postData.webhookType);
+    let webhookData = {
+      webhookType: postData.type || postData.webhookType
+    };
+    if (webhookData.webhookType == "scored" || webhookData.webhookType == "leveledUp") {
+      Object.assign(webhookData, {
+        taskType: postData.task.type,
+        isDue: postData.task.isDue,
+        gp: postData.user.stats.gp,
+        dropType: postData.user._tmp.drop?.type || null
+      });
+      if (webhookData.webhookType == "leveledUp") {
+        Object.assign(webhookData, {
+          statPoints: postData.user.stats.points,
+          lvl: postData.user._tmp.leveledUp.newLvl
+        });
+      }
+    } else if (webhookData.webhookType == "questFinished") {
+      Object.assign(webhookData, {
+        questKey: postData.quest.key
+      });
+    }
+
+    // log webhook type
+    console.log("Webhook type: " + webhookData.webhookType);
+
+    // process webhook
+    processWebhook(webhookData);
 
     // create temporary trigger to process queue
-    ScriptApp.newTrigger("processQueue")
-      .timeBased()
-      .after(1)
-      .create();
+    let triggerNeeded = true;
+    for (trigger of ScriptApp.getProjectTriggers()) {
+      if (trigger.getHandlerFunction() === "processQueue") {
+        triggerNeeded = false;
+        break;
+      }
+    }
+    if (triggerNeeded) {
+      ScriptApp.newTrigger("processQueue")
+        .timeBased()
+        .after(1)
+        .create();
+    }
 
   } catch (e) {
     MailApp.sendEmail(
@@ -59,7 +93,6 @@ function doPost(e) {
       DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
       e.stack
     );
-    log(e);
     throw e;
   }
 }
@@ -72,114 +105,104 @@ function doPost(e) {
  * periodically.
  */
 function processTrigger() {
-  try {
 
-    // get times
-    let now = new Date();
-    let dayStart = getUser().data.preferences.dayStart;
-    let needsCron = user.data.needsCron;
-    let lastCron = new Date(user.data.auth.timestamps.loggedin);
-    let lastBeforeCron = new Date(scriptProperties.getProperty("LAST_BEFORE_CRON"));
-    let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
+  // get times
+  let now = new Date();
+  let dayStart = getUser().preferences.dayStart;
+  let needsCron = user.needsCron;
+  let lastCron = new Date(user.auth.timestamps.loggedin);
+  let lastBeforeCron = new Date(scriptProperties.getProperty("LAST_BEFORE_CRON"));
+  let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
 
-    // if just before day start time
-    if (now.getHours() == dayStart-1 && 39 <= now.getMinutes() && now.getMinutes() < 54 && (lastBeforeCron.toDateString() !== now.toDateString() || lastBeforeCron.getHours() !== now.getHours())) {
-      scriptProperties.setProperty("beforeCron", "true");
-      scriptProperties.setProperty("LAST_BEFORE_CRON", now);
+  // if just before day start time
+  if (now.getHours() == dayStart-1 && 39 <= now.getMinutes() && now.getMinutes() < 54 && (lastBeforeCron.toDateString() !== now.toDateString() || lastBeforeCron.getHours() !== now.getHours())) {
+    scriptProperties.setProperty("beforeCron", "true");
+    scriptProperties.setProperty("LAST_BEFORE_CRON", now);
 
-    // if auto cron and player hasn't cronned today
-    } else if (AUTO_CRON === true && needsCron === true) {
-      scriptProperties.setProperty("runCron", "true");
-      if (AUTO_CAST_SKILLS === true) {
-        scriptProperties.setProperty("afterCron", "true");
-        scriptProperties.setProperty("LAST_AFTER_CRON", now);
-      }
-
-    // if player has cronned today and after cron hasn't run since cron
-    } else if (AUTO_CAST_SKILLS === true && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
+  // if auto cron and player hasn't cronned today
+  } else if (AUTO_CRON === true && needsCron === true) {
+    scriptProperties.setProperty("runCron", "true");
+    if (AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) {
       scriptProperties.setProperty("afterCron", "true");
       scriptProperties.setProperty("LAST_AFTER_CRON", now);
-    
-    // in case GAS execution time limit was reached
-    } else if (AUTO_CAST_SKILLS === true) {
-      scriptProperties.setProperty("useExcessMana", "true");
     }
 
-    if (AUTO_ACCEPT_QUEST_INVITES === true) {
-      scriptProperties.setProperty("acceptQuestInvite", "true");
-    }
-    if (AUTO_START_QUESTS === true) {
-      scriptProperties.setProperty("forceStartQuest", "true");
-    }
-    if (AUTO_CAST_SKILLS === true && getPlayerClass() == "healer") {
-      scriptProperties.setProperty("healParty", "true");
-    }
-    if (AUTO_PAUSE_RESUME_DAMAGE === true) {
-      scriptProperties.setProperty("pauseResumeDamage", "true");
-    }
+  // if player has cronned today and after cron hasn't run since cron
+  } else if ((AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
+    scriptProperties.setProperty("afterCron", "true");
+    scriptProperties.setProperty("LAST_AFTER_CRON", now);
+  
+  // in case GAS execution time limit was reached
+  } else if (AUTO_CAST_SKILLS === true) {
+    scriptProperties.setProperty("useExcessMana", "true");
+  }
 
-    // in case GAS execution time limit was reached
-    if (AUTO_PURCHASE_ARMOIRES === true) {
-      scriptProperties.setProperty("purchaseArmoires", "true");
-    }
+  if (AUTO_ACCEPT_QUEST_INVITES === true) {
+    scriptProperties.setProperty("acceptQuestInvite", "true");
+  }
+  if (AUTO_START_QUESTS === true) {
+    scriptProperties.setProperty("forceStartQuest", "true");
+  }
+  if (AUTO_CAST_SKILLS === true && getPlayerClass() == "healer") {
+    scriptProperties.setProperty("healParty", "true");
+  }
+  if (AUTO_PAUSE_RESUME_DAMAGE === true) {
+    scriptProperties.setProperty("pauseResumeDamage", "true");
+  }
 
-  } catch (e) {
-    log(e);
-    throw e;
+  // in case GAS execution time limit was reached
+  if (AUTO_PURCHASE_ARMOIRES === true) {
+    scriptProperties.setProperty("purchaseArmoires", "true");
   }
 }
 
 /**
- * processWebhook(webhookType)
+ * processWebhook(webhookData)
  * 
- * Logs webhook type and adds functions to the queue depending
- * on webhook type.
+ * Adds functions to the queue depending on the webhook data.
  */
-function processWebhook(webhookType) {
-
-  // log webhook type
-  log("Webhook type: " + webhookType);
+function processWebhook(webhookData) {
 
   // when a task is scored
-  if (webhookType == "scored") {
+  if (webhookData.webhookType == "scored") {
     if (AUTO_CAST_SKILLS === true) {
       scriptProperties.setProperty("useExcessMana", "true");
     }
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && getUser(true).data.preferences.sleep) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.taskType == "daily" && webhookData.isDue === true && getUser().preferences.sleep === true) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
-    if (AUTO_PURCHASE_ARMOIRES === true) {
-      scriptProperties.setProperty("purchaseArmoires", "true");
+    if (AUTO_PURCHASE_GEMS === true && webhookData.gp >= 20) {
+      scriptProperties.setProperty("purchaseGems", "true");
     }
-    if (AUTO_SELL_EGGS === true) {
+    if (AUTO_PURCHASE_ARMOIRES === true && webhookData.gp >= RESERVE_GOLD + 100) {
+      scriptProperties.setProperty("purchaseArmoires", webhookData.gp);
+    }
+    if (AUTO_SELL_EGGS === true && (webhookData.dropType === "Egg" || webhookData.dropType === "All")) {
       scriptProperties.setProperty("sellExtraEggs", "true");
     }
-    if (AUTO_SELL_HATCHING_POTIONS === true) {
+    if (AUTO_SELL_HATCHING_POTIONS === true && (webhookData.dropType === "HatchingPotion" || webhookData.dropType === "All")) {
       scriptProperties.setProperty("sellExtraHatchingPotions", "true");
     }
-    if (AUTO_SELL_FOOD === true) {
+    if (AUTO_SELL_FOOD === true && (webhookData.dropType === "Food" || webhookData.dropType === "All")) {
       scriptProperties.setProperty("sellExtraFood", "true");
     }
-    if (AUTO_HATCH_FEED_PETS === true) {
+    if (AUTO_HATCH_FEED_PETS === true && ["Egg", "HatchingPotion", "Food", "All"].includes(webhookData.dropType)) {
       scriptProperties.setProperty("hatchFeedPets", "true");
     }
 
   // when player levels up
-  } else if (webhookType == "leveledUp") {
-    processWebhook("scored"); // scored webhook doesn't fire if scoring a task causes level up (submitted bug report for this 2021-12-05)
-    if (AUTO_ALLOCATE_STAT_POINTS === true) {
-      scriptProperties.setProperty("allocateStatPoints", "true");
+  } else if (webhookData.webhookType == "leveledUp") {
+    webhookData.webhookType = "scored";
+    processWebhook(webhookData); // scored webhook doesn't fire if scoring a task causes level up (submitted bug report for this 2021-12-05)
+    if (AUTO_ALLOCATE_STAT_POINTS === true && webhookData.statPoints > 0 && webhookData.lvl >= 10) {
+      scriptProperties.setProperty("allocateStatPoints", webhookData);
     }
-    let lvl = getUser(true).data.stats.lvl;
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && user.data.preferences.sleep && lvl <= 100 && lvl % 2 == 0) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.lvl <= 100 && getUser().preferences.sleep === true) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
 
   // when player is invited to a quest
-  } else if (webhookType == "questInvited") {
-    if (AUTO_ACCEPT_QUEST_INVITES === true || AUTO_START_QUESTS === true || NOTIFY_ON_QUEST_END === true) {
-      scriptProperties.setProperty("saveQuestName", "true");
-    }
+  } else if (webhookData.webhookType == "questInvited") {
     if (AUTO_ACCEPT_QUEST_INVITES === true) {
       scriptProperties.setProperty("acceptQuestInvite", "true");
     }
@@ -191,15 +214,18 @@ function processWebhook(webhookType) {
     }
 
   // when a quest is started
-  } else if (webhookType == "questStarted") {
+  } else if (webhookData.webhookType == "questStarted") {
     if (AUTO_START_QUESTS === true) {
       scriptProperties.setProperty("forceStartQuest", "true");
     }
 
   // when a quest is finished
-  } else if (webhookType == "questFinished") {
-    if (NOTIFY_ON_QUEST_END === true) {
-      scriptProperties.setProperty("notifyQuestEnded", "true");
+  } else if (webhookData.webhookType == "questFinished") {
+    if (NOTIFY_ON_QUEST_END === true && typeof webhookData.questKey !== "undefined") {
+      scriptProperties.setProperty("notifyQuestEnded", webhookData.questKey);
+    }
+    if (AUTO_PURCHASE_GEMS === true) {
+      scriptProperties.setProperty("purchaseGems", "true");
     }
     if (AUTO_PURCHASE_ARMOIRES === true) {
       scriptProperties.setProperty("purchaseArmoires", "true");
@@ -223,31 +249,34 @@ function processWebhook(webhookType) {
 }
 
 /**
- * processQueue()
+ * processQueue(wait)
  * 
  * Loops through the queue, running functions in order of priority,
  * until there are no more functions left in the queue. Script lock 
  * ensures only one instance can run the queue at a time. All API 
- * calls & logging are kept within the queue (script lock), to 
- * prevent collisions.
+ * calls are kept within the queue (script lock), to prevent 
+ * collisions. If wait is set to true, will wait until the script 
+ * lock is released, then process the queue.
  */
-function processQueue() {
+function processQueue(wait) {
   try {
 
     // delete temporary triggers
-    ScriptApp.getProjectTriggers().forEach(trigger => {
+    for (trigger of ScriptApp.getProjectTriggers()) {
       if (trigger.getHandlerFunction() === "processQueue") {
         ScriptApp.deleteTrigger(trigger);
       }
-    });
+    }
 
     // prevent multiple instances from running at once
     let lock = LockService.getScriptLock();
-    if (lock.tryLock(0)) {
+    if (lock.tryLock(0) || (wait && lock.tryLock(360000))) {
 
       while (true) {
-        if (scriptProperties.getProperty("allocateStatPoints") !== null) {
-          allocateStatPoints();
+        let webhookData = scriptProperties.getProperty("allocateStatPoints");
+        if (webhookData !== null) {
+          webhookData = JSON.parse(webhookData);
+          allocateStatPoints(webhookData.points, webhookData.lvl);
           scriptProperties.deleteProperty("allocateStatPoints");
           continue;
         }
@@ -261,25 +290,9 @@ function processQueue() {
           scriptProperties.deleteProperty("pauseResumeDamage");
           continue;
         }
-        if (scriptProperties.getProperty("processTrigger") !== null) {
-          processTrigger();
-          scriptProperties.deleteProperty("processTrigger");
-          continue;
-        }
         if (scriptProperties.getProperty("beforeCron") !== null) {
           beforeCron();
           scriptProperties.deleteProperty("beforeCron");
-          continue;
-        }
-        let webhookType = scriptProperties.getProperty("processWebhook");
-        if (webhookType !== null) {
-          processWebhook(webhookType);
-          scriptProperties.deleteProperty("processWebhook");
-          continue;
-        }
-        if (scriptProperties.getProperty("saveQuestName") !== null) {
-          saveQuestName();
-          scriptProperties.deleteProperty("saveQuestName");
           continue;
         }
         if (scriptProperties.getProperty("acceptQuestInvite") !== null) {
@@ -297,13 +310,19 @@ function processQueue() {
           scriptProperties.deleteProperty("afterCron");
           continue;
         }
+        if (scriptProperties.getProperty("purchaseGems") !== null) {
+          purchaseGems();
+          scriptProperties.deleteProperty("purchaseGems");
+          continue;
+        }
         if (scriptProperties.getProperty("forceStartQuest") !== null) {
           forceStartQuest();
           scriptProperties.deleteProperty("forceStartQuest");
           continue;
         }
-        if (scriptProperties.getProperty("notifyQuestEnded") !== null) {
-          notifyQuestEnded();
+        let questKey = scriptProperties.getProperty("notifyQuestEnded");
+        if (questKey !== null) {
+          notifyQuestEnded(questKey);
           scriptProperties.deleteProperty("notifyQuestEnded");
           continue;
         }
@@ -312,8 +331,13 @@ function processQueue() {
           scriptProperties.deleteProperty("useExcessMana");
           continue;
         }
-        if (scriptProperties.getProperty("purchaseArmoires") !== null) {
-          purchaseArmoires();
+        let gold = scriptProperties.getProperty("purchaseArmoires");
+        if (gold !== null) {
+          if (gold === "true") {
+            purchaseArmoires();
+          } else {
+            purchaseArmoires(Number(gold));
+          }
           scriptProperties.deleteProperty("purchaseArmoires");
           continue;
         }
@@ -350,7 +374,6 @@ function processQueue() {
   
   } catch (e) {
     if (!e.stack.includes("There are too many LockService operations against the same script")) {
-      log(e);
       throw e;
     }
   }
@@ -365,22 +388,15 @@ function processQueue() {
  * run time).
  */
 function beforeCron() {
-  try {
-
-    let playerClass = getPlayerClass();
-    if (playerClass == "warrior") {
-      smashBossAndDumpMana();
-    } else if (playerClass == "mage") {
-      burnBossAndDumpMana();
-    } else if (playerClass == "healer") {
-      castProtectiveAura(true);
-    } else if (playerClass == "rogue") {
-      castStealthAndDumpMana();
-    }
-
-  } catch (e) {
-    log(e);
-    throw e;
+  let playerClass = getPlayerClass();
+  if (playerClass == "warrior") {
+    smashBossAndDumpMana();
+  } else if (playerClass == "mage") {
+    burnBossAndDumpMana();
+  } else if (playerClass == "healer") {
+    castProtectiveAura(true);
+  } else if (playerClass == "rogue") {
+    castStealthAndDumpMana();
   }
 }
 
@@ -391,8 +407,7 @@ function beforeCron() {
  * just after the player's cron.
  */
 function afterCron() {
-  try {
-
+  if (AUTO_CAST_SKILLS === true) {
     let playerClass = getPlayerClass();
     if (playerClass == "warrior") {
       castValorousPresence(false);
@@ -403,30 +418,9 @@ function afterCron() {
     } else if (playerClass == "rogue") {
       castToolsOfTheTrade(false);
     }
-
-  } catch (e) {
-    log(e);
-    throw e;
   }
-}
-
-/**
- * saveQuestName()
- * 
- * Saves the name of the party's current quest in a script 
- * property.
- */
-function saveQuestName() {
-  try {
-
-    let quest = getParty(true).data.quest.key;
-    if (typeof quest !== "undefined") {
-      scriptProperties.setProperty("QUEST_NAME", getContent().data.quests[quest].text);
-    }
-
-  } catch (e) {
-    log(e);
-    throw e;
+  if (AUTO_PURCHASE_GEMS === true) {
+    scriptProperties.setProperty("purchaseGems", "true");
   }
 }
 
@@ -438,22 +432,15 @@ function saveQuestName() {
  * damage to the quest boss.
  */
 function useExcessMana() {
-  try {
-
-    let playerClass = getPlayerClass();
-    if (playerClass == "warrior") {
-      castValorousPresence(true);
-    } else if (playerClass == "mage") {
-      castEarthquake(true);
-    } else if (playerClass == "healer") {
-      castProtectiveAura(false);
-    } else if (playerClass == "rogue") {
-      castToolsOfTheTrade(true);
-    }
-
-  } catch (e) {
-    log(e);
-    throw e;
+  let playerClass = getPlayerClass();
+  if (playerClass == "warrior") {
+    castValorousPresence(true);
+  } else if (playerClass == "mage") {
+    castEarthquake(true);
+  } else if (playerClass == "healer") {
+    castProtectiveAura(false);
+  } else if (playerClass == "rogue") {
+    castToolsOfTheTrade(true);
   }
 }
 
@@ -504,70 +491,6 @@ function fetch(url, params) {
 }
 
 /**
- * log(output)
- * 
- * Logs output to the console and, if LOG_SCRIPT_OUTPUT is 
- * true, to the spreadsheet.
- */
-let firstFunction = "";
-let printedFirstFunction = false;
-let logSpreadsheet;
-let logSheet;
-function log(output) {
-  try {
-
-    // if string, log to console & continue
-    if (typeof output != "object") {
-      console.log(output);
-
-    // if error & last function on stack, continue
-    } else if (new Error().stack.split("\n").length == 4) {
-      output = output.stack;
-    } else {
-      return;
-    }
-
-    if (typeof LOG_SCRIPT_OUTPUT !== "undefined" && LOG_SCRIPT_OUTPUT === true) {
-
-      // open spreadsheet & sheet if not already open
-      if (typeof logSpreadsheet === "undefined" || typeof logSheet === "undefined") {
-        logSpreadsheet = SpreadsheetApp.openById(LOG_SPREADSHEET_URL.match(/[^\/]{44}/)[0]);
-        logSheet = logSpreadsheet.getSheetByName(LOG_SPREADSHEET_TAB_NAME);
-      }
-
-      // get first function if not printed already
-      if (!printedFirstFunction) {
-        if (firstFunction === "") {
-          firstFunction = new Error().stack.split("\n    at ");
-          firstFunction = firstFunction[firstFunction.length - 2].split(" ")[0];
-        }
-        printedFirstFunction = true;
-      } else {
-        firstFunction = "";
-      }
-
-      // generate timestamp
-      let timestamp = new Date();
-      timestamp = timestamp.toLocaleString("en-US", { month: "short", day: "2-digit", year: "numeric", hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" }).replaceAll(",", "").replace(" AM", "").replace(" PM", "") + " GMT" + (-timestamp.getTimezoneOffset()/60);
-
-      // print to log spreadsheet
-      logSheet.insertRowBefore(1);
-      logSheet.getRange(1, 1, 1, 3).setValues([[timestamp, firstFunction, output]]);
-
-      // delete all rows after LOG_SPREADSHEET_MAX_ROWS
-      logSheet.getRange(LOG_SPREADSHEET_MAX_ROWS+1, 1, Math.max(1, logSheet.getLastRow()-LOG_SPREADSHEET_MAX_ROWS), logSheet.getLastColumn()).clearContent();
-    }
-
-  } catch (e) {
-    MailApp.sendEmail(
-      Session.getEffectiveUser().getEmail(),
-      DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
-      e.stack
-    );
-  }
-}
-
-/**
  * getPlayerClass()
  * 
  * Returns the player's current class. If the player's class has 
@@ -576,45 +499,39 @@ function log(output) {
  */
 let playerClass;
 function getPlayerClass() {
-  try {
 
-    // return player class if already checked during this instance
-    if (typeof playerClass !== "undefined") {
-      return playerClass;
-    }
-
-    // get saved player class
-    let savedPlayerClass = scriptProperties.getProperty("PLAYER_CLASS");
-
-    // get current player class
-    playerClass = getUser().data.stats.class;
-    if (playerClass == "wizard") {
-      playerClass = "mage";
-    }
-
-    // if player class has changed
-    if (playerClass != savedPlayerClass) {
-
-      if (savedPlayerClass !== null) {
-        log("Player class changed to " + playerClass + ", saving new class");
-      }
-
-      // save current player class
-      scriptProperties.setProperty("PLAYER_CLASS", playerClass);
-
-      // allocate stat points
-      if (AUTO_ALLOCATE_STAT_POINTS === true) {
-        allocateStatPoints();
-      }
-    }
-
-    // return current player class
+  // return player class if already checked during this instance
+  if (typeof playerClass !== "undefined") {
     return playerClass;
-
-  } catch (e) {
-    log(e);
-    throw e;
   }
+
+  // get saved player class
+  let savedPlayerClass = scriptProperties.getProperty("PLAYER_CLASS");
+
+  // get current player class
+  playerClass = getUser().stats.class;
+  if (playerClass == "wizard") {
+    playerClass = "mage";
+  }
+
+  // if player class has changed
+  if (playerClass != savedPlayerClass) {
+
+    if (savedPlayerClass !== null) {
+      console.log("Player class changed to " + playerClass + ", saving new class");
+    }
+
+    // save current player class
+    scriptProperties.setProperty("PLAYER_CLASS", playerClass);
+
+    // allocate stat points
+    if (AUTO_ALLOCATE_STAT_POINTS === true) {
+      allocateStatPoints();
+    }
+  }
+
+  // return current player class
+  return playerClass;
 }
 
 /**
@@ -628,21 +545,21 @@ function getTotalStat(stat) {
 
   // INT is easy to calculate with a simple formula
   if (stat == "int") {
-    return (getUser(true).data.stats.maxMP - 30) / 2;
+    return (getUser(true).stats.maxMP - 30) / 2;
   }
 
   // calculate stat from level, buffs, allocated
-  let levelStat = Math.min(Math.floor(getUser(true).data.stats.lvl / 2), 50);
+  let levelStat = Math.min(Math.floor(getUser(true).stats.lvl / 2), 50);
   let equipmentStat = 0;
-  let buffsStat = user.data.stats.buffs[stat];
-  let allocatedStat = user.data.stats[stat];
+  let buffsStat = user.stats.buffs[stat];
+  let allocatedStat = user.stats[stat];
 
   // calculate stat from equipment
-  for (equipped of Object.values(user.data.items.gear.equipped)) {
-    let equipment = getContent().data.gear.flat[equipped];
+  for (equipped of Object.values(user.items.gear.equipped)) {
+    let equipment = getContent().gear.flat[equipped];
     if (equipment != undefined) { 
       equipmentStat += equipment[stat];
-      if (equipment.klass == user.data.stats.class || ((equipment.klass == "special") && (equipment.specialClass == user.data.stats.class))) {
+      if (equipment.klass == getPlayerClass() || ((equipment.klass == "special") && (equipment.specialClass == user.stats.class))) {
         equipmentStat += equipment[stat] / 2;
       }
     }
@@ -659,12 +576,12 @@ function getTotalStat(stat) {
  * https://habitica.fandom.com/wiki/Perfect_Day
  */
 function calculatePerfectDayBuff() {
-  for (task of getTasks().data) {
-    if (task.type == "daily" && task.isDue && !task.completed) {
+  for (daily of getDailies()) {
+    if (daily.isDue && !daily.completed) {
       return 0;
     }
   }
-  return Math.min(Math.ceil(getUser().data.stats.lvl / 2), 50);
+  return Math.min(Math.ceil(getUser().stats.lvl / 2), 50);
 }
 
 /**
@@ -677,24 +594,52 @@ function calculatePerfectDayBuff() {
 let user;
 function getUser(updated) {
   if (updated || typeof user === "undefined") {
-    user = JSON.parse(fetch("https://habitica.com/api/v3/user", GET_PARAMS));
+    user = JSON.parse(fetch("https://habitica.com/api/v3/user", GET_PARAMS)).data;
   }
   return user;
 }
 
 /**
- * getTasks(updated)
+ * getTasks()
  * 
- * Fetches task data from the Habitica API if it hasn't already 
- * been fetched during this execution, or if updated is set to 
- * true.
+ * Fetches task data from the Habitica API if it hasn't 
+ * already been fetched during this execution. Removes 
+ * challenge tasks and rewards from the task list, and 
+ * stores daily data in a separate object.
  */
 let tasks;
-function getTasks(updated) {
-  if (updated || typeof tasks === "undefined") {
-    tasks = JSON.parse(fetch("https://habitica.com/api/v3/tasks/user", GET_PARAMS));
+function getTasks() {
+  if (typeof tasks === "undefined") {
+    tasks = JSON.parse(fetch("https://habitica.com/api/v3/tasks/user", GET_PARAMS)).data;
+    dailies = [];
+    for (let i=0; i<tasks.length; i++) {
+      if (tasks[i].type == "daily") {
+        dailies.push(tasks[i]);
+      } else if (tasks[i].type == "reward") {
+        tasks.splice(i, 1);
+        i--;
+      }
+      if (typeof tasks[i].challenge.id !== "undefined") {
+        tasks.splice(i, 1);
+        i--;
+      }
+    }
   }
   return tasks;
+}
+
+/**
+* getDailies()
+*
+* Fetches daily data from the Habitica API if it hasn't 
+* already been fetched during this execution.
+*/
+let dailies;
+function getDailies() {
+  if (typeof dailies === "undefined") {
+    getTasks();
+  }
+  return dailies;
 }
 
 /**
@@ -707,7 +652,7 @@ function getTasks(updated) {
 let party;
 function getParty(updated) {
   if (updated || typeof party === "undefined") {
-    party = JSON.parse(fetch("https://habitica.com/api/v3/groups/party", GET_PARAMS));
+    party = JSON.parse(fetch("https://habitica.com/api/v3/groups/party", GET_PARAMS)).data;
   }
   return party;
 }
@@ -722,7 +667,7 @@ function getParty(updated) {
 let members;
 function getMembers(updated) {
   if (updated || typeof members === "undefined") {
-    members = JSON.parse(fetch("https://habitica.com/api/v3/groups/party/members?includeAllPublicFields=true", GET_PARAMS));
+    members = JSON.parse(fetch("https://habitica.com/api/v3/groups/party/members?includeAllPublicFields=true", GET_PARAMS)).data;
   }
   return members;
 }
@@ -737,7 +682,7 @@ function getMembers(updated) {
 let content;
 function getContent(updated) {
   if (updated || typeof content === "undefined") {
-    content = JSON.parse(fetch("https://habitica.com/api/v3/content", GET_PARAMS));
+    content = JSON.parse(fetch("https://habitica.com/api/v3/content", GET_PARAMS)).data;
   }
   return content;
 }

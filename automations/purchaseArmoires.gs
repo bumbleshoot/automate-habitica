@@ -8,33 +8,29 @@
  * task is scored, and whenever a quest is completed:
  * https://habitica.fandom.com/wiki/Gold_Points
  */
-function purchaseArmoires() {
-  try {
+function purchaseArmoires(gold) {
 
-    // calculate number of armoires to buy
-    let gold = getUser(true).data.stats.gp;
-    let numArmoires = Math.max(Math.floor((gold - RESERVE_GOLD) / 100), 0);
+  // calculate number of armoires to buy
+  if (typeof gold === "undefined") {
+    gold = getUser(true).stats.gp;
+  }
+  let numArmoires = Math.max(Math.floor((gold - RESERVE_GOLD) / 100), 0);
 
-    log("Player gold: " + gold);
-    log("Gold reserve: " + RESERVE_GOLD);
-    log("Buying " + numArmoires + " armoire(s)");
+  console.log("Player gold: " + gold);
+  console.log("Gold reserve: " + RESERVE_GOLD);
+  console.log("Buying " + numArmoires + " armoire(s)");
 
-    // if buying at least one armoire
-    if (numArmoires > 0) {
+  // if buying at least one armoire
+  if (numArmoires > 0) {
 
-      // buy armoires
-      for (let i=0; i<numArmoires; i++) {
-        fetch("https://habitica.com/api/v3/user/buy-armoire", POST_PARAMS);
-      }
-
-      // sell extra food
-      if (AUTO_SELL_FOOD === true) {
-        scriptProperties.setProperty("sellExtraFood", "true");
-      }
+    // buy armoires
+    for (let i=0; i<numArmoires; i++) {
+      fetch("https://habitica.com/api/v3/user/buy-armoire", POST_PARAMS);
     }
 
-  } catch (e) {
-    log(e);
-    throw e;
+    // sell extra food
+    if (AUTO_SELL_FOOD === true) {
+      scriptProperties.setProperty("sellExtraFood", "true");
+    }
   }
 }
