@@ -25,7 +25,7 @@ function pauseResumeDamage() {
   let stealth = getUser(true).stats.buffs.stealth;
   let quest = user.party.quest.key;
   let boss;
-  if (quest !== null) {
+  if (quest) {
     boss = getContent().quests[quest].boss;
   }
   let bossHp = 3000;
