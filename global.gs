@@ -290,14 +290,14 @@ function processQueue(wait) {
           scriptProperties.deleteProperty("pauseResumeDamage");
           continue;
         }
-        if (scriptProperties.getProperty("beforeCron") !== null) {
-          beforeCron();
-          scriptProperties.deleteProperty("beforeCron");
-          continue;
-        }
         if (scriptProperties.getProperty("acceptQuestInvite") !== null) {
           acceptQuestInvite();
           scriptProperties.deleteProperty("acceptQuestInvite");
+          continue;
+        }
+        if (scriptProperties.getProperty("beforeCron") !== null) {
+          beforeCron();
+          scriptProperties.deleteProperty("beforeCron");
           continue;
         }
         if (scriptProperties.getProperty("runCron") !== null) {
