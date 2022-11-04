@@ -557,7 +557,7 @@ function getTotalStat(stat) {
   // calculate stat from equipment
   for (equipped of Object.values(user.items.gear.equipped)) {
     let equipment = getContent().gear.flat[equipped];
-    if (equipment != undefined) { 
+    if (typeof equipment !== "undefined") {
       equipmentStat += equipment[stat];
       if (equipment.klass == getPlayerClass() || ((equipment.klass == "special") && (equipment.specialClass == user.stats.class))) {
         equipmentStat += equipment[stat] / 2;
