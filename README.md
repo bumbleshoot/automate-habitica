@@ -1,3 +1,5 @@
+***Automate Habitica is currently in beta. I need beta testers to try it out and let me know if they run into any bugs. I especially need beta testers who are not mages, not in a party, and/or under level 10 (new users or rebirthed). Automate Habitica is mostly bug-free at this point, but there are still some edge cases that haven't been tested yet, so there's a small chance you will see an error while using it. If you're not okay with this, best to wait until Version 1 is released!***
+
 ## Summary
 Automate Habitica is a suite of automation tools for Habitica, allowing you to focus on your tasks instead of managing gameplay. Each tool can be enabled, disabled, and configured to suit your needs.
 
