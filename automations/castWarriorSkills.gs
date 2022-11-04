@@ -121,7 +121,7 @@ function smashBossAndDumpMana() {
         console.log("Mana remaining: " + mana);
 
         // if sleeping and on quest, pause or resume damage
-        if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && typeof party.quest.key !== "undefined") {
+        if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && typeof user.party.quest.key !== "undefined") {
           scriptProperties.setProperty("pauseResumeDamage", "true");
         }
       }
