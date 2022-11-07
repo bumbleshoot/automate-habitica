@@ -76,7 +76,7 @@ function forceStartQuest() {
     // if new pending quest, set variables
     } else {
 
-      console.log("New quest \"" + content.quests[party.quest.key].text + "\", saving quest info");
+      console.log("New quest \"" + getContent().quests[party.quest.key].text + "\", saving quest info");
 
       scriptProperties.setProperty("PENDING_QUEST_KEY", party.quest.key);
       scriptProperties.setProperty("INVITATION_DISCOVERED", new Date().toString());
