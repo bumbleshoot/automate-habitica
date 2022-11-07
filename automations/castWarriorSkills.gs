@@ -83,15 +83,21 @@ function smashBossAndDumpMana() {
 
     console.log("Mana: " + mana);
 
-    // if party is currently fighting a boss and user has non-challenge tasks
-    if (getParty(true).quest.progress.hp !== undefined && getTasks().length > 0) {
+    // get boss hp
+    let bossHP = 3000;
+    if (AUTO_CRON === true) {
+      bossHP = getParty(true).quest.progress.hp;
+    }
 
-      console.log("Boss HP: " + party.quest.progress.hp);
+    // if boss hp and user has non-challenge tasks
+    if (typeof bossHP !== "undefined" && getTasks().length > 0) {
+
+      console.log("Boss HP: " + bossHP);
       console.log("Pending damage: " + user.party.quest.progress.up);
 
       // calculate number of brutal smashes to cast
       let str = getTotalStat("str");
-      let numSmashes = Math.min(Math.max(Math.ceil((party.quest.progress.hp - user.party.quest.progress.up) / (55 * str / (str + 70))), 0), Math.floor(mana / 10));
+      let numSmashes = Math.min(Math.max(Math.ceil((bossHP - user.party.quest.progress.up) / (55 * str / (str + 70))), 0), Math.floor(mana / 10));
 
       // if casting at least 1 brutal smash
       if (numSmashes > 0) {

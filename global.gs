@@ -87,6 +87,9 @@ function doPost(e) {
         .create();
     }
 
+    // process queue (no timeout)
+    processQueue(true);
+
   } catch (e) {
     MailApp.sendEmail(
       Session.getEffectiveUser().getEmail(),
@@ -249,16 +252,18 @@ function processWebhook(webhookData) {
 }
 
 /**
- * processQueue(wait)
+ * processQueue(noTimeout, wait)
  * 
  * Loops through the queue, running functions in order of priority,
  * until there are no more functions left in the queue. Script lock 
  * ensures only one instance can run the queue at a time. All API 
  * calls are kept within the queue (script lock), to prevent 
- * collisions. If wait is set to true, will wait until the script 
- * lock is released, then process the queue.
+ * collisions. If noTimeout is set to true, functions that could 
+ * cause the script to run longer than 30s are skipped. If wait is 
+ * set to true, will wait until the script lock is released, then 
+ * process the queue.
  */
-function processQueue(wait) {
+function processQueue(noTimeout, wait) {
   try {
 
     // delete temporary triggers
@@ -295,7 +300,7 @@ function processQueue(wait) {
           scriptProperties.deleteProperty("acceptQuestInvite");
           continue;
         }
-        if (scriptProperties.getProperty("beforeCron") !== null) {
+        if (scriptProperties.getProperty("beforeCron") !== null && noTimeout !== true) {
           beforeCron();
           scriptProperties.deleteProperty("beforeCron");
           continue;
@@ -305,7 +310,7 @@ function processQueue(wait) {
           scriptProperties.deleteProperty("runCron");
           continue;
         }
-        if (scriptProperties.getProperty("afterCron") !== null) {
+        if (scriptProperties.getProperty("afterCron") !== null && noTimeout !== true) {
           afterCron();
           scriptProperties.deleteProperty("afterCron");
           continue;
@@ -326,13 +331,13 @@ function processQueue(wait) {
           scriptProperties.deleteProperty("notifyQuestEnded");
           continue;
         }
-        if (scriptProperties.getProperty("useExcessMana") !== null) {
+        if (scriptProperties.getProperty("useExcessMana") !== null && noTimeout !== true) {
           useExcessMana();
           scriptProperties.deleteProperty("useExcessMana");
           continue;
         }
         let gold = scriptProperties.getProperty("purchaseArmoires");
-        if (gold !== null) {
+        if (gold !== null && noTimeout !== true) {
           if (gold === "true") {
             purchaseArmoires();
           } else {
@@ -341,27 +346,27 @@ function processQueue(wait) {
           scriptProperties.deleteProperty("purchaseArmoires");
           continue;
         }
-        if (scriptProperties.getProperty("updateQuestTracker") !== null) {
+        if (scriptProperties.getProperty("updateQuestTracker") !== null && noTimeout !== true) {
           updateQuestTracker();
           scriptProperties.deleteProperty("updateQuestTracker");
           continue;
         }
-        if (scriptProperties.getProperty("sellExtraFood") !== null) {
+        if (scriptProperties.getProperty("sellExtraFood") !== null && noTimeout !== true) {
           sellExtraFood();
           scriptProperties.deleteProperty("sellExtraFood");
           continue;
         }
-        if (scriptProperties.getProperty("sellExtraHatchingPotions") !== null) {
+        if (scriptProperties.getProperty("sellExtraHatchingPotions") !== null && noTimeout !== true) {
           sellExtraHatchingPotions();
           scriptProperties.deleteProperty("sellExtraHatchingPotions");
           continue;
         }
-        if (scriptProperties.getProperty("sellExtraEggs") !== null) {
+        if (scriptProperties.getProperty("sellExtraEggs") !== null && noTimeout !== true) {
           sellExtraEggs();
           scriptProperties.deleteProperty("sellExtraEggs");
           continue;
         }
-        if (scriptProperties.getProperty("hatchFeedPets") !== null) {
+        if (scriptProperties.getProperty("hatchFeedPets") !== null && noTimeout !== true) {
           hatchFeedPets();
           scriptProperties.deleteProperty("hatchFeedPets");
           continue;
