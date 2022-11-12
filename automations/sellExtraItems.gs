@@ -9,6 +9,11 @@
  */
 function sellExtraEggs() {
 
+  // do not run if approaching API call limit
+  if (minimizeAPICalls) {
+    return;
+  }
+
   let logged = false;
 
   // for each egg in the player's inventory
@@ -45,6 +50,11 @@ function sellExtraEggs() {
  */
 function sellExtraHatchingPotions() {
 
+  // do not run if approaching API call limit
+  if (minimizeAPICalls) {
+    return;
+  }
+
   let logged = false;
 
   // for each hatching potion in the player's inventory
@@ -80,6 +90,11 @@ function sellExtraHatchingPotions() {
  * https://habitica.fandom.com/wiki/Food#How_To_Obtain_A_Food_Item
  */
 function sellExtraFood() {
+
+  // do not run if approaching API call limit
+  if (minimizeAPICalls) {
+    return;
+  }
 
   let logged = false;
 

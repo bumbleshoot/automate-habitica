@@ -14,6 +14,11 @@
  */
 function hatchFeedPets() {
 
+  // do not run if approaching API call limit
+  if (minimizeAPICalls) {
+    return;
+  }
+
   // get # each egg & hatching potion needed
   let numEachEggNeededTotal = {};
   let numEachPotionNeededTotal = {};

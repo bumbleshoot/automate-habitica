@@ -10,6 +10,11 @@
  */
 function purchaseArmoires(gold) {
 
+  // do not run if approaching API call limit
+  if (minimizeAPICalls) {
+    return;
+  }
+
   // calculate number of armoires to buy
   if (typeof gold === "undefined") {
     gold = getUser(true).stats.gp;

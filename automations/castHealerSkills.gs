@@ -17,6 +17,11 @@
  */
 function castProtectiveAura(beforeCron) {
 
+  // do not run if approaching API call limit
+  if (minimizeAPICalls) {
+    return;
+  }
+
   // if lvl >= 13
   if (getUser(true).stats.lvl >= 13) {
 

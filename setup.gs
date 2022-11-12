@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.19.3 (beta) by @bumbleshoot
+ * Automate Habitica v0.19.4 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -66,7 +66,7 @@ function install() {
     deleteTriggers();
     deleteWebhooks();
 
-    // run enabled automations
+    // queue enabled automations
     processTrigger();
     processWebhook({
       webhookType: "leveledUp",
@@ -80,11 +80,19 @@ function install() {
     processWebhook({ webhookType: "questInvited" });
     processWebhook({ webhookType: "questStarted" });
     processWebhook({ webhookType: "questFinished" });
-    processQueue(true, true);
+
+    // minimize API calls to prevent timeout
+    minimizeAPICalls = true;
+
+    // process queue
+    processQueue(false, true);
 
     // create trigger & webhooks
     createTrigger();
     createWebhooks();
+
+    // save API call count
+    scriptProperties.setProperty("numAPICalls", numAPICalls);
 
     console.log("Success!");
   }

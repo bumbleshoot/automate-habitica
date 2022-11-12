@@ -16,6 +16,11 @@
  */
 function castToolsOfTheTrade(saveMana) {
 
+  // do not run if approaching API call limit
+  if (minimizeAPICalls) {
+    return;
+  }
+
   // if lvl >= 11
   if (getUser(true).stats.lvl >= 11) {
 

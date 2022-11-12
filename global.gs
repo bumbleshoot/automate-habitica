@@ -12,6 +12,20 @@ const DELETE_PARAMS = Object.assign({ "method": "delete" }, PARAMS);
 
 const scriptProperties = PropertiesService.getScriptProperties();
 
+// count API calls
+let scriptStart = new Date();
+let numAPICalls = 0;
+let minimizeAPICalls = false;
+if (new Date(scriptProperties.getProperty("dateAPICallsCounted")).toDateString() !== scriptStart.toDateString()) {
+  scriptProperties.setProperty("dateAPICallsCounted", scriptStart);
+  scriptProperties.setProperty("numAPICalls", 0);
+} else {
+  numAPICalls = Number(scriptProperties.getProperty("numAPICalls"));
+  if (numAPICalls >= 19000) {
+    minimizeAPICalls = true;
+  }
+}
+
 /**
  * onTrigger()
  * 
@@ -266,6 +280,10 @@ function processWebhook(webhookData) {
 function processQueue(noTimeout, wait) {
   try {
 
+    if (noTimeout === true) {
+      minimizeAPICalls = true;
+    }
+
     // delete temporary triggers
     for (trigger of ScriptApp.getProjectTriggers()) {
       if (trigger.getHandlerFunction() === "processQueue") {
@@ -300,7 +318,7 @@ function processQueue(noTimeout, wait) {
           scriptProperties.deleteProperty("acceptQuestInvite");
           continue;
         }
-        if (scriptProperties.getProperty("beforeCron") !== null && noTimeout !== true) {
+        if (scriptProperties.getProperty("beforeCron") !== null) {
           beforeCron();
           scriptProperties.deleteProperty("beforeCron");
           continue;
@@ -310,7 +328,7 @@ function processQueue(noTimeout, wait) {
           scriptProperties.deleteProperty("runCron");
           continue;
         }
-        if (scriptProperties.getProperty("afterCron") !== null && noTimeout !== true) {
+        if (scriptProperties.getProperty("afterCron") !== null) {
           afterCron();
           scriptProperties.deleteProperty("afterCron");
           continue;
@@ -331,13 +349,13 @@ function processQueue(noTimeout, wait) {
           scriptProperties.deleteProperty("notifyQuestEnded");
           continue;
         }
-        if (scriptProperties.getProperty("useExcessMana") !== null && noTimeout !== true) {
+        if (scriptProperties.getProperty("useExcessMana") !== null && minimizeAPICalls !== true) {
           useExcessMana();
           scriptProperties.deleteProperty("useExcessMana");
           continue;
         }
         let gold = scriptProperties.getProperty("purchaseArmoires");
-        if (gold !== null && noTimeout !== true) {
+        if (gold !== null && minimizeAPICalls !== true) {
           if (gold === "true") {
             purchaseArmoires();
           } else {
@@ -351,28 +369,31 @@ function processQueue(noTimeout, wait) {
           scriptProperties.deleteProperty("updateQuestTracker");
           continue;
         }
-        if (scriptProperties.getProperty("sellExtraFood") !== null && noTimeout !== true) {
+        if (scriptProperties.getProperty("sellExtraFood") !== null && minimizeAPICalls !== true) {
           sellExtraFood();
           scriptProperties.deleteProperty("sellExtraFood");
           continue;
         }
-        if (scriptProperties.getProperty("sellExtraHatchingPotions") !== null && noTimeout !== true) {
+        if (scriptProperties.getProperty("sellExtraHatchingPotions") !== null && minimizeAPICalls !== true) {
           sellExtraHatchingPotions();
           scriptProperties.deleteProperty("sellExtraHatchingPotions");
           continue;
         }
-        if (scriptProperties.getProperty("sellExtraEggs") !== null && noTimeout !== true) {
+        if (scriptProperties.getProperty("sellExtraEggs") !== null && minimizeAPICalls !== true) {
           sellExtraEggs();
           scriptProperties.deleteProperty("sellExtraEggs");
           continue;
         }
-        if (scriptProperties.getProperty("hatchFeedPets") !== null && noTimeout !== true) {
+        if (scriptProperties.getProperty("hatchFeedPets") !== null && minimizeAPICalls !== true) {
           hatchFeedPets();
           scriptProperties.deleteProperty("hatchFeedPets");
           continue;
         }
         break;
       }
+
+      // save API call count
+      scriptProperties.setProperty("numAPICalls", numAPICalls);
 
       lock.releaseLock();
     }
@@ -477,6 +498,15 @@ function fetch(url, params) {
 
     // call API
     let response = UrlFetchApp.fetch(url, params);
+
+    // count API calls
+    numAPICalls++;
+    if (new Date().getTime() - scriptStart.getTime() >= 350000) {
+      scriptProperties.setProperty("numAPICalls", numAPICalls);
+    }
+    if (numAPICalls >= 19000) {
+      minimizeAPICalls = true;
+    }
 
     // store rate limiting data
     scriptProperties.setProperties({

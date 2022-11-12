@@ -16,7 +16,12 @@
  * cron.
  */
 function castEarthquake(saveMana) {
-    
+
+  // do not run if approaching API call limit
+  if (minimizeAPICalls) {
+    return;
+  }
+
   // if lvl >= 12
   if (getUser(true).stats.lvl >= 12) {
 
@@ -146,21 +151,25 @@ function burnBossAndDumpMana() {
       console.log("No boss fight or user has no non-challenge tasks");
     }
 
-    // if lvl >= 12
-    if (user.stats.lvl >= 12) {
+    // if not approaching API call limit
+    if (!minimizeAPICalls) {
 
-      // calculate number of ethereal surges to cast
-      let maxManaAfterCron = ((int - user.stats.buffs.int + perfectDayBuff) * 2 + 30) * 0.9;
+      // if lvl >= 12
+      if (user.stats.lvl >= 12) {
 
-      console.log("Reserving no more than " + maxManaAfterCron + " (maxManaAfterCron) mana");
+        // calculate number of ethereal surges to cast
+        let maxManaAfterCron = ((int - user.stats.buffs.int + perfectDayBuff) * 2 + 30) * 0.9;
 
-      let numSurges = Math.max(Math.ceil((mana - maxManaAfterCron) / 30), 0);
+        console.log("Reserving no more than " + maxManaAfterCron + " (maxManaAfterCron) mana");
 
-      console.log("Casting Ethereal Surge " + numSurges + " time(s)");
+        let numSurges = Math.max(Math.ceil((mana - maxManaAfterCron) / 30), 0);
 
-      // cast ethereal surge
-      for (let i=0; i<numSurges; i++) {
-        fetch("https://habitica.com/api/v3/user/class/cast/mpheal", POST_PARAMS);
+        console.log("Casting Ethereal Surge " + numSurges + " time(s)");
+
+        // cast ethereal surge
+        for (let i=0; i<numSurges; i++) {
+          fetch("https://habitica.com/api/v3/user/class/cast/mpheal", POST_PARAMS);
+        }
       }
     }
 
