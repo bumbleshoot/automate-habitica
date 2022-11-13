@@ -564,7 +564,7 @@ function getTotalStat(stat) {
     let equipment = getContent().gear.flat[equipped];
     if (typeof equipment !== "undefined") {
       equipmentStat += equipment[stat];
-      if (equipment.klass == getPlayerClass() || ((equipment.klass == "special") && (equipment.specialClass == user.stats.class))) {
+      if (equipment.klass == user.stats.class || ((equipment.klass == "special") && (equipment.specialClass == user.stats.class))) {
         equipmentStat += equipment[stat] / 2;
       }
     }
