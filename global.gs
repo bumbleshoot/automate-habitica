@@ -134,7 +134,7 @@ function processTrigger() {
   } else if ((AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
     scriptProperties.setProperty("afterCron", "true");
     scriptProperties.setProperty("LAST_AFTER_CRON", now);
-  
+
   // in case GAS execution time limit was reached
   } else if (AUTO_CAST_SKILLS === true) {
     scriptProperties.setProperty("useExcessMana", "true");

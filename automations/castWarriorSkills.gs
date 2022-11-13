@@ -39,16 +39,16 @@ function castValorousPresence(saveMana) {
       numPresences = Math.floor(user.stats.mp / 20);
       numStances = Math.floor(user.stats.mp / 25);
     }
-    
+
     // if lvl > 12, cast valorous presence
     if (user.stats.lvl > 12) {
-      
+
       console.log("Casting Valorous Presence " + numPresences + " time(s)");
 
       for (let i=0; i<numPresences; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/valorousPresence", POST_PARAMS);
       }
-    
+
     // if lvl 12, cast defensive stance
     } else {
 
@@ -155,7 +155,7 @@ function smashBossAndDumpMana() {
       for (let i=0; i<numPresences; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/valorousPresence", POST_PARAMS);
       }
-    
+
     // if lvl < 13, cast defensive stances
     } else {
 

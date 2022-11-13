@@ -81,7 +81,7 @@ function forceStartQuest() {
       scriptProperties.setProperty("PENDING_QUEST_KEY", party.quest.key);
       scriptProperties.setProperty("INVITATION_DISCOVERED", new Date().toString());
     }
-  
+
   // if no pending quest, delete variables
   } else {
 

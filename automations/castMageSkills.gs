@@ -40,7 +40,7 @@ function castEarthquake(saveMana) {
       numEarthquakes = Math.floor(user.stats.mp / 35);
       numSurges = Math.floor(user.stats.mp / 30);
     }
-    
+
     // if lvl > 12, cast earthquake
     if (user.stats.lvl > 12) {
 

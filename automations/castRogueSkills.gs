@@ -47,7 +47,7 @@ function castToolsOfTheTrade(saveMana) {
       numBackstabs = Math.floor(user.stats.mp / 15);
       numPickpockets = Math.floor(user.stats.mp / 10);
     }
-    
+
     // if lvl >= 13, cast tools of the trade
     if (user.stats.lvl >= 13) {
 
@@ -56,7 +56,7 @@ function castToolsOfTheTrade(saveMana) {
       for (let i=0; i<numTools; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/toolsOfTrade", POST_PARAMS);
       }
-    
+
     // if lvl 12, cast backstab
     } else if (user.stats.lvl == 12) {
 
@@ -121,7 +121,7 @@ function castToolsOfTheTrade(saveMana) {
         console.log("Player level 11 and player has no non-challenge tasks, no skills to cast");
       }
     }
-  
+
   // if lvl < 11, nothing to cast
   } else {
     console.log("Player level " + user.stats.lvl + ", no skills to cast");

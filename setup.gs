@@ -1,6 +1,6 @@
 /**
  * Automate Habitica v0.19.2 (beta) by @bumbleshoot
- * 
+ *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
  */
@@ -43,7 +43,7 @@ const ONLY_USE_DROP_FOOD = false;
 
 /************************\
  *  PARTY LEADERS ONLY  *
-\************************/ 
+\************************/
 
 const AUTO_START_QUESTS = false;
 const AUTO_START_QUESTS_AFTER_HOURS_MIN = 4; // eg. if set to 1, quests will auto start in 1-2 hours
@@ -55,7 +55,7 @@ const QUEST_TRACKER_SPREADSHEET_TAB_NAME = "Sheet1";
 
 /*************************************\
  *  DO NOT EDIT ANYTHING BELOW HERE  *
-\*************************************/ 
+\*************************************/
 
 function install() {
 
@@ -327,7 +327,7 @@ function deleteTriggers() {
 }
 
 function createTrigger() {
-  
+
   // create trigger if needed for enabled automations
   if (AUTO_CRON === true || AUTO_CAST_SKILLS === true || AUTO_ACCEPT_QUEST_INVITES === true || AUTO_START_QUESTS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true) {
 
@@ -408,7 +408,7 @@ function createWebhooks() {
 
   // create webhooks
   if (webhooks.length > 0) {
-    
+
     console.log("Creating webhooks");
 
     for (webhook of webhooks) {

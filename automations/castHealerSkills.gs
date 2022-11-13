@@ -100,7 +100,7 @@ function healParty() {
       playerDamage = Math.max(playerDamage, 0);
 
       console.log("Mana remaining: " + mana);
-    
+
     // if lvl < 14, nothing to cast
     } else {
       console.log("Player level " + user.stats.lvl + ", cannot cast Blessing");

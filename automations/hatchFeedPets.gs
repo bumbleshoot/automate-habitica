@@ -115,7 +115,7 @@ function hatchFeedPets() {
       }
     }
   }
-  
+
   // get # extra food owned, # extra extra food needed/owned
   let numExtraFoodOwned = 0;
   let numExtraExtraFoodNeeded = 0;
@@ -207,7 +207,7 @@ function hatchFeedPets() {
             // feed until mount
             grewToMount = feedExtraFood(pet, feedingsNeeded);
           }
-        
+
         // if premium color mount
         } else {
 
@@ -221,7 +221,7 @@ function hatchFeedPets() {
             grewToMount = feedExtraFood(pet, feedingsNeeded);
           }
         }
-          
+
         // if grew to mount, hatch another pet
         if (grewToMount) {
           console.log("Hatching " + pet);
