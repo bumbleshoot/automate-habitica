@@ -176,7 +176,7 @@
           completions[key] = timesCompleted;
         }
 
-        // combine everythine else & save to quest list
+        // combine everything else & save to quest list
         eggQuests.push({
           name: eggQuests[i].name + " OR " + eggQuests[j].name,
           rewards: eggQuests[i].rewards,

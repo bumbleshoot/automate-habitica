@@ -107,7 +107,7 @@ You're all done! If you need to change the settings or uninstall the script at s
 
 ## Updating the Script
 1. Follow the steps in [Uninstalling the Script](#uninstalling-the-script) above.
-2. Copy & paste your settings (`const`s) in a text editor so you can reference them while setting up the new version.
+2. Copy & paste your settings (`const`s) into a text editor so you can reference them while setting up the new version.
 3. In the main menu on the left, click on "Overview" (looks like a lowercase letter i inside a circle).
 4. Click the "Remove project" button (looks like a trash can).
 5. Follow the [Setup Instructions](#setup-instructions) above. You don't have to make a new Quest Tracker spreadsheet, just use your existing one.

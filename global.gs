@@ -10,7 +10,7 @@ const GET_PARAMS = Object.assign({ "method": "get" }, PARAMS);
 const POST_PARAMS = Object.assign({ "method": "post" }, PARAMS);
 const DELETE_PARAMS = Object.assign({ "method": "delete" }, PARAMS);
 
-let scriptProperties = PropertiesService.getScriptProperties();
+const scriptProperties = PropertiesService.getScriptProperties();
 
 /**
  * onTrigger()
@@ -52,7 +52,7 @@ function doPost(e) {
         taskType: postData.task.type,
         isDue: postData.task.isDue,
         gp: postData.user.stats.gp,
-        dropType: postData.user._tmp.drop?.type || null
+        dropType: postData.user._tmp?.drop?.type || null
       });
       if (webhookData.webhookType == "leveledUp") {
         Object.assign(webhookData, {
@@ -198,7 +198,7 @@ function processWebhook(webhookData) {
     webhookData.webhookType = "scored";
     processWebhook(webhookData); // scored webhook doesn't fire if scoring a task causes level up (submitted bug report for this 2021-12-05)
     if (AUTO_ALLOCATE_STAT_POINTS === true && webhookData.statPoints > 0 && webhookData.lvl >= 10) {
-      scriptProperties.setProperty("allocateStatPoints", webhookData);
+      scriptProperties.setProperty("allocateStatPoints", JSON.stringify(webhookData));
     }
     if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.lvl <= 100 && getUser().preferences.sleep === true) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
