@@ -87,7 +87,7 @@ Make sure you read the [Before Installing](#before-installing) section above, an
 You're all done! If you need to change the settings or uninstall the script at some point, follow the steps below.
 
 ## Changing the Settings
-1. [Click here](https://script.google.com/home) to see a list of your scripts. If you're not already signed into your Google account, click the "Start Scripting" button and sign in.  Then click on "My Projects" in the main menu on the left.
+1. [Click here](https://script.google.com/home) to see a list of your scripts. If you're not already signed into your Google account, click the "Start Scripting" button and sign in. Then click on "My Projects" in the main menu on the left.
 2. Click on "Automate Habitica".
 3. Edit the settings (`const`s) to your liking.
 4. Click the "Save project" button near the top of the page (looks like a floppy disk).
@@ -98,7 +98,7 @@ You're all done! If you need to change the settings or uninstall the script at s
 9. Click the "Run" button to the left of the "Debug" button. Wait for it to say "Execution completed".
 
 ## Uninstalling the Script
-1. [Click here](https://script.google.com/home) to see a list of your scripts. If you're not already signed into your Google account, click the "Start Scripting" button and sign in.  Then click on "My Projects" in the main menu on the left.
+1. [Click here](https://script.google.com/home) to see a list of your scripts. If you're not already signed into your Google account, click the "Start Scripting" button and sign in. Then click on "My Projects" in the main menu on the left.
 2. Click on "Automate Habitica".
 3. Click the drop-down menu to the right of the "Debug" button, near the top of the page. Select "uninstall" from the drop-down.
 4. Click the "Run" button to the left of the "Debug" button. Wait for it to say "Execution completed".
