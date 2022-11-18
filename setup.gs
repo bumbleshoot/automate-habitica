@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.19.4 (beta) by @bumbleshoot
+ * Automate Habitica v0.19.5 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -366,7 +366,7 @@ function createWebhooks() {
 
   // task scored
   let webhooks = [];
-  if (AUTO_CAST_SKILLS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
+  if (AUTO_ALLOCATE_STAT_POINTS === true || AUTO_CAST_SKILLS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
     webhooks.push({
       "type": "taskActivity",
       "options": {
@@ -376,7 +376,7 @@ function createWebhooks() {
   }
 
   // level up
-  if (AUTO_ALLOCATE_STAT_POINTS === true || AUTO_PAUSE_RESUME_DAMAGE === true) { // scored webhook doesn't fire if scoring a task causes level up (submitted bug report for this 2021-12-05)
+  if (AUTO_ALLOCATE_STAT_POINTS === true || AUTO_PAUSE_RESUME_DAMAGE === true) {
     webhooks.push({
       "type": "userActivity",
       "options": {

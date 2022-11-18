@@ -61,27 +61,29 @@ function doPost(e) {
     let webhookData = {
       webhookType: postData.type || postData.webhookType
     };
-    if (webhookData.webhookType == "scored" || webhookData.webhookType == "leveledUp") {
+    if (webhookData.webhookType == "scored") {
+      if (typeof postData.user._tmp.leveledUp !== "undefined") {
+        processWebhook({
+          webhookType: "leveledUp",
+          statPoints: postData.user.stats.points,
+          lvl: postData.user._tmp.leveledUp.newLvl
+        });
+      }
       Object.assign(webhookData, {
         taskType: postData.task.type,
         isDue: postData.task.isDue,
         gp: postData.user.stats.gp,
         dropType: postData.user._tmp?.drop?.type || null
       });
-      if (webhookData.webhookType == "leveledUp") {
-        Object.assign(webhookData, {
-          statPoints: postData.user.stats.points,
-          lvl: postData.user._tmp.leveledUp.newLvl
-        });
-      }
+    } else if (webhookData.webhookType == "leveledUp") {
+      Object.assign(webhookData, {
+        lvl: postData.finalLvl
+      });
     } else if (webhookData.webhookType == "questFinished") {
       Object.assign(webhookData, {
         questKey: postData.quest.key
       });
     }
-
-    // log webhook type
-    console.log("Webhook type: " + webhookData.webhookType);
 
     // process webhook
     processWebhook(webhookData);
@@ -180,6 +182,9 @@ function processTrigger() {
  */
 function processWebhook(webhookData) {
 
+  // log webhook type
+  console.log("Webhook type: " + webhookData.webhookType);
+
   // when a task is scored
   if (webhookData.webhookType == "scored") {
     if (AUTO_CAST_SKILLS === true) {
@@ -209,9 +214,7 @@ function processWebhook(webhookData) {
 
   // when player levels up
   } else if (webhookData.webhookType == "leveledUp") {
-    webhookData.webhookType = "scored";
-    processWebhook(webhookData); // scored webhook doesn't fire if scoring a task causes level up (submitted bug report for this 2021-12-05)
-    if (AUTO_ALLOCATE_STAT_POINTS === true && webhookData.statPoints > 0 && webhookData.lvl >= 10) {
+    if (AUTO_ALLOCATE_STAT_POINTS === true && (typeof webhookData.statPoints === "undefined" || webhookData.statPoints > 0) && webhookData.lvl >= 10) {
       scriptProperties.setProperty("allocateStatPoints", JSON.stringify(webhookData));
     }
     if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.lvl <= 100 && getUser().preferences.sleep === true) {
