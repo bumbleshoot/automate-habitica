@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.19.6 (beta) by @bumbleshoot
+ * Automate Habitica v0.19.7 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -427,13 +427,10 @@ function createWebhooks() {
         "url": WEB_APP_URL,
         "label": DriveApp.getFileById(ScriptApp.getScriptId()).getName()
       }, webhook);
-      webhook = Object.assign(
-        POST_PARAMS,
-        {
-          "contentType": "application/json",
-          "payload": JSON.stringify(webhook)
-        }
-      );
+      webhook = Object.assign({
+        "contentType": "application/json",
+        "payload": JSON.stringify(webhook)
+      }, POST_PARAMS);
       fetch("https://habitica.com/api/v3/user/webhook", webhook);
     }
   }

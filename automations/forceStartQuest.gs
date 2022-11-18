@@ -49,16 +49,13 @@ function forceStartQuest() {
 
           // send list to player in a private message
           if (membersMissingQuest.length > 0) {
-            let params = Object.assign(
-              POST_PARAMS,
-              {
-                "contentType": "application/json",
-                "payload": JSON.stringify({
-                  "message": "The following party members failed to join the quest " + getContent().quests[party.quest.key].text + ": " + membersMissingQuest.join(", "),
-                  "toUserId": USER_ID
-                })
-              }
-            );
+            let params = Object.assign({
+              "contentType": "application/json",
+              "payload": JSON.stringify({
+                "message": "The following party members failed to join the quest " + getContent().quests[party.quest.key].text + ": " + membersMissingQuest.join(", "),
+                "toUserId": USER_ID
+              })
+            }, POST_PARAMS);
             fetch("https://habitica.com/api/v3/members/send-private-message", params);
           }
         }
