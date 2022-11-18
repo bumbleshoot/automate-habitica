@@ -134,22 +134,32 @@ function processTrigger() {
   let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
 
   // if just before day start time
-  if (now.getHours() == dayStart-1 && 39 <= now.getMinutes() && now.getMinutes() < 54 && (lastBeforeCron.toDateString() !== now.toDateString() || lastBeforeCron.getHours() !== now.getHours())) {
-    scriptProperties.setProperty("beforeCron", "true");
+  if (AUTO_CAST_SKILLS === true && now.getHours() == dayStart-1 && 39 <= now.getMinutes() && now.getMinutes() < 54 && (lastBeforeCron.toDateString() !== now.toDateString() || lastBeforeCron.getHours() !== now.getHours())) {
+    scriptProperties.setProperty("beforeCronSkills", "true");
     scriptProperties.setProperty("LAST_BEFORE_CRON", now);
 
   // if auto cron and player hasn't cronned today
   } else if (AUTO_CRON === true && needsCron === true) {
     scriptProperties.setProperty("runCron", "true");
     if (AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) {
-      scriptProperties.setProperty("afterCron", "true");
       scriptProperties.setProperty("LAST_AFTER_CRON", now);
+      if (AUTO_CAST_SKILLS === true) {
+        scriptProperties.setProperty("afterCronSkills", "true");
+      }
+      if (AUTO_PURCHASE_GEMS === true) {
+        scriptProperties.setProperty("purchaseGems", "true");
+      }
     }
 
   // if player has cronned today and after cron hasn't run since cron
   } else if ((AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
-    scriptProperties.setProperty("afterCron", "true");
     scriptProperties.setProperty("LAST_AFTER_CRON", now);
+    if (AUTO_CAST_SKILLS === true) {
+      scriptProperties.setProperty("afterCronSkills", "true");
+    }
+    if (AUTO_PURCHASE_GEMS === true) {
+      scriptProperties.setProperty("purchaseGems", "true");
+    }
 
   // in case GAS execution time limit was reached
   } else if (AUTO_CAST_SKILLS === true) {
@@ -321,9 +331,9 @@ function processQueue(noTimeout, wait) {
           scriptProperties.deleteProperty("acceptQuestInvite");
           continue;
         }
-        if (scriptProperties.getProperty("beforeCron") !== null) {
-          beforeCron();
-          scriptProperties.deleteProperty("beforeCron");
+        if (scriptProperties.getProperty("beforeCronSkills") !== null) {
+          beforeCronSkills();
+          scriptProperties.deleteProperty("beforeCronSkills");
           continue;
         }
         if (scriptProperties.getProperty("runCron") !== null) {
@@ -331,9 +341,9 @@ function processQueue(noTimeout, wait) {
           scriptProperties.deleteProperty("runCron");
           continue;
         }
-        if (scriptProperties.getProperty("afterCron") !== null) {
-          afterCron();
-          scriptProperties.deleteProperty("afterCron");
+        if (scriptProperties.getProperty("afterCronSkills") !== null) {
+          afterCronSkills();
+          scriptProperties.deleteProperty("afterCronSkills");
           continue;
         }
         if (scriptProperties.getProperty("purchaseGems") !== null) {
@@ -409,14 +419,14 @@ function processQueue(noTimeout, wait) {
 }
 
 /**
- * beforeCron()
+ * beforeCronSkills()
  * 
  * Attack the boss and use up mana that will be lost at cron.
  * Run this function just before the player's day start time, 
  * at least 6 mins before day start (max Google Apps Script 
  * run time).
  */
-function beforeCron() {
+function beforeCronSkills() {
   let playerClass = getPlayerClass();
   if (playerClass == "warrior") {
     smashBossAndDumpMana();
@@ -430,26 +440,21 @@ function beforeCron() {
 }
 
 /**
- * afterCron()
+ * afterCronSkills()
  * 
  * Cast buffs until all mana is used up. Run this function 
  * just after the player's cron.
  */
-function afterCron() {
-  if (AUTO_CAST_SKILLS === true) {
-    let playerClass = getPlayerClass();
-    if (playerClass == "warrior") {
-      castValorousPresence(false);
-    } else if (playerClass == "mage") {
-      castEarthquake(false);
-    } else if (playerClass == "healer") {
-      castProtectiveAura(false);
-    } else if (playerClass == "rogue") {
-      castToolsOfTheTrade(false);
-    }
-  }
-  if (AUTO_PURCHASE_GEMS === true) {
-    scriptProperties.setProperty("purchaseGems", "true");
+function afterCronSkills() {
+  let playerClass = getPlayerClass();
+  if (playerClass == "warrior") {
+    castValorousPresence(false);
+  } else if (playerClass == "mage") {
+    castEarthquake(false);
+  } else if (playerClass == "healer") {
+    castProtectiveAura(false);
+  } else if (playerClass == "rogue") {
+    castToolsOfTheTrade(false);
   }
 }
 

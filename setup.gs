@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.19.7 (beta) by @bumbleshoot
+ * Automate Habitica v0.19.8 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -162,7 +162,7 @@ function validateConstants() {
 
   if (AUTO_ALLOCATE_STAT_POINTS === true) {
     if (!["str", "int", "con", "per"].includes(STAT_TO_ALLOCATE)) {
-      console.log("ERROR: STAT_TO_ALLOCATE must be one of either \"str\", \"int\", \"con\", or \"per\".\n\neg. const STAT_TO_ALLOCATE = \"int\";\n    const STAT_TO_ALLOCATE = \"per\";")
+      console.log("ERROR: STAT_TO_ALLOCATE must be one of either \"str\", \"int\", \"con\", or \"per\".\n\neg. const STAT_TO_ALLOCATE = \"int\";\n    const STAT_TO_ALLOCATE = \"per\";");
       valid = false;
     }
   }
