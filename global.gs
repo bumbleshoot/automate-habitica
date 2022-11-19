@@ -197,14 +197,14 @@ function processWebhook(webhookData) {
 
   // when a task is scored
   if (webhookData.webhookType == "scored") {
-    if (AUTO_CAST_SKILLS === true) {
-      scriptProperties.setProperty("useExcessMana", "true");
-    }
     if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.taskType == "daily" && webhookData.isDue === true && getUser().preferences.sleep === true) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
     if (AUTO_PURCHASE_GEMS === true && webhookData.gp >= 20) {
       scriptProperties.setProperty("purchaseGems", "true");
+    }
+    if (AUTO_CAST_SKILLS === true) {
+      scriptProperties.setProperty("useExcessMana", "true");
     }
     if (AUTO_PURCHASE_ARMOIRES === true && webhookData.gp >= RESERVE_GOLD + 100) {
       scriptProperties.setProperty("purchaseArmoires", webhookData.gp);
@@ -233,14 +233,14 @@ function processWebhook(webhookData) {
 
   // when player is invited to a quest
   } else if (webhookData.webhookType == "questInvited") {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true) {
+      scriptProperties.setProperty("pauseResumeDamage", "true");
+    }
     if (AUTO_ACCEPT_QUEST_INVITES === true) {
       scriptProperties.setProperty("acceptQuestInvite", "true");
     }
     if (AUTO_START_QUESTS === true) {
       scriptProperties.setProperty("forceStartQuest", "true");
-    }
-    if (AUTO_PAUSE_RESUME_DAMAGE === true) {
-      scriptProperties.setProperty("pauseResumeDamage", "true");
     }
 
   // when a quest is started
@@ -251,14 +251,17 @@ function processWebhook(webhookData) {
 
   // when a quest is finished
   } else if (webhookData.webhookType == "questFinished") {
-    if (NOTIFY_ON_QUEST_END === true && typeof webhookData.questKey !== "undefined") {
-      scriptProperties.setProperty("notifyQuestEnded", webhookData.questKey);
-    }
     if (AUTO_PURCHASE_GEMS === true) {
       scriptProperties.setProperty("purchaseGems", "true");
     }
+    if (NOTIFY_ON_QUEST_END === true && typeof webhookData.questKey !== "undefined") {
+      scriptProperties.setProperty("notifyQuestEnded", webhookData.questKey);
+    }
     if (AUTO_PURCHASE_ARMOIRES === true) {
       scriptProperties.setProperty("purchaseArmoires", "true");
+    }
+    if (AUTO_UPDATE_QUEST_TRACKER === true) {
+      scriptProperties.setProperty("updateQuestTracker", "true");
     }
     if (AUTO_SELL_EGGS === true) {
       scriptProperties.setProperty("sellExtraEggs", "true");
@@ -271,9 +274,6 @@ function processWebhook(webhookData) {
     }
     if (AUTO_HATCH_FEED_PETS === true) {
       scriptProperties.setProperty("hatchFeedPets", "true");
-    }
-    if (AUTO_UPDATE_QUEST_TRACKER === true) {
-      scriptProperties.setProperty("updateQuestTracker", "true");
     }
   }
 }
