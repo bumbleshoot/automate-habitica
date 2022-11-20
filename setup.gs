@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.19.9 (beta) by @bumbleshoot
+ * Automate Habitica v0.20.0 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -80,7 +80,10 @@ function install() {
       statPoints: user.stats.points,
       lvl: user.stats.lvl
     });
-    processWebhook({ webhookType: "questInvited" });
+    processWebhook({
+      webhookType: "questInvited",
+      questKey: user.party.quest.key
+    });
     processWebhook({ webhookType: "questStarted" });
     processWebhook({ webhookType: "questFinished" });
 

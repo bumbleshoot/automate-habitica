@@ -18,12 +18,12 @@
  * If the player is sleeping and on a quest, run this function 
  * whenever they cast brutal smash or burst of flames.
  */
-function pauseResumeDamage() {
+function pauseResumeDamage(questKey) {
 
   let damageToPlayer = 0;
   let damageToParty = 0;
   let stealth = getUser(true).stats.buffs.stealth;
-  let quest = user.party.quest.key;
+  let quest = questKey || user.party.quest.key;
   let boss;
   if (quest) {
     boss = getContent().quests[quest].boss;
@@ -85,9 +85,9 @@ function pauseResumeDamage() {
   console.log("Pending damage to player: " + damageTotal);
   console.log("Pending damage to party: " + damageToParty);
 
-  // if fighting a boss or not on a quest
+  // if fighting a boss
   let hp = user.stats.hp;
-  if (typeof boss !== "undefined" || quest === null) {
+  if (typeof boss !== "undefined") {
 
     // get lowest party member health
     let lowestHealth = 50;
@@ -104,7 +104,7 @@ function pauseResumeDamage() {
       wakeUp();
     }
 
-  // if on a collection quest
+  // if on a collection quest or not on a quest
   } else {
 
     // if damage to player greater than threshold or hp, sleep, otherwise wake up

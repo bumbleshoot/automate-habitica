@@ -79,7 +79,7 @@ function doPost(e) {
       Object.assign(webhookData, {
         lvl: postData.finalLvl
       });
-    } else if (webhookData.webhookType == "questFinished") {
+    } else if (webhookData.webhookType == "questInvited" || webhookData.webhookType == "questFinished") {
       Object.assign(webhookData, {
         questKey: postData.quest.key
       });
@@ -234,7 +234,7 @@ function processWebhook(webhookData) {
   // when player is invited to a quest
   } else if (webhookData.webhookType == "questInvited") {
     if (AUTO_PAUSE_RESUME_DAMAGE === true) {
-      scriptProperties.setProperty("pauseResumeDamage", "true");
+      scriptProperties.setProperty("pauseResumeDamage", webhookData.questKey);
     }
     if (AUTO_ACCEPT_QUEST_INVITES === true) {
       scriptProperties.setProperty("acceptQuestInvite", "true");
@@ -321,8 +321,13 @@ function processQueue(noTimeout, wait) {
           scriptProperties.deleteProperty("healParty");
           continue;
         }
-        if (scriptProperties.getProperty("pauseResumeDamage") !== null) {
-          pauseResumeDamage();
+        let questKey = scriptProperties.getProperty("pauseResumeDamage");
+        if (questKey !== null) {
+          if (questKey === "true") {
+            pauseResumeDamage();
+          } else {
+            pauseResumeDamage(questKey);
+          }
           scriptProperties.deleteProperty("pauseResumeDamage");
           continue;
         }
@@ -356,7 +361,7 @@ function processQueue(noTimeout, wait) {
           scriptProperties.deleteProperty("forceStartQuest");
           continue;
         }
-        let questKey = scriptProperties.getProperty("notifyQuestEnded");
+        questKey = scriptProperties.getProperty("notifyQuestEnded");
         if (questKey !== null) {
           notifyQuestEnded(questKey);
           scriptProperties.deleteProperty("notifyQuestEnded");
