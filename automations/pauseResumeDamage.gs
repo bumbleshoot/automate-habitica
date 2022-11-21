@@ -64,7 +64,7 @@ function pauseResumeDamage(questKey) {
       }
 
       // if fighting a boss or not on a quest, calculate damage to party
-      if (typeof boss !== "undefined" || quest === null) {
+      if (typeof boss !== "undefined" || !quest) {
         let bossDelta = delta;
         if (daily.priority < 1) {
             bossDelta *= daily.priority;
