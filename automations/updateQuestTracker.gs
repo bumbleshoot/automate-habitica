@@ -30,7 +30,13 @@
       throw e;
     }
   }
-  
+
+  // get party members
+  let members = getMembers(true);
+  if (typeof members === "undefined") {
+    members = [getUser(true)];
+  }
+
   console.log("Getting quest data");
 
   // get lists of premium eggs, premium hatching potions & wacky hatching potions
@@ -122,7 +128,7 @@
 
       // get completions
       let completions = {};
-      for (member of getMembers(true)) {
+      for (member of members) {
         let timesCompleted = 0;
         for ([questKey, numCompletions] of Object.entries(member.achievements.quests)) {
           if (questKey == quest.key) {

@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.20.0 (beta) by @bumbleshoot
+ * Automate Habitica v0.20.1 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -39,7 +39,7 @@ const AUTO_SELL_FOOD = false;
 const RESERVE_FOOD = 999;
 
 const AUTO_HATCH_FEED_PETS = false;
-const ONLY_USE_DROP_FOOD = false;
+const ONLY_USE_DROP_FOOD = true;
 
 /************************\
  *  PARTY LEADERS ONLY  *

@@ -234,7 +234,7 @@ function processWebhook(webhookData) {
   // when player is invited to a quest
   } else if (webhookData.webhookType == "questInvited") {
     if (AUTO_PAUSE_RESUME_DAMAGE === true) {
-      scriptProperties.setProperty("pauseResumeDamage", webhookData.questKey);
+      scriptProperties.setProperty("pauseResumeDamage", webhookData.questKey || "true");
     }
     if (AUTO_ACCEPT_QUEST_INVITES === true) {
       scriptProperties.setProperty("acceptQuestInvite", "true");
@@ -596,6 +596,12 @@ function getTotalStat(stat) {
     return (getUser(true).stats.maxMP - 30) / 2;
   }
 
+  // get player class
+  let playerClass = getPlayerClass();
+  if (playerClass == "mage") {
+    playerClass = "wizard";
+  }
+
   // calculate stat from level, buffs, allocated
   let levelStat = Math.min(Math.floor(getUser(true).stats.lvl / 2), 50);
   let equipmentStat = 0;
@@ -607,7 +613,7 @@ function getTotalStat(stat) {
     let equipment = getContent().gear.flat[equipped];
     if (typeof equipment !== "undefined") {
       equipmentStat += equipment[stat];
-      if (equipment.klass == user.stats.class || ((equipment.klass == "special") && (equipment.specialClass == user.stats.class))) {
+      if (equipment.klass == playerClass || ((equipment.klass == "special") && (equipment.specialClass == playerClass))) {
         equipmentStat += equipment[stat] / 2;
       }
     }
@@ -661,15 +667,17 @@ function getTasks() {
     tasks = JSON.parse(fetch("https://habitica.com/api/v3/tasks/user", GET_PARAMS)).data;
     dailies = [];
     for (let i=0; i<tasks.length; i++) {
-      if (tasks[i].type == "daily") {
-        dailies.push(tasks[i]);
-      } else if (tasks[i].type == "reward") {
+      if (tasks[i].type == "reward") {
         tasks.splice(i, 1);
         i--;
-      }
-      if (typeof tasks[i].challenge.id !== "undefined") {
-        tasks.splice(i, 1);
-        i--;
+      } else {
+        if (tasks[i].type == "daily") {
+          dailies.push(tasks[i]);
+        }
+        if (typeof tasks[i].challenge.id !== "undefined") {
+          tasks.splice(i, 1);
+          i--;
+        }
       }
     }
   }
