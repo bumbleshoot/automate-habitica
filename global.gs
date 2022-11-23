@@ -517,7 +517,10 @@ function fetch(url, params) {
     if (new Date().getTime() - scriptStart.getTime() >= 350000) {
       scriptProperties.setProperty("numAPICalls", numAPICalls);
     }
-    if (numAPICalls >= 19000) {
+    if (!minimizeAPICalls && numAPICalls >= 19000) {
+
+      console.log("Approaching UrlFetch limit, turning off non-essential automations until tomorrow");
+
       minimizeAPICalls = true;
     }
 
