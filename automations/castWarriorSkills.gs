@@ -66,7 +66,7 @@ function castValorousPresence(saveMana) {
 
   // if lvl < 12, nothing to cast
   } else {
-    console.log("Player level " + user.stats.lvl + ", no skills to cast");
+    console.log("Player level " + user.stats.lvl + ", cannot cast buffs");
   }
 }
 
@@ -81,12 +81,16 @@ function castValorousPresence(saveMana) {
  */
 function smashBossAndDumpMana() {
 
-  // if lvl >= 11
-  if (getUser(true).stats.lvl >= 11) {
+  // if lvl < 11, nothing to cast
+  if (getUser(true).stats.lvl < 11) {
+    console.log("Player level " + user.stats.lvl + ", no skills to cast");
+    return;
+  }
 
-    let mana = user.stats.mp;
+  console.log("Mana: " + user.stats.mp);
 
-    console.log("Mana: " + mana);
+  // if in a party
+  if (typeof user.party._id !== "undefined") {
 
     // get boss hp
     let bossHP = 3000;
@@ -102,7 +106,7 @@ function smashBossAndDumpMana() {
 
       // calculate number of brutal smashes to cast
       let str = getTotalStat("str");
-      let numSmashes = Math.min(Math.max(Math.ceil((bossHP - user.party.quest.progress.up) / (55 * str / (str + 70))), 0), Math.floor(mana / 10));
+      let numSmashes = Math.min(Math.max(Math.ceil((bossHP - user.party.quest.progress.up) / (55 * str / (str + 70))), 0), Math.floor(user.stats.mp / 10));
 
       // if casting at least 1 brutal smash
       if (numSmashes > 0) {
@@ -126,57 +130,63 @@ function smashBossAndDumpMana() {
         // cast brutal smash on bluest task
         for (let i=0; i<numSmashes; i++) {
           fetch("https://habitica.com/api/v3/user/class/cast/smash?targetId=" + bluestTask.id, POST_PARAMS);
-          mana -= 10;
+          user.stats.mp -= 10;
         }
 
-        console.log("Mana remaining: " + mana);
+        console.log("Mana remaining: " + user.stats.mp);
 
         // if sleeping and on quest, pause or resume damage
         if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && typeof user.party.quest.key !== "undefined") {
           scriptProperties.setProperty("pauseResumeDamage", "true");
         }
       }
+
+    // if no boss or no non-challenge tasks
     } else {
       console.log("No boss fight or user has no non-challenge tasks");
     }
 
-    // if not approaching API call limit
-    if (!minimizeAPICalls) {
+    // if not in a party
+  } else {
+    console.log("Player not in a party, cannot cast Brutal Smash");
+  }
 
-      // check for perfect day
-      let perfectDayBuff = calculatePerfectDayBuff();
+  // if not approaching API call limit & lvl >= 12
+  if (!minimizeAPICalls && user.stats.lvl >= 12) {
 
-      // calculate number of valorous presences to cast
-      let int = getTotalStat("int");
-      let maxManaAfterCron = ((int - user.stats.buffs.int + perfectDayBuff) * 2 + 30) * 0.9;
+    // check for perfect day
+    let perfectDayBuff = calculatePerfectDayBuff();
 
-      console.log("Reserving no more than " + maxManaAfterCron + " (maxManaAfterCron) mana");
+    // calculate number of valorous presences to cast
+    let int = getTotalStat("int");
+    let maxManaAfterCron = ((int - user.stats.buffs.int + perfectDayBuff) * 2 + 30) * 0.9;
 
-      let numPresences = Math.max(Math.ceil((mana - maxManaAfterCron) / 20), 0);
-      let numStances = Math.max(Math.ceil((mana - maxManaAfterCron) / 25), 0);
+    console.log("Reserving no more than " + maxManaAfterCron + " (maxManaAfterCron) mana");
 
-      // if lvl >= 13, cast valorous presences
-      if (user.stats.lvl >= 13) {
+    let numPresences = Math.max(Math.ceil((user.stats.mp - maxManaAfterCron) / 20), 0);
+    let numStances = Math.max(Math.ceil((user.stats.mp - maxManaAfterCron) / 25), 0);
 
-        console.log("Casting Valorous Presence " + numPresences + " time(s)");
+    // if lvl >= 13, cast valorous presences
+    if (user.stats.lvl >= 13) {
 
-        for (let i=0; i<numPresences; i++) {
-          fetch("https://habitica.com/api/v3/user/class/cast/valorousPresence", POST_PARAMS);
-        }
-      
-      // if lvl < 13, cast defensive stances
-      } else {
+      console.log("Casting Valorous Presence " + numPresences + " time(s)");
 
-        console.log("Player level " + user.stats.lvl + ", casting Defensive Stance " + numStances + " time(s)");
+      for (let i=0; i<numPresences; i++) {
+        fetch("https://habitica.com/api/v3/user/class/cast/valorousPresence", POST_PARAMS);
+      }
+    
+    // if lvl 12, cast defensive stances
+    } else {
 
-        for (let i=0; i<numStances; i++) {
-          fetch("https://habitica.com/api/v3/user/class/cast/defensiveStance", POST_PARAMS);
-        }
+      console.log("Player level " + user.stats.lvl + ", casting Defensive Stance " + numStances + " time(s)");
+
+      for (let i=0; i<numStances; i++) {
+        fetch("https://habitica.com/api/v3/user/class/cast/defensiveStance", POST_PARAMS);
       }
     }
 
-  // if lvl < 11, nothing to cast
-  } else {
-    console.log("Player level " + user.stats.lvl + ", no skills to cast");
+  // if lvl < 12
+  } else if (user.stats.lvl < 12) {
+    console.log("Player level " + user.stats.lvl + ", cannot cast buffs");
   }
 }

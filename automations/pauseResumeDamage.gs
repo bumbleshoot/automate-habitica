@@ -28,10 +28,8 @@ function pauseResumeDamage(questKey) {
   if (quest) {
     boss = getContent().quests[quest].boss;
   }
-  let bossHp = 3000;
   let bossStr = 4;
   if (typeof boss !== "undefined") {
-    bossHp = boss.hp;
     bossStr = boss.str;
   }
   let con = getTotalStat("con");
@@ -63,8 +61,10 @@ function pauseResumeDamage(questKey) {
         delta *= (1 - subtasksDone / daily.checklist.length);
       }
 
-      // if fighting a boss or not on a quest, calculate damage to party
-      if (typeof boss !== "undefined" || !quest) {
+      // if in a party and fighting a boss or not on a quest
+      if (typeof user.party._id !== "undefined" && (typeof boss !== "undefined" || !quest)) {
+
+        // calculate damage to party
         let bossDelta = delta;
         if (daily.priority < 1) {
             bossDelta *= daily.priority;
@@ -80,7 +80,11 @@ function pauseResumeDamage(questKey) {
   // add up & round damage values
   let damageTotal = Math.ceil((damageToPlayer + damageToParty) * 10) / 10;
   damageToPlayer = Math.ceil(damageToPlayer  * 10) / 10;
-  damageToParty = Math.ceil(damageToParty * 10) / 10;
+  if (typeof getMembers(true) !== "undefined" && members.length > 1) {
+    damageToParty = Math.ceil(damageToParty * 10) / 10;
+  } else {
+    damageToParty = 0;
+  }
 
   console.log("Pending damage to player: " + damageTotal);
   console.log("Pending damage to party: " + damageToParty);
@@ -91,7 +95,7 @@ function pauseResumeDamage(questKey) {
 
     // get lowest party member health
     let lowestHealth = 50;
-    for (member of getMembers(true)) {
+    for (member of members || []) {
       if (member.stats.hp < lowestHealth) {
         lowestHealth = member.stats.hp;
       }

@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.20.5 (beta) by @bumbleshoot
+ * Automate Habitica v0.20.6 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -257,9 +257,11 @@ function validateConstants() {
     valid = false;
   }
 
-  if (ONLY_USE_DROP_FOOD !== true && ONLY_USE_DROP_FOOD !== false) {
-    console.log("ERROR: ONLY_USE_DROP_FOOD must equal either true or false.\n\neg. const ONLY_USE_DROP_FOOD = true;\n    const ONLY_USE_DROP_FOOD = false;");
-    valid = false;
+  if (AUTO_HATCH_FEED_PETS === true) {
+    if (ONLY_USE_DROP_FOOD !== true && ONLY_USE_DROP_FOOD !== false) {
+      console.log("ERROR: ONLY_USE_DROP_FOOD must equal either true or false.\n\neg. const ONLY_USE_DROP_FOOD = true;\n    const ONLY_USE_DROP_FOOD = false;");
+      valid = false;
+    }
   }
 
   if (AUTO_START_QUESTS !== true && AUTO_START_QUESTS !== false) {
@@ -269,8 +271,8 @@ function validateConstants() {
 
   if (AUTO_START_QUESTS === true) {
 
-    if (getParty().leader.id !== USER_ID) {
-      console.log("ERROR: AUTO_START_QUESTS can only be run by the party leader.");
+    if (typeof getParty() === "undefined" || party.leader.id !== USER_ID) {
+      console.log("ERROR: AUTO_START_QUESTS can only be run by party leaders.");
       valid = false;
     }
 
@@ -292,7 +294,7 @@ function validateConstants() {
 
   if (AUTO_UPDATE_QUEST_TRACKER === true) {
 
-    if (getParty().leader.id !== USER_ID) {
+    if (typeof getParty() === "undefined" || party.leader.id !== USER_ID) {
       console.log("WARNING: AUTO_UPDATE_QUEST_TRACKER should only be run by one party member (preferably the party leader).");
     }
 

@@ -536,7 +536,7 @@ function fetch(url, params) {
     });
 
     // if success, return response
-    if (response.getResponseCode() < 300) {
+    if (response.getResponseCode() < 300 || (response.getResponseCode() === 404 && (url === "https://habitica.com/api/v3/groups/party" || url.startsWith("https://habitica.com/api/v3/groups/party/members")))) {
       return response;
 
     // if 3xx or 4xx or failed 3 times, throw exception

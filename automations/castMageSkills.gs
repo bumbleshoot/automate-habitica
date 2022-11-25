@@ -17,57 +17,52 @@
  */
 function castEarthquake(saveMana) {
 
-  // do not run if approaching API call limit
+  // if approaching API call limit or lvl < 12 or lvl 12 & not in party with other players, return
   if (minimizeAPICalls) {
+    return;
+  } else if (getUser(true).stats.lvl < 12 || (user.stats.lvl === 12 && (typeof getParty() === "undefined" || getParty().memberCount <= 1))) {
+    console.log("Player level " + user.stats.lvl + ", cannot cast buffs");
     return;
   }
 
-  // if lvl >= 12
-  if (getUser(true).stats.lvl >= 12) {
+  console.log("Mana: " + user.stats.mp);
 
-    console.log("Mana: " + user.stats.mp);
+  // calculate number of earthquakes to cast
+  let numEarthquakes = 0;
+  let numSurges = 0;
+  if (saveMana) {
+    let int = getTotalStat("int");
+    let maxManaAfterCron = ((int - user.stats.buffs.int + Math.min(Math.ceil(user.stats.lvl / 2), 50)) * 2 + 30) * 0.9;
+    let chillingFrostMana = user.stats.lvl >= 14 && calculatePerfectDayBuff() === 0 ? 40 : 0;
+    let finishBossMana = Math.max(Math.ceil((3000 - user.party.quest.progress.up) / Math.ceil(int / 10)) * 10, 0);
+    let reserve = maxManaAfterCron + chillingFrostMana + finishBossMana;
 
-    // calculate number of earthquakes to cast
-    let numEarthquakes = 0;
-    let numSurges = 0;
-    if (saveMana) {
-      let int = getTotalStat("int");
-      let maxManaAfterCron = ((int - user.stats.buffs.int + Math.min(Math.ceil(user.stats.lvl / 2), 50)) * 2 + 30) * 0.9;
-      let chillingFrostMana = user.stats.lvl >= 14 && calculatePerfectDayBuff() === 0 ? 40 : 0;
-      let finishBossMana = Math.max(Math.ceil((3000 - user.party.quest.progress.up) / Math.ceil(int / 10)) * 10, 0);
-      let reserve = maxManaAfterCron + chillingFrostMana + finishBossMana;
+    console.log("Reserving no more than " + maxManaAfterCron + " (maxManaAfterCron) + " + chillingFrostMana + " (chillingFrostMana) + " + finishBossMana + " (finishBossMana) = " + reserve + " mana");
 
-      console.log("Reserving no more than " + maxManaAfterCron + " (maxManaAfterCron) + " + chillingFrostMana + " (chillingFrostMana) + " + finishBossMana + " (finishBossMana) = " + reserve + " mana");
-
-      numEarthquakes = Math.max(Math.ceil((user.stats.mp - reserve) / 35), 0);
-      numSurges = Math.max(Math.ceil((user.stats.mp - reserve) / 30), 0);
-    } else {
-      numEarthquakes = Math.floor(user.stats.mp / 35);
-      numSurges = Math.floor(user.stats.mp / 30);
-    }
-
-    // if lvl > 12, cast earthquake
-    if (user.stats.lvl > 12) {
-
-      console.log("Casting Earthquake " + numEarthquakes + " time(s)");
-
-      for (let i=0; i<numEarthquakes; i++) {
-        fetch("https://habitica.com/api/v3/user/class/cast/earth", POST_PARAMS);
-      }
-
-    // if lvl 12, cast ethereal surge
-    } else {
-
-      console.log("Player level 12, casting Ethereal Surge " + numSurges + " time(s)");
-
-      for (let i=0; i<numSurges; i++) {
-        fetch("https://habitica.com/api/v3/user/class/cast/mpheal", POST_PARAMS);
-      }
-    }
-
-  // if lvl < 12, nothing to cast
+    numEarthquakes = Math.max(Math.ceil((user.stats.mp - reserve) / 35), 0);
+    numSurges = Math.max(Math.ceil((user.stats.mp - reserve) / 30), 0);
   } else {
-    console.log("Player level " + user.stats.lvl + ", no skills to cast");
+    numEarthquakes = Math.floor(user.stats.mp / 35);
+    numSurges = Math.floor(user.stats.mp / 30);
+  }
+
+  // if lvl > 12, cast earthquake
+  if (user.stats.lvl > 12) {
+
+    console.log("Casting Earthquake " + numEarthquakes + " time(s)");
+
+    for (let i=0; i<numEarthquakes; i++) {
+      fetch("https://habitica.com/api/v3/user/class/cast/earth", POST_PARAMS);
+    }
+
+  // if lvl 12 & in a party with other players, cast ethereal surge
+  } else {
+
+    console.log("Player level 12, casting Ethereal Surge " + numSurges + " time(s)");
+
+    for (let i=0; i<numSurges; i++) {
+      fetch("https://habitica.com/api/v3/user/class/cast/mpheal", POST_PARAMS);
+    }
   }
 }
 
@@ -83,23 +78,28 @@ function castEarthquake(saveMana) {
  */
 function burnBossAndDumpMana() {
 
-  // if lvl >= 11
-  if (getUser(true).stats.lvl >= 11) {
+  // if lvl < 11, return
+  if (getUser(true).stats.lvl < 11) {
+    console.log("Player level " + user.stats.lvl + ", no skills to cast");
+    return;
+  }
 
-    let int = getTotalStat("int");
-    let mana = user.stats.mp;
-    let perfectDayBuff = calculatePerfectDayBuff();
+  let int = getTotalStat("int");
+  let perfectDayBuff = calculatePerfectDayBuff();
 
-    console.log("Mana: " + mana);
+  console.log("Mana: " + user.stats.mp);
 
-    // if imperfect day & enough mana & streaks not already frozen & lvl >= 14, cast chilling frost
-    if (perfectDayBuff === 0 && mana >= 40 && !user.stats.buffs.streaks && user.stats.lvl >= 14) {
+  // if imperfect day & enough mana & streaks not already frozen & lvl >= 14, cast chilling frost
+  if (perfectDayBuff === 0 && user.stats.mp >= 40 && !user.stats.buffs.streaks && user.stats.lvl >= 14) {
 
-      console.log("Imperfect day, casting Chilling Frost");
+    console.log("Imperfect day, casting Chilling Frost");
 
-      fetch("https://habitica.com/api/v3/user/class/cast/frost", POST_PARAMS);
-      mana -= 40;
-    }
+    fetch("https://habitica.com/api/v3/user/class/cast/frost", POST_PARAMS);
+    user.stats.mp -= 40;
+  }
+
+  // if in a party
+  if (typeof user.party._id !== "undefined") {
 
     // get boss hp
     let bossHP = 3000;
@@ -114,7 +114,7 @@ function burnBossAndDumpMana() {
       console.log("Pending damage: " + user.party.quest.progress.up);
 
       // calculate number of burst of flames to cast
-      let numBursts = Math.min(Math.max(Math.ceil((bossHP - user.party.quest.progress.up) / Math.ceil(int / 10)), 0), Math.floor(mana / 10));
+      let numBursts = Math.min(Math.max(Math.ceil((bossHP - user.party.quest.progress.up) / Math.ceil(int / 10)), 0), Math.floor(user.stats.mp / 10));
 
       // if casting at least 1 burst of flames
       if (numBursts > 0) {
@@ -138,7 +138,7 @@ function burnBossAndDumpMana() {
         // cast burst of flames on bluest task
         for (let i=0; i<numBursts; i++) {
           fetch("https://habitica.com/api/v3/user/class/cast/fireball?targetId=" + bluestTask.id, POST_PARAMS);
-          mana -= 10;
+          user.stats.mp -= 10;
         }
 
         // if sleeping and on quest, pause or resume damage
@@ -151,18 +151,15 @@ function burnBossAndDumpMana() {
       console.log("No boss fight or user has no non-challenge tasks");
     }
 
-    // if not approaching API call limit
-    if (!minimizeAPICalls) {
-
-      // if lvl >= 12
-      if (user.stats.lvl >= 12) {
+    // if not approaching API call limit & lvl >= 12 & party has other players
+    if (!minimizeAPICalls && user.stats.lvl >= 12 && getParty().memberCount > 1) {
 
         // calculate number of ethereal surges to cast
         let maxManaAfterCron = ((int - user.stats.buffs.int + perfectDayBuff) * 2 + 30) * 0.9;
 
         console.log("Reserving no more than " + maxManaAfterCron + " (maxManaAfterCron) mana");
 
-        let numSurges = Math.max(Math.ceil((mana - maxManaAfterCron) / 30), 0);
+        let numSurges = Math.max(Math.ceil((user.stats.mp - maxManaAfterCron) / 30), 0);
 
         console.log("Casting Ethereal Surge " + numSurges + " time(s)");
 
@@ -170,11 +167,32 @@ function burnBossAndDumpMana() {
         for (let i=0; i<numSurges; i++) {
           fetch("https://habitica.com/api/v3/user/class/cast/mpheal", POST_PARAMS);
         }
-      }
+
+      // if lvl < 12, cannot cast ethereal surge
+    } else if (user.stats.lvl < 12) {
+      console.log("Player level " + user.stats.lvl + ", cannot cast Ethereal Surge");
+    }
+  }
+
+  // not in a party with other players & not approaching API call limit & lvl >= 13
+  if ((typeof getParty() === "undefined" || getParty().memberCount <= 1) && !minimizeAPICalls && user.stats.lvl >= 13) {
+
+    // calculate number of earthquakes to cast
+    let maxManaAfterCron = ((int - user.stats.buffs.int + perfectDayBuff) * 2 + 30) * 0.9;
+
+    console.log("Reserving no more than " + maxManaAfterCron + " (maxManaAfterCron) mana");
+
+    let numEarthquakes = Math.max(Math.ceil((user.stats.mp - maxManaAfterCron) / 35), 0);
+
+    console.log("Casting Earthquake " + numEarthquakes + " time(s)");
+
+    // cast earthquake
+    for (let i=0; i<numEarthquakes; i++) {
+      fetch("https://habitica.com/api/v3/user/class/cast/mpheal", POST_PARAMS);
     }
 
-  // if lvl < 11, nothing to cast
-  } else {
-    console.log("Player level " + user.stats.lvl + ", no skills to cast");
+  // if lvl < 13, cannot cast earthquake
+  } else if (user.stats.lvl < 13) {
+    console.log("Player level " + user.stats.lvl + ", cannot cast Earthquake");
   }
 }

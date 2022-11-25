@@ -9,7 +9,7 @@
 function acceptQuestInvite() {
 
   // if pending quest & unaccepted invite
-  if (typeof getParty(true).quest.key !== "undefined" && !party.quest.active && party.quest.members[USER_ID] === null) {
+  if (typeof getParty(true) !== "undefined" && typeof party.quest.key !== "undefined" && !party.quest.active && party.quest.members[USER_ID] === null) {
 
     console.log("Accepting invite to pending quest \"" + getContent().quests[party.quest.key].text + "\"");
 
