@@ -418,6 +418,11 @@ function processQueue(noTimeout, wait) {
   
   } catch (e) {
     if (!e.stack.includes("There are too many LockService operations against the same script")) {
+      MailApp.sendEmail(
+        Session.getEffectiveUser().getEmail(),
+        DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
+        e.stack
+      );
       throw e;
     }
   }

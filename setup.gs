@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.20.4 (beta) by @bumbleshoot
+ * Automate Habitica v0.20.5 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -370,8 +370,9 @@ function deleteWebhooks() {
 
 function createWebhooks() {
 
-  // task scored
   let webhooks = [];
+
+  // task scored
   if (AUTO_ALLOCATE_STAT_POINTS === true || AUTO_CAST_SKILLS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
     webhooks.push({
       "type": "taskActivity",
