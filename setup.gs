@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.20.6 (beta) by @bumbleshoot
+ * Automate Habitica v0.21.0 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -49,10 +49,6 @@ const AUTO_START_QUESTS = false;
 const AUTO_START_QUESTS_AFTER_HOURS_MIN = 4; // eg. if set to 1, quests will auto start in 1-2 hours
 const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = true;
 
-const AUTO_UPDATE_QUEST_TRACKER = false;
-const QUEST_TRACKER_SPREADSHEET_URL = "";
-const QUEST_TRACKER_SPREADSHEET_TAB_NAME = "Sheet1";
-
 /*************************************\
  *  DO NOT EDIT ANYTHING BELOW HERE  *
 \*************************************/
@@ -91,7 +87,7 @@ function install() {
     minimizeAPICalls = true;
 
     // process queue
-    processQueue(false, true);
+    processQueue(true);
 
     // create trigger & webhooks
     createTrigger();
@@ -287,42 +283,6 @@ function validateConstants() {
     }
   }
 
-  if (AUTO_UPDATE_QUEST_TRACKER !== true && AUTO_UPDATE_QUEST_TRACKER !== false) {
-    console.log("ERROR: AUTO_UPDATE_QUEST_TRACKER must equal either true or false.\n\neg. const AUTO_UPDATE_QUEST_TRACKER = true;\n    const AUTO_UPDATE_QUEST_TRACKER = false;");
-    valid = false;
-  }
-
-  if (AUTO_UPDATE_QUEST_TRACKER === true) {
-
-    if (typeof getParty() === "undefined" || party.leader.id !== USER_ID) {
-      console.log("WARNING: AUTO_UPDATE_QUEST_TRACKER should only be run by one party member (preferably the party leader).");
-    }
-
-    if (typeof QUEST_TRACKER_SPREADSHEET_URL !== "string" || !QUEST_TRACKER_SPREADSHEET_URL.startsWith("https://docs.google.com/spreadsheets/d/") || QUEST_TRACKER_SPREADSHEET_URL.match(/[^\/]{44}/) === null) {
-      console.log("ERROR: QUEST_TRACKER_SPREADSHEET_URL must equal the URL of the Google Sheet that contains the Quest Tracker tab. You can copy this URL from your address bar while viewing the spreadsheet in a web browser.\n\neg. const QUEST_TRACKER_SPREADSHEET_URL = \"https://docs.google.com/spreadsheets/d/1YbiVoNxP6q08KFPY01ARa3bNv8MDhBtRx41fBqPWN2o\";");
-      valid = false;
-    } else {
-      try {
-        var questTrackerSpreadsheet = SpreadsheetApp.openById(QUEST_TRACKER_SPREADSHEET_URL.match(/[^\/]{44}/)[0]);
-      } catch (e) {
-        if (e.stack.includes("Unexpected error while getting the method or property openById on object SpreadsheetApp")) {
-          console.log("ERROR: QUEST_TRACKER_SPREADSHEET_URL not found: " + QUEST_TRACKER_SPREADSHEET_URL);
-          valid = false;
-        } else {
-          throw e;
-        }
-      }
-    }
-
-    if (typeof QUEST_TRACKER_SPREADSHEET_TAB_NAME !== "string" || QUEST_TRACKER_SPREADSHEET_TAB_NAME == "") {
-      console.log("ERROR: QUEST_TRACKER_SPREADSHEET_TAB_NAME must equal the name of the Quest Tracker tab.\n\neg. const QUEST_TRACKER_SPREADSHEET_TAB_NAME = \"Quest Tracker\";");
-      valid = false;
-    } else if (typeof questTrackerSpreadsheet !== "undefined" && questTrackerSpreadsheet.getSheetByName(QUEST_TRACKER_SPREADSHEET_TAB_NAME) === null) {
-      console.log("ERROR: QUEST_TRACKER_SPREADSHEET_TAB_NAME \"" + QUEST_TRACKER_SPREADSHEET_TAB_NAME + "\" doesn't exist.");
-      valid = false;
-    }
-  }
-
   if (!valid) {
     console.log("Please fix the above errors, create a new version of the existing deployment (or create a new deployment if you haven't created one already), then run the install function again.");
   }
@@ -411,7 +371,7 @@ function createWebhooks() {
   }
 
   // quest finished
-  if (NOTIFY_ON_QUEST_END === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true || AUTO_UPDATE_QUEST_TRACKER === true) {
+  if (NOTIFY_ON_QUEST_END === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
     Object.assign(questActivityOptions, {
       "questFinished": true
     });

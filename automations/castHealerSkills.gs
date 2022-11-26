@@ -55,7 +55,7 @@ function castProtectiveAura(beforeCron) {
  * 
  * Casts Blessing enough times to heal all other party members,
  * then casts Healing Light enough times to finish healing the
- * user.
+ * player.
  * 
  * Run this function every 10 mins.
  */
@@ -63,19 +63,18 @@ function healParty() {
     
   // if lvl < 11, return
   if (getUser(true).stats.lvl < 11) {
-    console.log("Player level " + user.stats.lvl + ", cannot cast healing spells");
+    console.log("Player level " + user.stats.lvl + ", cannot cast healing skills");
     return;
   }
 
   let con = getTotalStat("con");
   let int = getTotalStat("int");
-  let playerDamage = 50 - user.stats.hp;
 
   console.log("Mana: " + user.stats.mp);
 
   // if lvl >= 14 & in a party with other players
   let numBlessings = 0;
-  if (user.stats.lvl >= 14 && typeof getMembers() !== "undefined" && getMembers().length > 1) {
+  if (user.stats.lvl >= 14 && typeof getMembers() !== "undefined" && members.length > 1) {
 
     // get lowest party member health (excluding player)
     let lowestMemberHealth = 50;
@@ -85,23 +84,26 @@ function healParty() {
       }
     }
 
-    console.log("Lowest party member health: " + lowestMemberHealth);
-
     // calculate number of blessings to cast
     let healthPerBlessing = (con + int + 5) * 0.04;
     numBlessings = Math.min(Math.ceil((50 - lowestMemberHealth) / healthPerBlessing), Math.floor(user.stats.mp / 25));
 
-    console.log("Casting Blessing " + numBlessings + " time(s)");
-    
     // cast blessing
-    for (let i=0; i<numBlessings; i++) {
-      fetch("https://habitica.com/api/v3/user/class/cast/healAll", POST_PARAMS);
-      user.stats.mp -= 25;
-      playerDamage -= healthPerBlessing;
-    }
-    playerDamage = Math.max(playerDamage, 0);
+    if (numBlessings > 0) {
 
-    console.log("Mana remaining: " + user.stats.mp);
+      console.log("Lowest party member health: " + lowestMemberHealth);
+      console.log("Casting Blessing " + numBlessings + " time(s)");
+
+      for (let i=0; i<numBlessings; i++) {
+        fetch("https://habitica.com/api/v3/user/class/cast/healAll", POST_PARAMS);
+        user.stats.mp -= 25;
+        user.stats.hp += healthPerBlessing;
+      }
+      user.stats.hp = Math.min(user.stats.hp, 50);
+
+      console.log("Mana remaining: " + user.stats.mp);
+
+    }
 
   // if lvl < 14 or not in a party, nothing to cast
   } else if (user.stats.lvl < 14) {
@@ -109,12 +111,12 @@ function healParty() {
   }
 
   // calculate number of healing lights to cast
-  let numLights = Math.min(Math.max(Math.ceil((playerDamage) / ((con + int + 5) * 0.075)), 0), Math.floor(user.stats.mp / 15));
+  let numLights = Math.min(Math.max(Math.ceil((50 - user.stats.hp) / ((con + int + 5) * 0.075)), 0), Math.floor(user.stats.mp / 15));
 
   // cast healing light
   if (numLights > 0) {
 
-    console.log("Player damage: " + playerDamage);
+    console.log("Player health: " + user.stats.hp);
     console.log("Casting Healing Light " + numLights + " time(s)");
 
     for (let i=0; i<numLights; i++) {

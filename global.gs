@@ -104,7 +104,7 @@ function doPost(e) {
     }
 
     // process queue (no timeout)
-    processQueue(true);
+    processQueue();
 
   } catch (e) {
     MailApp.sendEmail(
@@ -260,9 +260,6 @@ function processWebhook(webhookData) {
     if (AUTO_PURCHASE_ARMOIRES === true) {
       scriptProperties.setProperty("purchaseArmoires", "true");
     }
-    if (AUTO_UPDATE_QUEST_TRACKER === true) {
-      scriptProperties.setProperty("updateQuestTracker", "true");
-    }
     if (AUTO_SELL_EGGS === true) {
       scriptProperties.setProperty("sellExtraEggs", "true");
     }
@@ -279,23 +276,17 @@ function processWebhook(webhookData) {
 }
 
 /**
- * processQueue(noTimeout, wait)
+ * processQueue(wait)
  * 
  * Loops through the queue, running functions in order of priority,
  * until there are no more functions left in the queue. Script lock 
  * ensures only one instance can run the queue at a time. All API 
  * calls are kept within the queue (script lock), to prevent 
- * collisions. If noTimeout is set to true, functions that could 
- * cause the script to run longer than 30s are skipped. If wait is 
- * set to true, will wait until the script lock is released, then 
- * process the queue.
+ * collisions. If wait is set to true, will wait until the script 
+ * lock is released, then process the queue.
  */
-function processQueue(noTimeout, wait) {
+function processQueue(wait) {
   try {
-
-    if (noTimeout === true) {
-      minimizeAPICalls = true;
-    }
 
     // delete temporary triggers
     for (trigger of ScriptApp.getProjectTriggers()) {
@@ -380,11 +371,6 @@ function processQueue(noTimeout, wait) {
             purchaseArmoires(Number(gold));
           }
           scriptProperties.deleteProperty("purchaseArmoires");
-          continue;
-        }
-        if (scriptProperties.getProperty("updateQuestTracker") !== null && noTimeout !== true) {
-          updateQuestTracker();
-          scriptProperties.deleteProperty("updateQuestTracker");
           continue;
         }
         if (scriptProperties.getProperty("sellExtraFood") !== null && minimizeAPICalls !== true) {
