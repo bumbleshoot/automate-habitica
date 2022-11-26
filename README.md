@@ -45,7 +45,7 @@ Automatically hatches [pets](https://habitica.fandom.com/wiki/Pets), but only if
 Forces pending [quests](https://habitica.fandom.com/wiki/Quests) to start after `AUTO_START_QUESTS_AFTER_HOURS_MIN` hours, regardless of how many [party](https://habitica.fandom.com/wiki/Party) members have joined. If the script force starts the quest, and if `NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST` is set to `true`, it sends a private message to the player with a list of party members who failed to join. Only party leaders can run this automation.
 
 ## Before Installing
-First you must uninstall any scripts that do the same thing(s) as Automate Habitica. For example, if you are running the [Auto Accept Quests](https://habitica.fandom.com/wiki/Google_Apps_Script#Auto_Accept_Quests) script, you need to uninstall it, because Automate Habitica also auto accepts quest invites, and these two scripts will conflict with each other. To uninstall a script:
+You need to use a desktop computer for this. It will not work on a phone or tablet! First you must uninstall any scripts that do the same thing(s) as Automate Habitica. For example, if you are running the [Auto Accept Quests](https://habitica.fandom.com/wiki/Google_Apps_Script#Auto_Accept_Quests) script, you need to uninstall it, because Automate Habitica also auto accepts quest invites, and these two scripts will conflict with each other. To uninstall a script:
 1. Click [here](https://script.google.com/home) to see a list of your scripts. If you're not already signed into your Google account, click the "Start Scripting" button and sign in. Then click on "My Projects" in the main menu on the left.
 2. Click on the script you want to uninstall.
 3. Click the blue "Deploy" button near the top of the page, then click "Manage deployments".
@@ -61,7 +61,7 @@ First you must uninstall any scripts that do the same thing(s) as Automate Habit
 13. Repeat the above steps for every script you need to uninstall.
 
 ## Setup Instructions
-Make sure you read the [Before Installing](#before-installing) section above, and follow the instructions there if applicable!
+You need to use a desktop computer for this. It will not work on a phone or tablet! Make sure you read the [Before Installing](#before-installing) section above, and follow the instructions there if applicable!
 1. Click [here](https://script.google.com/d/1y5jBYAWqi0Lrd5Oo40q9GYu8KIltzas2hxUOS3ecUUjZP35L-EP3j28N/edit?usp=sharing) to go to the Automate Habitica script. If you're not already signed into your Google account, you will be asked to sign in.
 2. In the main menu on the left, click on "Overview" (looks like a lowercase letter i inside a circle).
 3. Click the "Make a copy" button (looks like two pages of paper).
@@ -80,6 +80,7 @@ Make sure you read the [Before Installing](#before-installing) section above, an
 You're all done! If you need to change the settings or uninstall the script at some point, follow the steps below.
 
 ## Changing the Settings
+You need to use a desktop computer for this. It will not work on a phone or tablet!
 1. [Click here](https://script.google.com/home) to see a list of your scripts. If you're not already signed into your Google account, click the "Start Scripting" button and sign in. Then click on "My Projects" in the main menu on the left.
 2. Click on "Automate Habitica".
 3. Edit the settings (`const`s) to your liking.
@@ -99,6 +100,7 @@ You're all done! If you need to change the settings or uninstall the script at s
 6. Click the "Archive" button (looks like a box with a down arrow inside). Then click the "Done" button.
 
 ## Updating the Script
+You need to use a desktop computer for this. It will not work on a phone or tablet!
 1. Follow the steps in [Uninstalling the Script](#uninstalling-the-script) above.
 2. Copy & paste your settings (`const`s) into a text editor so you can reference them while setting up the new version.
 3. In the main menu on the left, click on "Overview" (looks like a lowercase letter i inside a circle).
