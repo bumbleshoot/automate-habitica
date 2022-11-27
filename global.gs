@@ -104,6 +104,7 @@ function doPost(e) {
     }
 
     // process queue (no timeout)
+    minimizeAPICalls = true;
     processQueue();
 
   } catch (e) {
