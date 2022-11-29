@@ -16,8 +16,8 @@ const scriptProperties = PropertiesService.getScriptProperties();
 let scriptStart = new Date();
 let numAPICalls = 0;
 let minimizeAPICalls = false;
-if (new Date(scriptProperties.getProperty("dateAPICallsCounted")).toDateString() !== scriptStart.toDateString()) {
-  scriptProperties.setProperty("dateAPICallsCounted", scriptStart);
+if (scriptStart.getTime() - new Date(scriptProperties.getProperty("lastUrlFetchReset")).getTime() >= 86400000) {
+  scriptProperties.setProperty("lastUrlFetchReset", scriptStart);
   scriptProperties.setProperty("numAPICalls", 0);
 } else {
   numAPICalls = Number(scriptProperties.getProperty("numAPICalls"));
