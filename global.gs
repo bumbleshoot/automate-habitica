@@ -144,6 +144,7 @@ function processTrigger() {
     scriptProperties.setProperty("runCron", "true");
     if (AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) {
       scriptProperties.setProperty("LAST_AFTER_CRON", now);
+      scriptProperties.deleteProperty("beforeCronSkills");
       if (AUTO_CAST_SKILLS === true) {
         scriptProperties.setProperty("afterCronSkills", "true");
       }
@@ -155,6 +156,7 @@ function processTrigger() {
   // if player has cronned today and after cron hasn't run since cron
   } else if ((AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
     scriptProperties.setProperty("LAST_AFTER_CRON", now);
+    scriptProperties.deleteProperty("beforeCronSkills");
     if (AUTO_CAST_SKILLS === true) {
       scriptProperties.setProperty("afterCronSkills", "true");
     }
