@@ -169,17 +169,17 @@ function processTrigger() {
     scriptProperties.setProperty("useExcessMana", "true");
   }
 
-  if (AUTO_ACCEPT_QUEST_INVITES === true) {
-    scriptProperties.setProperty("acceptQuestInvite", "true");
-  }
-  if (AUTO_START_QUESTS === true) {
-    scriptProperties.setProperty("forceStartQuest", "true");
-  }
   if (AUTO_CAST_SKILLS === true && getPlayerClass() == "healer") {
     scriptProperties.setProperty("healParty", "true");
   }
   if (AUTO_PAUSE_RESUME_DAMAGE === true) {
     scriptProperties.setProperty("pauseResumeDamage", "true");
+  }
+  if (AUTO_ACCEPT_QUEST_INVITES === true) {
+    scriptProperties.setProperty("acceptQuestInvite", "true");
+  }
+  if (AUTO_START_QUESTS === true) {
+    scriptProperties.setProperty("forceStartQuest", "true");
   }
 
   // in case GAS execution time limit was reached
