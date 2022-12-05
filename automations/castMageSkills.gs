@@ -140,11 +140,6 @@ function burnBossAndDumpMana() {
           fetch("https://habitica.com/api/v3/user/class/cast/fireball?targetId=" + bluestTask.id, POST_PARAMS);
           user.stats.mp -= 10;
         }
-
-        // if sleeping and on quest, pause or resume damage
-        if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && typeof user.party.quest.key !== "undefined") {
-          scriptProperties.setProperty("pauseResumeDamage", "true");
-        }
       }
 
     } else {

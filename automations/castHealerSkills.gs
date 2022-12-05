@@ -48,6 +48,11 @@ function castProtectiveAura(beforeCron) {
   for (let i=0; i<numAuras; i++) {
     fetch("https://habitica.com/api/v3/user/class/cast/protectAura", POST_PARAMS);
   }
+
+  // if player is asleep, pause or resume damage
+  if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep) {
+    scriptProperties.setProperty("pauseResumeDamage", "true");
+  }
 }
 
 /**

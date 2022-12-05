@@ -134,11 +134,6 @@ function smashBossAndDumpMana() {
         }
 
         console.log("Mana remaining: " + user.stats.mp);
-
-        // if sleeping and on quest, pause or resume damage
-        if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && typeof user.party.quest.key !== "undefined") {
-          scriptProperties.setProperty("pauseResumeDamage", "true");
-        }
       }
 
     // if no boss or no non-challenge tasks

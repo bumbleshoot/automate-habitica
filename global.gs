@@ -254,6 +254,9 @@ function processWebhook(webhookData) {
 
   // when a quest is finished
   } else if (webhookData.webhookType == "questFinished") {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && getUser().preferences.sleep === true) {
+      scriptProperties.setProperty("pauseResumeDamage", "true");
+    }
     if (AUTO_PURCHASE_GEMS === true) {
       scriptProperties.setProperty("purchaseGems", "true");
     }

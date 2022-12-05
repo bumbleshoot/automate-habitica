@@ -32,7 +32,7 @@ function allocateStatPoints(unusedStatPoints, lvl) {
     fetch("https://habitica.com/api/v3/user/allocate-bulk", params);
 
     // if allocated to str or con and player is asleep, pause or resume damage
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && (STAT_TO_ALLOCATE == "str" || STAT_TO_ALLOCATE == "con")) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && user.preferences.sleep && STAT_TO_ALLOCATE == "con") {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
   }

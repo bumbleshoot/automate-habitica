@@ -2,21 +2,19 @@
  * pauseResumeDamage()
  * 
  * Calculates pending damage to player & party based on player's
- * incomplete dailies & the current boss. Checks player into the
- * inn if pending damage to player or party exceed MAX_PLAYER_DAMAGE
- * or MAX_PARTY_DAMAGE or player's hp or party members' hp, checks 
- * player out of inn otherwise.
+ * incomplete dailies, stats, & the current quest. Checks player 
+ * into the inn if pending damage to player or party exceed 
+ * MAX_PLAYER_DAMAGE or MAX_PARTY_DAMAGE or player's hp or party 
+ * members' hp, checks player out of inn otherwise.
  * 
- * Run this function whenever the player is invited to a quest, and 
- * periodically throughout the day.
+ * Run this function whenever the player is invited to a quest, 
+ * when the player crons, and periodically throughout the day.
  * 
  * If the player is sleeping, run this function whenever they cast 
- * stealth, whenever a task is scored, whenever they level up 
+ * stealth, whenever a due daily is scored, whenever they level up 
  * to an even number level <= 100, whenever stat points are 
- * allocated to STR or CON, and whenever the player is healed.
- * 
- * If the player is sleeping and on a quest, run this function 
- * whenever they cast brutal smash or burst of flames.
+ * allocated to CON, whenever CON is buffed, whenever the player's 
+ * party finishes a quest, and whenever the player/party is healed.
  */
 function pauseResumeDamage(questKey) {
 
