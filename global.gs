@@ -12,20 +12,6 @@ const DELETE_PARAMS = Object.assign({ "method": "delete" }, PARAMS);
 
 const scriptProperties = PropertiesService.getScriptProperties();
 
-// count API calls
-let scriptStart = new Date();
-let numAPICalls = 0;
-let minimizeAPICalls = false;
-if (scriptStart.getTime() - new Date(scriptProperties.getProperty("lastUrlFetchReset")).getTime() >= 86400000) {
-  scriptProperties.setProperty("lastUrlFetchReset", scriptStart);
-  scriptProperties.setProperty("numAPICalls", 0);
-} else {
-  numAPICalls = Number(scriptProperties.getProperty("numAPICalls"));
-  if (numAPICalls >= 19000) {
-    minimizeAPICalls = true;
-  }
-}
-
 /**
  * onTrigger()
  * 
@@ -53,8 +39,11 @@ function onTrigger() {
  * 
  * This function is called by webhooks.
  */
+let webhook;
 function doPost(e) {
   try {
+
+    webhook = true;
 
     // get relevant data from webhook
     let postData = JSON.parse(e.postData.contents);
@@ -88,23 +77,7 @@ function doPost(e) {
     // process webhook
     processWebhook(webhookData);
 
-    // create temporary trigger to process queue
-    let triggerNeeded = true;
-    for (trigger of ScriptApp.getProjectTriggers()) {
-      if (trigger.getHandlerFunction() === "processQueue") {
-        triggerNeeded = false;
-        break;
-      }
-    }
-    if (triggerNeeded) {
-      ScriptApp.newTrigger("processQueue")
-        .timeBased()
-        .after(1)
-        .create();
-    }
-
-    // process queue (no timeout)
-    minimizeAPICalls = true;
+    // process queue
     processQueue();
 
   } catch (e) {
@@ -135,7 +108,7 @@ function processTrigger() {
   let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
 
   // if just before day start time
-  if (AUTO_CAST_SKILLS === true && now.getHours() == dayStart-1 && 39 <= now.getMinutes() && now.getMinutes() < 54 && (lastBeforeCron.toDateString() !== now.toDateString() || lastBeforeCron.getHours() !== now.getHours())) {
+  if (AUTO_CAST_SKILLS === true && now.getHours() == dayStart-1 && 24 <= now.getMinutes() && now.getMinutes() < 54 && (lastBeforeCron.toDateString() !== now.toDateString() || lastBeforeCron.getHours() !== now.getHours())) {
     scriptProperties.setProperty("beforeCronSkills", "true");
     scriptProperties.setProperty("LAST_BEFORE_CRON", now);
 
@@ -282,28 +255,20 @@ function processWebhook(webhookData) {
 }
 
 /**
- * processQueue(wait)
+ * processQueue()
  * 
  * Loops through the queue, running functions in order of priority,
  * until there are no more functions left in the queue. Script lock 
  * ensures only one instance can run the queue at a time. All API 
  * calls are kept within the queue (script lock), to prevent 
- * collisions. If wait is set to true, will wait until the script 
- * lock is released, then process the queue.
+ * collisions.
  */
-function processQueue(wait) {
+function processQueue() {
   try {
-
-    // delete temporary triggers
-    for (trigger of ScriptApp.getProjectTriggers()) {
-      if (trigger.getHandlerFunction() === "processQueue") {
-        ScriptApp.deleteTrigger(trigger);
-      }
-    }
 
     // prevent multiple instances from running at once
     let lock = LockService.getScriptLock();
-    if (lock.tryLock(0) || (wait && lock.tryLock(360000))) {
+    if (lock.tryLock(0) || (installing && lock.tryLock(360000))) {
 
       while (true) {
         let webhookData = scriptProperties.getProperty("allocateStatPoints");
@@ -333,7 +298,7 @@ function processQueue(wait) {
           scriptProperties.deleteProperty("acceptQuestInvite");
           continue;
         }
-        if (scriptProperties.getProperty("beforeCronSkills") !== null) {
+        if (scriptProperties.getProperty("beforeCronSkills") !== null && !webhook) {
           beforeCronSkills();
           scriptProperties.deleteProperty("beforeCronSkills");
           continue;
@@ -343,7 +308,7 @@ function processQueue(wait) {
           scriptProperties.deleteProperty("runCron");
           continue;
         }
-        if (scriptProperties.getProperty("afterCronSkills") !== null) {
+        if (scriptProperties.getProperty("afterCronSkills") !== null && !webhook) {
           afterCronSkills();
           scriptProperties.deleteProperty("afterCronSkills");
           continue;
@@ -364,13 +329,13 @@ function processQueue(wait) {
           scriptProperties.deleteProperty("notifyQuestEnded");
           continue;
         }
-        if (scriptProperties.getProperty("useExcessMana") !== null && minimizeAPICalls !== true) {
+        if (scriptProperties.getProperty("useExcessMana") !== null && !webhook && !installing) {
           useExcessMana();
           scriptProperties.deleteProperty("useExcessMana");
           continue;
         }
         let gold = scriptProperties.getProperty("purchaseArmoires");
-        if (gold !== null && minimizeAPICalls !== true) {
+        if (gold !== null && !webhook && !installing) {
           if (gold === "true") {
             purchaseArmoires();
           } else {
@@ -379,31 +344,28 @@ function processQueue(wait) {
           scriptProperties.deleteProperty("purchaseArmoires");
           continue;
         }
-        if (scriptProperties.getProperty("sellExtraFood") !== null && minimizeAPICalls !== true) {
+        if (scriptProperties.getProperty("sellExtraFood") !== null && !webhook) {
           sellExtraFood();
           scriptProperties.deleteProperty("sellExtraFood");
           continue;
         }
-        if (scriptProperties.getProperty("sellExtraHatchingPotions") !== null && minimizeAPICalls !== true) {
+        if (scriptProperties.getProperty("sellExtraHatchingPotions") !== null && !webhook) {
           sellExtraHatchingPotions();
           scriptProperties.deleteProperty("sellExtraHatchingPotions");
           continue;
         }
-        if (scriptProperties.getProperty("sellExtraEggs") !== null && minimizeAPICalls !== true) {
+        if (scriptProperties.getProperty("sellExtraEggs") !== null && !webhook) {
           sellExtraEggs();
           scriptProperties.deleteProperty("sellExtraEggs");
           continue;
         }
-        if (scriptProperties.getProperty("hatchFeedPets") !== null && minimizeAPICalls !== true) {
+        if (scriptProperties.getProperty("hatchFeedPets") !== null && !webhook && !installing) {
           hatchFeedPets();
           scriptProperties.deleteProperty("hatchFeedPets");
           continue;
         }
         break;
       }
-
-      // save API call count
-      scriptProperties.setProperty("numAPICalls", numAPICalls);
 
       lock.releaseLock();
     }
@@ -508,18 +470,6 @@ function fetch(url, params) {
 
     // call API
     let response = UrlFetchApp.fetch(url, params);
-
-    // count API calls
-    numAPICalls++;
-    if (new Date().getTime() - scriptStart.getTime() >= 350000) {
-      scriptProperties.setProperty("numAPICalls", numAPICalls);
-    }
-    if (!minimizeAPICalls && numAPICalls >= 19000) {
-
-      console.log("Approaching UrlFetch limit, turning off non-essential automations until tomorrow");
-
-      minimizeAPICalls = true;
-    }
 
     // store rate limiting data
     scriptProperties.setProperties({

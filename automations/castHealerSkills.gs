@@ -17,8 +17,8 @@
  */
 function castProtectiveAura(beforeCron) {
 
-  // if approaching API call limit or lvl < 13, return
-  if (minimizeAPICalls) {
+  // if time limit or lvl < 13, return
+  if (webhook || installing) {
     return;
   } else if (getUser(true).stats.lvl < 13) {
     console.log("Player level " + user.stats.lvl + ", cannot cast Protective Aura");

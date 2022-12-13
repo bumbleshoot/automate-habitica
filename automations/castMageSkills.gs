@@ -17,8 +17,8 @@
  */
 function castEarthquake(saveMana) {
 
-  // if approaching API call limit or lvl < 12 or lvl 12 & not in party with other players, return
-  if (minimizeAPICalls) {
+  // if time limit or lvl < 12 or lvl 12 & not in party with other players, return
+  if (webhook || installing) {
     return;
   } else if (getUser(true).stats.lvl < 12 || (user.stats.lvl === 12 && (typeof getParty() === "undefined" || getParty().memberCount <= 1))) {
     console.log("Player level " + user.stats.lvl + ", cannot cast buffs");
@@ -146,8 +146,8 @@ function burnBossAndDumpMana() {
       console.log("No boss fight or user has no non-challenge tasks");
     }
 
-    // if not approaching API call limit & lvl >= 12 & party has other players
-    if (!minimizeAPICalls && user.stats.lvl >= 12 && getParty().memberCount > 1) {
+    // if no time limit & lvl >= 12 & party has other players
+    if (!webhook && !installing && user.stats.lvl >= 12 && getParty().memberCount > 1) {
 
         // calculate number of ethereal surges to cast
         let maxManaAfterCron = ((int - user.stats.buffs.int + perfectDayBuff) * 2 + 30) * 0.9;
@@ -169,8 +169,8 @@ function burnBossAndDumpMana() {
     }
   }
 
-  // not in a party with other players & not approaching API call limit & lvl >= 13
-  if ((typeof getParty() === "undefined" || getParty().memberCount <= 1) && !minimizeAPICalls && user.stats.lvl >= 13) {
+  // not in a party with other players & no time limit & lvl >= 13
+  if ((typeof getParty() === "undefined" || getParty().memberCount <= 1) && !webhook && !installing && user.stats.lvl >= 13) {
 
     // calculate number of earthquakes to cast
     let maxManaAfterCron = ((int - user.stats.buffs.int + perfectDayBuff) * 2 + 30) * 0.9;

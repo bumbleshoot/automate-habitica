@@ -9,8 +9,8 @@
  */
 function sellExtraEggs() {
 
-  // do not run if approaching API call limit
-  if (minimizeAPICalls) {
+  // do not run if webhook
+  if (webhook) {
     return;
   }
 
@@ -50,8 +50,8 @@ function sellExtraEggs() {
  */
 function sellExtraHatchingPotions() {
 
-  // do not run if approaching API call limit
-  if (minimizeAPICalls) {
+  // do not run if webhook
+  if (webhook) {
     return;
   }
 
@@ -91,8 +91,8 @@ function sellExtraHatchingPotions() {
  */
 function sellExtraFood() {
 
-  // do not run if approaching API call limit
-  if (minimizeAPICalls) {
+  // do not run if webhook
+  if (webhook) {
     return;
   }
 

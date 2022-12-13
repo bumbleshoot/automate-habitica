@@ -10,8 +10,8 @@
  */
 function purchaseArmoires(gold) {
 
-  // do not run if approaching API call limit
-  if (minimizeAPICalls) {
+  // if time limit, return
+  if (webhook || installing) {
     return;
   }
 

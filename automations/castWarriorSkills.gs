@@ -16,8 +16,8 @@
  */
 function castValorousPresence(saveMana) {
 
-  // do not run if approaching API call limit
-  if (minimizeAPICalls) {
+  // if time limit, return
+  if (webhook || installing) {
     return;
   }
 
@@ -146,8 +146,8 @@ function smashBossAndDumpMana() {
     console.log("Player not in a party, cannot cast Brutal Smash");
   }
 
-  // if not approaching API call limit & lvl >= 12
-  if (!minimizeAPICalls && user.stats.lvl >= 12) {
+  // if no time limit & lvl >= 12
+  if (!webhook && !installing && user.stats.lvl >= 12) {
 
     // check for perfect day
     let perfectDayBuff = calculatePerfectDayBuff();

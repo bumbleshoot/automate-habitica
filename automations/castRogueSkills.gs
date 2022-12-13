@@ -16,8 +16,8 @@
  */
 function castToolsOfTheTrade(saveMana) {
 
-  // if approaching API call limit or lvl < 11, return
-  if (minimizeAPICalls) {
+  // if time limit or lvl < 11, return
+  if (webhook || installing) {
     return;
   } else if (getUser(true).stats.lvl < 11) {
     console.log("Player level " + user.stats.lvl + ", nothing to cast");

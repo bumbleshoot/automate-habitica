@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.21.7 (beta) by @bumbleshoot
+ * Automate Habitica v0.21.8 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -53,7 +53,10 @@ const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = true;
  *  DO NOT EDIT ANYTHING BELOW HERE  *
 \*************************************/
 
+let installing;
 function install() {
+
+  installing = true;
 
   // if settings are valid
   if (validateConstants()) {
@@ -83,18 +86,12 @@ function install() {
     processWebhook({ webhookType: "questStarted" });
     processWebhook({ webhookType: "questFinished" });
 
-    // minimize API calls to prevent timeout
-    minimizeAPICalls = true;
-
     // process queue
-    processQueue(true);
+    processQueue();
 
     // create trigger & webhooks
     createTrigger();
     createWebhooks();
-
-    // save API call count
-    scriptProperties.setProperty("numAPICalls", numAPICalls);
 
     console.log("Success!");
   }
@@ -311,7 +308,7 @@ function createTrigger() {
 
     ScriptApp.newTrigger("onTrigger")
       .timeBased()
-      .everyMinutes(10)
+      .everyMinutes(15)
       .create();
   }
 }
