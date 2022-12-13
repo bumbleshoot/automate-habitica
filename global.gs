@@ -101,14 +101,17 @@ function processTrigger() {
 
   // get times
   let now = new Date();
-  let dayStart = getUser().preferences.dayStart;
+  let timezoneOffset = now.getTimezoneOffset() * 60 * 1000 - getUser().preferences.timezoneOffset * 60 * 1000;
+  let nowAdjusted = new Date(now.getTime() + timezoneOffset);
+  let dayStart = user.preferences.dayStart;
   let needsCron = user.needsCron;
   let lastCron = new Date(user.auth.timestamps.loggedin);
   let lastBeforeCron = new Date(scriptProperties.getProperty("LAST_BEFORE_CRON"));
+  let lastBeforeCronAdjusted = new Date(lastBeforeCron.getTime() + timezoneOffset);
   let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
 
   // if just before day start time
-  if (AUTO_CAST_SKILLS === true && now.getHours() == dayStart-1 && 24 <= now.getMinutes() && now.getMinutes() < 54 && (lastBeforeCron.toDateString() !== now.toDateString() || lastBeforeCron.getHours() !== now.getHours())) {
+  if (AUTO_CAST_SKILLS === true && nowAdjusted.getHours() == dayStart-1 && 24 <= nowAdjusted.getMinutes() && nowAdjusted.getMinutes() < 54 && (lastBeforeCronAdjusted.toDateString() !== nowAdjusted.toDateString() || lastBeforeCronAdjusted.getHours() !== nowAdjusted.getHours())) {
     scriptProperties.setProperty("beforeCronSkills", "true");
     scriptProperties.setProperty("LAST_BEFORE_CRON", now);
 
