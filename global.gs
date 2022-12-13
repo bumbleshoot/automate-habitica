@@ -154,7 +154,7 @@ function processTrigger() {
   if (AUTO_ACCEPT_QUEST_INVITES === true) {
     scriptProperties.setProperty("acceptQuestInvite", "true");
   }
-  if (AUTO_START_QUESTS === true) {
+  if (FORCE_START_QUESTS === true) {
     scriptProperties.setProperty("forceStartQuest", "true");
   }
 
@@ -218,13 +218,13 @@ function processWebhook(webhookData) {
     if (AUTO_ACCEPT_QUEST_INVITES === true) {
       scriptProperties.setProperty("acceptQuestInvite", "true");
     }
-    if (AUTO_START_QUESTS === true) {
+    if (FORCE_START_QUESTS === true) {
       scriptProperties.setProperty("forceStartQuest", "true");
     }
 
   // when a quest is started
   } else if (webhookData.webhookType == "questStarted") {
-    if (AUTO_START_QUESTS === true) {
+    if (FORCE_START_QUESTS === true) {
       scriptProperties.setProperty("forceStartQuest", "true");
     }
 

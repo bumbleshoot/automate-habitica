@@ -1,7 +1,7 @@
 /**
  * forceStartQuest()
  * 
- * Forces pending quests to start after AUTO_START_QUESTS_AFTER_HOURS_MIN
+ * Forces pending quests to start after FORCE_START_QUESTS_AFTER_HOURS_MIN
  * hours, regardless of how many party members have joined. Only works if 
  * the player ran the quest, or the player is the party leader.
  * 
@@ -18,10 +18,10 @@ function forceStartQuest() {
 
       console.log("Quest \"" + getContent().quests[party.quest.key].text + "\" already discovered " + scriptProperties.getProperty("INVITATION_DISCOVERED"));
 
-      // if AUTO_START_QUESTS_AFTER_HOURS_MIN hours have passed
-      if ((new Date().getTime() - new Date(scriptProperties.getProperty("INVITATION_DISCOVERED")).getTime()) / 3600000 >= AUTO_START_QUESTS_AFTER_HOURS_MIN) {
+      // if FORCE_START_QUESTS_AFTER_HOURS_MIN hours have passed
+      if ((new Date().getTime() - new Date(scriptProperties.getProperty("INVITATION_DISCOVERED")).getTime()) / 3600000 >= FORCE_START_QUESTS_AFTER_HOURS_MIN) {
 
-        console.log(AUTO_START_QUESTS_AFTER_HOURS_MIN + " hours have passed, force starting quest");
+        console.log(FORCE_START_QUESTS_AFTER_HOURS_MIN + " hours have passed, force starting quest");
 
         // force start quest
         try {
@@ -67,7 +67,7 @@ function forceStartQuest() {
         scriptProperties.deleteProperty("INVITATION_DISCOVERED");
       
       } else {
-        console.log(AUTO_START_QUESTS_AFTER_HOURS_MIN + " hours have not passed, waiting");
+        console.log(FORCE_START_QUESTS_AFTER_HOURS_MIN + " hours have not passed, waiting");
       }
     
     // if new pending quest, set variables

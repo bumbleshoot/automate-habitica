@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.21.9 (beta) by @bumbleshoot
+ * Automate Habitica v0.21.10 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -13,6 +13,10 @@ const AUTO_CRON = true; // true or false
 
 const AUTO_ACCEPT_QUEST_INVITES = true;
 
+const FORCE_START_QUESTS = false; // party leaders only
+const FORCE_START_QUESTS_AFTER_HOURS_MIN = 4; // eg. if set to 1, quests will force start in 1-2 hours
+const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = true;
+
 const NOTIFY_ON_QUEST_END = true;
 
 const AUTO_ALLOCATE_STAT_POINTS = false;
@@ -24,7 +28,7 @@ const AUTO_PAUSE_RESUME_DAMAGE = true;
 const MAX_PLAYER_DAMAGE = 20;
 const MAX_PARTY_DAMAGE = 5;
 
-const AUTO_PURCHASE_GEMS = false;
+const AUTO_PURCHASE_GEMS = false; // subscribers only
 
 const AUTO_PURCHASE_ARMOIRES = false;
 const RESERVE_GOLD = 50000;
@@ -40,14 +44,6 @@ const RESERVE_FOOD = 999;
 
 const AUTO_HATCH_FEED_PETS = false;
 const ONLY_USE_DROP_FOOD = true;
-
-/************************\
- *  PARTY LEADERS ONLY  *
-\************************/
-
-const AUTO_START_QUESTS = false;
-const AUTO_START_QUESTS_AFTER_HOURS_MIN = 4; // eg. if set to 1, quests will auto start in 1-2 hours
-const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = true;
 
 /*************************************\
  *  DO NOT EDIT ANYTHING BELOW HERE  *
@@ -144,6 +140,29 @@ function validateConstants() {
   if (AUTO_ACCEPT_QUEST_INVITES !== true && AUTO_ACCEPT_QUEST_INVITES !== false) {
     console.log("ERROR: AUTO_ACCEPT_QUEST_INVITES must equal either true or false.\n\neg. const AUTO_ACCEPT_QUEST_INVITES = true;\n    const AUTO_ACCEPT_QUEST_INVITES = false;");
     valid = false;
+  }
+
+  if (FORCE_START_QUESTS !== true && FORCE_START_QUESTS !== false) {
+    console.log("ERROR: FORCE_START_QUESTS must equal either true or false.\n\neg. const FORCE_START_QUESTS = true;\n    const FORCE_START_QUESTS = false;");
+    valid = false;
+  }
+
+  if (FORCE_START_QUESTS === true) {
+
+    if (typeof getParty() === "undefined" || party.leader.id !== USER_ID) {
+      console.log("ERROR: FORCE_START_QUESTS can only be run by party leaders.");
+      valid = false;
+    }
+
+    if (typeof FORCE_START_QUESTS_AFTER_HOURS_MIN !== "number" || !Number.isInteger(FORCE_START_QUESTS_AFTER_HOURS_MIN) || FORCE_START_QUESTS_AFTER_HOURS_MIN < 1) {
+      console.log("ERROR: FORCE_START_QUESTS_AFTER_HOURS_MIN must be a whole number greater than 0.\n\neg. const FORCE_START_QUESTS_AFTER_HOURS_MIN = 1;\n    const FORCE_START_QUESTS_AFTER_HOURS_MIN = 8;");
+      valid = false;
+    }
+
+    if (NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST !== true && NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST !== false) {
+      console.log("ERROR: NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST must equal either true or false.\n\neg. const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = true;\n    const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = false;");
+      valid = false;
+    }
   }
 
   if (NOTIFY_ON_QUEST_END !== true && NOTIFY_ON_QUEST_END !== false) {
@@ -257,29 +276,6 @@ function validateConstants() {
     }
   }
 
-  if (AUTO_START_QUESTS !== true && AUTO_START_QUESTS !== false) {
-    console.log("ERROR: AUTO_START_QUESTS must equal either true or false.\n\neg. const AUTO_START_QUESTS = true;\n    const AUTO_START_QUESTS = false;");
-    valid = false;
-  }
-
-  if (AUTO_START_QUESTS === true) {
-
-    if (typeof getParty() === "undefined" || party.leader.id !== USER_ID) {
-      console.log("ERROR: AUTO_START_QUESTS can only be run by party leaders.");
-      valid = false;
-    }
-
-    if (typeof AUTO_START_QUESTS_AFTER_HOURS_MIN !== "number" || !Number.isInteger(AUTO_START_QUESTS_AFTER_HOURS_MIN) || AUTO_START_QUESTS_AFTER_HOURS_MIN < 1) {
-      console.log("ERROR: AUTO_START_QUESTS_AFTER_HOURS_MIN must be a whole number greater than 0.\n\neg. const AUTO_START_QUESTS_AFTER_HOURS_MIN = 1;\n    const AUTO_START_QUESTS_AFTER_HOURS_MIN = 8;");
-      valid = false;
-    }
-
-    if (NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST !== true && NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST !== false) {
-      console.log("ERROR: NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST must equal either true or false.\n\neg. const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = true;\n    const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = false;");
-      valid = false;
-    }
-  }
-
   if (!valid) {
     console.log("Please fix the above errors, create a new version of the existing deployment (or create a new deployment if you haven't created one already), then run the install function again.");
   }
@@ -302,7 +298,7 @@ function deleteTriggers() {
 function createTrigger() {
 
   // create trigger if needed for enabled automations
-  if (AUTO_CRON === true || AUTO_CAST_SKILLS === true || AUTO_ACCEPT_QUEST_INVITES === true || AUTO_START_QUESTS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true) {
+  if (AUTO_CRON === true || AUTO_CAST_SKILLS === true || AUTO_ACCEPT_QUEST_INVITES === true || FORCE_START_QUESTS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true) {
 
     console.log("Creating trigger");
 
@@ -354,14 +350,14 @@ function createWebhooks() {
   let questActivityOptions = {};
 
   // quest invited
-  if (AUTO_ACCEPT_QUEST_INVITES === true || AUTO_START_QUESTS === true || NOTIFY_ON_QUEST_END === true || AUTO_PAUSE_RESUME_DAMAGE === true) {
+  if (AUTO_ACCEPT_QUEST_INVITES === true || FORCE_START_QUESTS === true || NOTIFY_ON_QUEST_END === true || AUTO_PAUSE_RESUME_DAMAGE === true) {
     Object.assign(questActivityOptions, {
       "questInvited": true
     });
   }
 
   // quest started
-  if (AUTO_START_QUESTS === true) {
+  if (FORCE_START_QUESTS === true) {
     Object.assign(questActivityOptions, {
       "questStarted": true
     });
