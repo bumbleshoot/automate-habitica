@@ -10,4 +10,8 @@ function runCron() {
   console.log("Running cron");
 
   fetch("https://habitica.com/api/v3/cron", POST_PARAMS);
+
+  if (AUTO_PAUSE_RESUME_DAMAGE === true) {
+    scriptProperties.setProperty("pauseResumeDamage", "true");
+  }
 }
