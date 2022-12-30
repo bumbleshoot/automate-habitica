@@ -239,6 +239,18 @@ function processWebhook(webhookData) {
     if (NOTIFY_ON_QUEST_END === true && typeof webhookData.questKey !== "undefined") {
       scriptProperties.setProperty("notifyQuestEnded", webhookData.questKey);
     }
+    if (AUTO_INVITE_QUESTS === true) {
+      for (trigger of ScriptApp.getProjectTriggers()) {
+        if (trigger.getHandlerFunction() === "inviteRandomQuest") {
+          ScriptApp.deleteTrigger(trigger);
+        }
+      }
+      let afterMs = Math.random() * 600000 + 300000;
+      ScriptApp.newTrigger("inviteRandomQuest")
+        .timeBased()
+        .after(afterMs)
+        .create();
+    }
     if (AUTO_PURCHASE_ARMOIRES === true) {
       scriptProperties.setProperty("purchaseArmoires", "true");
     }

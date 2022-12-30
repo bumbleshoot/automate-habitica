@@ -13,6 +13,9 @@ Automatically and immediately accepts [quest](https://habitica.fandom.com/wiki/Q
 ### Force start quests
 Forces pending [quests](https://habitica.fandom.com/wiki/Quests) to start after `FORCE_START_QUESTS_AFTER_HOURS_MIN` hours, regardless of how many [party](https://habitica.fandom.com/wiki/Party) members have joined. If the script force starts the quest, and if `NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST` is set to `true`, it sends a [private message](https://habitica.fandom.com/wiki/Private_Messaging) to the player with a list of party members who failed to join. Only party leaders can run this automation.
 
+### Auto invite quests
+Whenever your party completes a quest, automatically selects a random quest scroll from your inventory and invites your party to that quest. There is a ~5-15 min delay between quest ending and using the quest scroll, to give other party members a chance to run their quests too, and to prevent multiple simultaneous quest invitations. If `EXCLUDE_GEM_QUESTS` is set to `true`, the script will not use your gem quest scrolls. If `EXCLUDE_HOURGLASS_QUESTS` is set to `true`, the script will not use your hourglass quest scrolls.
+
 ### Notify on quest end
 Sends a [private message](https://habitica.fandom.com/wiki/Private_Messaging) to you on Habitica to notify you whenever your [party](https://habitica.fandom.com/wiki/Party) completes a [quest](https://habitica.fandom.com/wiki/Quests).
 

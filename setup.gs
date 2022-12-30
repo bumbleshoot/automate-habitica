@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.21.10 (beta) by @bumbleshoot
+ * Automate Habitica v0.22.0 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -16,6 +16,10 @@ const AUTO_ACCEPT_QUEST_INVITES = true;
 const FORCE_START_QUESTS = false; // party leaders only
 const FORCE_START_QUESTS_AFTER_HOURS_MIN = 4; // eg. if set to 1, quests will force start in 1-2 hours
 const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = true;
+
+const AUTO_INVITE_QUESTS = false;
+const EXCLUDE_GEM_QUESTS = true;
+const EXCLUDE_HOURGLASS_QUESTS = true;
 
 const NOTIFY_ON_QUEST_END = true;
 
@@ -161,6 +165,22 @@ function validateConstants() {
 
     if (NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST !== true && NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST !== false) {
       console.log("ERROR: NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST must equal either true or false.\n\neg. const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = true;\n    const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = false;");
+    }
+  }
+
+  if (AUTO_INVITE_QUESTS !== true && AUTO_INVITE_QUESTS !== false) {
+    console.log("ERROR: AUTO_INVITE_QUESTS must equal either true or false.\n\neg. const AUTO_INVITE_QUESTS = true;\n    const AUTO_INVITE_QUESTS = false;");
+    valid = false;
+  }
+
+  if (AUTO_INVITE_QUESTS === true) {
+    if (EXCLUDE_GEM_QUESTS !== true && EXCLUDE_GEM_QUESTS !== false) {
+      console.log("ERROR: EXCLUDE_GEM_QUESTS must equal either true or false.\n\neg. const EXCLUDE_GEM_QUESTS = true;\n    const EXCLUDE_GEM_QUESTS = false;");
+      valid = false;
+    }
+
+    if (EXCLUDE_HOURGLASS_QUESTS !== true && EXCLUDE_HOURGLASS_QUESTS !== false) {
+      console.log("ERROR: EXCLUDE_HOURGLASS_QUESTS must equal either true or false.\n\neg. const EXCLUDE_HOURGLASS_QUESTS = true;\n    const EXCLUDE_HOURGLASS_QUESTS = false;");
       valid = false;
     }
   }
@@ -364,7 +384,7 @@ function createWebhooks() {
   }
 
   // quest finished
-  if (NOTIFY_ON_QUEST_END === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
+  if (AUTO_INVITE_QUESTS === true || NOTIFY_ON_QUEST_END === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
     Object.assign(questActivityOptions, {
       "questFinished": true
     });
