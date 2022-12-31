@@ -172,7 +172,9 @@ function processTrigger() {
 function processWebhook(webhookData) {
 
   // log webhook type
-  console.log("Webhook type: " + webhookData.webhookType);
+  if (!installing) {
+    console.log("Webhook type: " + webhookData.webhookType);
+  }
 
   // when a task is scored
   if (webhookData.webhookType == "scored") {
