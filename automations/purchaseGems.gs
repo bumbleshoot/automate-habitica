@@ -20,6 +20,12 @@ function purchaseGems() {
 
     console.log("Buying " + gemsToBuy + " gems");
 
-    fetch("https://habitica.com/api/v3/user/purchase/gems/gem?quantity=" + gemsToBuy, POST_PARAMS);
+    let params = Object.assign({
+      "contentType": "application/json",
+      "payload": JSON.stringify({
+        "quantity": gemsToBuy
+      })
+    }, POST_PARAMS);
+    fetch("https://habitica.com/api/v3/user/purchase/gems/gem", params);
   }
 }
