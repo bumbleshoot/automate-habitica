@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.22.2 (beta) by @bumbleshoot
+ * Automate Habitica v0.22.3 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -127,6 +127,8 @@ function validateConstants() {
       if (e.stack.includes("There is no account that uses those credentials")) {
         console.log("ERROR: Your USER_ID and/or API_TOKEN is incorrect. Both of these can be found at https://habitica.com/user/settings/api");
         valid = false;
+      } else {
+        throw e;
       }
     }
   }
