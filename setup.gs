@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.22.3 (beta) by @bumbleshoot
+ * Automate Habitica v0.23.0 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -49,6 +49,13 @@ const RESERVE_FOOD = 999;
 const AUTO_HATCH_FEED_PETS = false;
 const ONLY_USE_DROP_FOOD = true;
 
+const HIDE_PARTY_NOTIFICATIONS = false;
+const HIDE_ALL_GUILD_NOTIFICATIONS = false;
+const HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS = [ // only used if HIDE_ALL_GUILD_NOTIFICATIONS is false
+  "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", // enter a guild ID between the quotes to hide notifications from that guild
+  "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" // repeat for as many guilds as you want
+]
+
 /*************************************\
  *  DO NOT EDIT ANYTHING BELOW HERE  *
 \*************************************/
@@ -85,6 +92,7 @@ function install() {
     });
     processWebhook({ webhookType: "questStarted" });
     processWebhook({ webhookType: "questFinished" });
+    processWebhook({ webhookType: "groupChatReceived" });
 
     // process queue
     processQueue();
@@ -298,6 +306,41 @@ function validateConstants() {
     }
   }
 
+  if (HIDE_PARTY_NOTIFICATIONS !== true && HIDE_PARTY_NOTIFICATIONS !== false) {
+    console.log("ERROR: HIDE_PARTY_NOTIFICATIONS must equal either true or false.\n\neg. const HIDE_PARTY_NOTIFICATIONS = true;\n    const HIDE_PARTY_NOTIFICATIONS = false;");
+    valid = false;
+  }
+
+  if (HIDE_ALL_GUILD_NOTIFICATIONS !== true && HIDE_ALL_GUILD_NOTIFICATIONS !== false) {
+    console.log("ERROR: HIDE_ALL_GUILD_NOTIFICATIONS must equal either true or false.\n\neg. const HIDE_ALL_GUILD_NOTIFICATIONS = true;\n    const HIDE_ALL_GUILD_NOTIFICATIONS = false;");
+    valid = false;
+  }
+
+  if (HIDE_ALL_GUILD_NOTIFICATIONS === false) {
+    if (!Array.isArray(HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS)) {
+      console.log("ERROR: HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS must equal an array (list) of guild IDs.\n\neg. const HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS = [\n      \"f2db2a7f-13c5-454d-b3ee-ea1f5089e601\",\n      \"5481ccf3-5d2d-48a9-a871-70a7380cee5a\",\n      \"694b15e1-19b0-4ea8-ac71-ce9f27031330\"\n    ]");
+      valid = false;
+
+    } else {
+      let inGuilds = true;
+      for (guildId of HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS) {
+        if (typeof guildId !== "string" || (guildId !== "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" && guildId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/) === null)) {
+          console.log("ERROR: HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS must equal an array (list) of guild IDs.\n\neg. const HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS = [\n      \"f2db2a7f-13c5-454d-b3ee-ea1f5089e601\",\n      \"5481ccf3-5d2d-48a9-a871-70a7380cee5a\",\n      \"694b15e1-19b0-4ea8-ac71-ce9f27031330\"\n    ]");
+          valid = false;
+          break;
+        }
+
+        if (inGuilds && guildId !== "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" && !getUser().guilds.includes(guildId)) {
+          inGuilds = false;
+          valid = false;
+        }
+      }
+      if (!inGuilds) {
+        console.log("ERROR: You must be a member of each guild in the HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS list.");
+      }
+    }
+  }
+
   if (!valid) {
     console.log("Please fix the above errors, create a new version of the existing deployment (or create a new deployment if you haven't created one already), then run the install function again.");
   }
@@ -331,77 +374,120 @@ function createTrigger() {
   }
 }
 
-function deleteWebhooks() {
+function deleteWebhooks(groupChatReceived) {
   let webhooks = JSON.parse(fetch("https://habitica.com/api/v3/user/webhook", GET_PARAMS)).data;
   if (webhooks.length > 0) {
 
-    console.log("Deleting webhooks");
+    if (!groupChatReceived) {
+      console.log("Deleting webhooks");
+    } else {
+      console.log("Deleting groupChatReceived webhooks");
+    }
 
     for (webhook of webhooks) {
-      if (webhook.url == WEB_APP_URL) {
+      if (webhook.url == WEB_APP_URL && (!groupChatReceived || webhook.type == "groupChatReceived")) {
         fetch("https://habitica.com/api/v3/user/webhook/" + webhook.id, DELETE_PARAMS);
       }
     }
   }
 }
 
-function createWebhooks() {
+function createWebhooks(groupChatReceived) {
 
   let webhooks = [];
 
-  // task scored
-  if (AUTO_ALLOCATE_STAT_POINTS === true || AUTO_CAST_SKILLS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
+  if (!groupChatReceived) {
+
+    // task scored
+    if (AUTO_ALLOCATE_STAT_POINTS === true || AUTO_CAST_SKILLS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
+      webhooks.push({
+        "type": "taskActivity",
+        "options": {
+          "scored": true
+        }
+      });
+    }
+
+    // level up
+    if (AUTO_ALLOCATE_STAT_POINTS === true || AUTO_PAUSE_RESUME_DAMAGE === true) {
+      webhooks.push({
+        "type": "userActivity",
+        "options": {
+          "leveledUp": true
+        }
+      });
+    }
+
+    let questActivityOptions = {};
+
+    // quest invited
+    if (AUTO_ACCEPT_QUEST_INVITES === true || FORCE_START_QUESTS === true || NOTIFY_ON_QUEST_END === true || AUTO_PAUSE_RESUME_DAMAGE === true) {
+      Object.assign(questActivityOptions, {
+        "questInvited": true
+      });
+    }
+
+    // quest started
+    if (FORCE_START_QUESTS === true) {
+      Object.assign(questActivityOptions, {
+        "questStarted": true
+      });
+    }
+
+    // quest finished
+    if (AUTO_INVITE_QUESTS === true || NOTIFY_ON_QUEST_END === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
+      Object.assign(questActivityOptions, {
+        "questFinished": true
+      });
+    }
+    if (Object.keys(questActivityOptions).length > 0) {
+      webhooks.push({
+        "type": "questActivity",
+        "options": questActivityOptions
+      });
+    }
+  }
+
+  // group chat received
+  if (HIDE_PARTY_NOTIFICATIONS === true) {
     webhooks.push({
-      "type": "taskActivity",
+      "type": "groupChatReceived",
       "options": {
-        "scored": true
+        "groupId": getUser().party._id
       }
     });
   }
-
-  // level up
-  if (AUTO_ALLOCATE_STAT_POINTS === true || AUTO_PAUSE_RESUME_DAMAGE === true) {
-    webhooks.push({
-      "type": "userActivity",
-      "options": {
-        "leveledUp": true
+  if (HIDE_ALL_GUILD_NOTIFICATIONS === true) {
+    scriptProperties.setProperty("playerGuilds", getUser().guilds.join());
+    for (guild of user.guilds) {
+      webhooks.push({
+        "type": "groupChatReceived",
+        "options": {
+          "groupId": guild
+        }
+      });
+    }
+  } else {
+    for (guild of HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS) {
+      if (guild !== "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx") {
+        webhooks.push({
+          "type": "groupChatReceived",
+          "options": {
+            "groupId": guild
+          }
+        });
       }
-    });
-  }
-
-  let questActivityOptions = {};
-
-  // quest invited
-  if (AUTO_ACCEPT_QUEST_INVITES === true || FORCE_START_QUESTS === true || NOTIFY_ON_QUEST_END === true || AUTO_PAUSE_RESUME_DAMAGE === true) {
-    Object.assign(questActivityOptions, {
-      "questInvited": true
-    });
-  }
-
-  // quest started
-  if (FORCE_START_QUESTS === true) {
-    Object.assign(questActivityOptions, {
-      "questStarted": true
-    });
-  }
-
-  // quest finished
-  if (AUTO_INVITE_QUESTS === true || NOTIFY_ON_QUEST_END === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
-    Object.assign(questActivityOptions, {
-      "questFinished": true
-    });
-  }
-  if (Object.keys(questActivityOptions).length > 0) {
-    webhooks.push({
-      "type": "questActivity",
-      "options": questActivityOptions
-    });
+    }
   }
 
   // create webhooks
   if (webhooks.length > 0) {
 
-    console.log("Creating webhooks");
+    if (!groupChatReceived) {
+      console.log("Creating webhooks");
+    } else {
+      console.log("Creating groupChatReceived webhooks");
+    }
 
     for (webhook of webhooks) {
       webhook = Object.assign({

@@ -145,6 +145,12 @@ function processTrigger() {
     scriptProperties.setProperty("useExcessMana", "true");
   }
 
+  if (HIDE_ALL_GUILD_NOTIFICATIONS === true && !installing) {
+    if (user.guilds.join() !== scriptProperties.getProperty("playerGuilds")) {
+      deleteWebhooks(true);
+      createWebhooks(true);
+    }
+  }
   if (AUTO_CAST_SKILLS === true && getPlayerClass() == "healer") {
     scriptProperties.setProperty("healParty", "true");
   }
@@ -268,6 +274,10 @@ function processWebhook(webhookData) {
     if (AUTO_HATCH_FEED_PETS === true) {
       scriptProperties.setProperty("hatchFeedPets", "true");
     }
+
+  // when a chat notification is received
+  } else if (webhookData.webhookType == "groupChatReceived") {
+    scriptProperties.setProperty("hideNotifications", "true");
   }
 }
 
@@ -288,6 +298,11 @@ function processQueue() {
     if (lock.tryLock(0) || (installing && lock.tryLock(360000))) {
 
       while (true) {
+        if (scriptProperties.getProperty("hideNotifications") !== null) {
+          hideNotifications();
+          scriptProperties.deleteProperty("hideNotifications");
+          continue;
+        }
         let webhookData = scriptProperties.getProperty("allocateStatPoints");
         if (webhookData !== null) {
           webhookData = JSON.parse(webhookData);
