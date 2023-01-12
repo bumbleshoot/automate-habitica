@@ -7,22 +7,22 @@ Automate Habitica is a suite of automation tools for Habitica, allowing you to f
 ### Auto cron
 Automatically runs [cron](https://habitica.fandom.com/wiki/Cron) shortly after your [day start time](https://habitica.fandom.com/wiki/Custom_Day_Start).
 
-### Auto accept quest invites
+### Auto Accept Quest Invites
 Automatically and immediately accepts [quest](https://habitica.fandom.com/wiki/Quests) invites from your [party](https://habitica.fandom.com/wiki/Party).
 
-### Force start quests
+### Force Start Quests
 Forces pending [quests](https://habitica.fandom.com/wiki/Quests) to start after `FORCE_START_QUESTS_AFTER_HOURS_MIN` hours, regardless of how many [party](https://habitica.fandom.com/wiki/Party) members have joined. If the script force starts the quest, and if `NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST` is set to `true`, it sends a [private message](https://habitica.fandom.com/wiki/Private_Messaging) to the player with a list of party members who failed to join. Only party leaders can run this automation.
 
-### Auto invite quests
+### Auto Invite Quests
 Whenever your party completes a quest, automatically selects a random quest scroll from your inventory and invites your party to that quest. There is a ~5-15 min delay between quest ending and using the quest scroll, to give other party members a chance to run their quests too, and to prevent multiple simultaneous quest invitations. If `EXCLUDE_GEM_QUESTS` is set to `true`, the script will not use your gem quest scrolls. If `EXCLUDE_HOURGLASS_QUESTS` is set to `true`, the script will not use your hourglass quest scrolls.
 
-### Notify on quest end
+### Notify On Quest End
 Sends a [private message](https://habitica.fandom.com/wiki/Private_Messaging) to you on Habitica to notify you whenever your [party](https://habitica.fandom.com/wiki/Party) completes a [quest](https://habitica.fandom.com/wiki/Quests).
 
-### Auto allocate stat points
+### Auto Allocate Stat Points
 Stat points are automatically allocated to your chosen [stat](https://habitica.fandom.com/wiki/Character_Stats).
 
-### Auto cast skills
+### Auto Cast Skills
 Strategically casts your [skills](https://habitica.fandom.com/wiki/Skills) for you. Ensures no [mana](https://habitica.fandom.com/wiki/Mana_Points) is wasted, and no mana is lost at [cron](https://habitica.fandom.com/wiki/Cron). In order from highest to lowest priority:
 1. Heals you and your [party](https://habitica.fandom.com/wiki/Party) as needed ([healer](https://habitica.fandom.com/wiki/Healer))
 2. Casts Stealth to hide you from any [missed dailies](https://habitica.fandom.com/wiki/Dailies#Uncompleted_Dailies) just before your [day start time](https://habitica.fandom.com/wiki/Custom_Day_Start) ([rogue](https://habitica.fandom.com/wiki/Rogue))
@@ -32,19 +32,19 @@ Strategically casts your [skills](https://habitica.fandom.com/wiki/Skills) for y
 6. Buffs your class's primary stat whenever extra mana is available (reserves mana for the items listed above)
 7. Gives any extra mana to your party with Ethereal Surge (mage) or uses it to cast more buffs (other classes) just before your day start time
 
-### Auto pause/resume damage
+### Auto Pause/Resume Damage
 Automatically checks you into the [inn](https://habitica.fandom.com/wiki/Rest_in_the_Inn) if the current [boss](https://habitica.fandom.com/wiki/Boss) will do more than `MAX_PLAYER_DAMAGE` to you, or `MAX_PARTY_DAMAGE` to your [party](https://habitica.fandom.com/wiki/Party), or enough damage to [kill](https://habitica.fandom.com/wiki/Death_Mechanics) you or one of your party members. Checks you out of the inn otherwise.
 
-### Auto purchase gems
+### Auto Purchase Gems
 Automatically purchases [gems](https://habitica.fandom.com/wiki/Gems) with [gold](https://habitica.fandom.com/wiki/Gold_Points) each month. Note that you must [cron](https://habitica.fandom.com/wiki/Cron) at least once during a month in order to buy gems for that month. Only [subscribers](https://habitica.fandom.com/wiki/Subscription) can run this automation.
 
-### Auto purchase armoires
+### Auto Purchase Armoires
 Any [gold](https://habitica.fandom.com/wiki/Gold_Points) you earn over `RESERVE_GOLD` will automatically be spent on [enchanted armoires](https://habitica.fandom.com/wiki/Enchanted_Armoire).
 
-### Auto sell eggs/hatching potions/food
+### Auto Sell Eggs/Hatching Potions/Food
 Automatically sells your extra [eggs](https://habitica.fandom.com/wiki/Eggs), [hatching potions](https://habitica.fandom.com/wiki/Hatching_Potions), and/or [food](https://habitica.fandom.com/wiki/Food). You can configure how many you want to keep with `RESERVE_EGGS`, `RESERVE_HATCHING_POTIONS`, and `RESERVE_FOOD`.
 
-### Auto hatch/feed pets
+### Auto Hatch/Feed Pets
 Automatically hatches [pets](https://habitica.fandom.com/wiki/Pets), but only if the player has enough [eggs](https://habitica.fandom.com/wiki/Eggs) for all pets/[mounts](https://habitica.fandom.com/wiki/Mounts) of that species, and enough [hatching potions](https://habitica.fandom.com/wiki/Hatching_Potions) for all pets/mounts of that color. Automatically feeds pets, but only if the player has enough [food](https://habitica.fandom.com/wiki/Food) to feed all pets of that color with their [favorite food](https://habitica.fandom.com/wiki/Food_Preferences). If `ONLY_USE_DROP_FOOD` is set to `true`, the script will only feed basic foods (meat, milk, fish, etc.) to your pets. Special foods like cake, candy, pie, etc. will not be fed.
 
 ## Before Installing
