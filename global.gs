@@ -646,7 +646,19 @@ function calculatePerfectDayBuff() {
 let user;
 function getUser(updated) {
   if (updated || typeof user === "undefined") {
-    user = JSON.parse(fetch("https://habitica.com/api/v3/user", GET_PARAMS)).data;
+    for (let i=0; i<3; i++) {
+      user = fetch("https://habitica.com/api/v3/user", GET_PARAMS);
+      try {
+        user = JSON.parse(user).data;
+        break;
+      } catch (e) {
+        if (i < 2 && e.stack.includes("Unterminated string in JSON")) {
+          continue;
+        } else {
+          throw e;
+        }
+      }
+    }
   }
   return user;
 }
@@ -721,7 +733,19 @@ function getParty(updated) {
 let members;
 function getMembers(updated) {
   if (updated || typeof members === "undefined") {
-    members = JSON.parse(fetch("https://habitica.com/api/v3/groups/party/members?includeAllPublicFields=true", GET_PARAMS)).data;
+    for (let i=0; i<3; i++) {
+      members = fetch("https://habitica.com/api/v3/groups/party/members?includeAllPublicFields=true", GET_PARAMS);
+      try {
+        members = JSON.parse(members).data;
+        break;
+      } catch (e) {
+        if (i < 2 && e.stack.includes("Unterminated string in JSON")) {
+          continue;
+        } else {
+          throw e;
+        }
+      }
+    }
   }
   return members;
 }
@@ -736,7 +760,19 @@ function getMembers(updated) {
 let content;
 function getContent(updated) {
   if (updated || typeof content === "undefined") {
-    content = JSON.parse(fetch("https://habitica.com/api/v3/content", GET_PARAMS)).data;
+    for (let i=0; i<3; i++) {
+      content = fetch("https://habitica.com/api/v3/content", GET_PARAMS);
+      try {
+        content = JSON.parse(content).data;
+        break;
+      } catch (e) {
+        if (i < 2 && e.stack.includes("Unterminated string in JSON")) {
+          continue;
+        } else {
+          throw e;
+        }
+      }
+    }
   }
   return content;
 }
