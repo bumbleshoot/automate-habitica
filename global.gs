@@ -501,7 +501,23 @@ function fetch(url, params) {
     }
 
     // call API
-    let response = UrlFetchApp.fetch(url, params);
+    let response;
+    let addressUnavailable = 0;
+    while (true) {
+      try {
+        response = UrlFetchApp.fetch(url, params);
+        break;
+
+      // if address unavailable, wait 5 seconds & try again
+      } catch (e) {
+        if (addressUnavailable < 12 && e.stack.includes("Address unavailable")) {
+          addressUnavailable++;
+          Utilities.sleep(5000);
+        } else {
+          throw e;
+        }
+      }
+    }
 
     // store rate limiting data
     scriptProperties.setProperties({
