@@ -232,9 +232,7 @@ function processWebhook(webhookData) {
 
   // when a quest is started
   } else if (webhookData.webhookType == "questStarted") {
-    if (FORCE_START_QUESTS === true) {
-      scriptProperties.setProperty("forceStartQuest", "true");
-    }
+    scriptProperties.setProperty("forceStartQuest", "true");
 
   // when a quest is finished
   } else if (webhookData.webhookType == "questFinished") {
