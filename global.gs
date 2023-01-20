@@ -296,25 +296,25 @@ function processQueue() {
     if (lock.tryLock(0) || (installing && lock.tryLock(360000))) {
 
       while (true) {
-        if (scriptProperties.getProperty("hideNotifications") !== null) {
+        let properties = scriptProperties.getProperties();
+        if (properties.hasOwnProperty("hideNotifications")) {
           hideNotifications();
           scriptProperties.deleteProperty("hideNotifications");
           continue;
         }
-        let webhookData = scriptProperties.getProperty("allocateStatPoints");
-        if (webhookData !== null) {
-          webhookData = JSON.parse(webhookData);
+        let webhookData = properties["allocateStatPoints"];
+        if (typeof webhookData !== "undefined") {
           allocateStatPoints(webhookData.points, webhookData.lvl);
           scriptProperties.deleteProperty("allocateStatPoints");
           continue;
         }
-        if (scriptProperties.getProperty("healParty") !== null) {
+        if (properties.hasOwnProperty("healParty")) {
           healParty();
           scriptProperties.deleteProperty("healParty");
           continue;
         }
-        let questKey = scriptProperties.getProperty("pauseResumeDamage");
-        if (questKey !== null) {
+        let questKey = properties["pauseResumeDamage"];
+        if (typeof questKey !== "undefined") {
           if (questKey === "true") {
             pauseResumeDamage();
           } else {
@@ -323,49 +323,49 @@ function processQueue() {
           scriptProperties.deleteProperty("pauseResumeDamage");
           continue;
         }
-        if (scriptProperties.getProperty("acceptQuestInvite") !== null) {
+        if (properties.hasOwnProperty("acceptQuestInvite")) {
           acceptQuestInvite();
           scriptProperties.deleteProperty("acceptQuestInvite");
           continue;
         }
-        if (scriptProperties.getProperty("beforeCronSkills") !== null && !webhook) {
+        if (properties.hasOwnProperty("beforeCronSkills") && !webhook) {
           beforeCronSkills();
           scriptProperties.deleteProperty("beforeCronSkills");
           continue;
         }
-        if (scriptProperties.getProperty("runCron") !== null) {
+        if (properties.hasOwnProperty("runCron")) {
           runCron();
           scriptProperties.deleteProperty("runCron");
           continue;
         }
-        if (scriptProperties.getProperty("afterCronSkills") !== null && !webhook) {
+        if (properties.hasOwnProperty("afterCronSkills") && !webhook) {
           afterCronSkills();
           scriptProperties.deleteProperty("afterCronSkills");
           continue;
         }
-        if (scriptProperties.getProperty("purchaseGems") !== null) {
+        if (properties.hasOwnProperty("purchaseGems")) {
           purchaseGems();
           scriptProperties.deleteProperty("purchaseGems");
           continue;
         }
-        if (scriptProperties.getProperty("forceStartQuest") !== null) {
+        if (properties.hasOwnProperty("forceStartQuest")) {
           forceStartQuest();
           scriptProperties.deleteProperty("forceStartQuest");
           continue;
         }
-        questKey = scriptProperties.getProperty("notifyQuestEnded");
-        if (questKey !== null) {
+        questKey = properties["notifyQuestEnded"];
+        if (typeof questKey !== "undefined") {
           notifyQuestEnded(questKey);
           scriptProperties.deleteProperty("notifyQuestEnded");
           continue;
         }
-        if (scriptProperties.getProperty("useExcessMana") !== null && !webhook && !installing) {
+        if (properties.hasOwnProperty("useExcessMana") && !webhook && !installing) {
           useExcessMana();
           scriptProperties.deleteProperty("useExcessMana");
           continue;
         }
-        let gold = scriptProperties.getProperty("purchaseArmoires");
-        if (gold !== null && !webhook && !installing) {
+        let gold = properties["purchaseArmoires"];
+        if (typeof gold !== "undefined" && !webhook && !installing) {
           if (gold === "true") {
             purchaseArmoires();
           } else {
@@ -374,22 +374,22 @@ function processQueue() {
           scriptProperties.deleteProperty("purchaseArmoires");
           continue;
         }
-        if (scriptProperties.getProperty("sellExtraFood") !== null && !webhook) {
+        if (properties.hasOwnProperty("sellExtraFood") && !webhook) {
           sellExtraFood();
           scriptProperties.deleteProperty("sellExtraFood");
           continue;
         }
-        if (scriptProperties.getProperty("sellExtraHatchingPotions") !== null && !webhook) {
+        if (properties.hasOwnProperty("sellExtraHatchingPotions") && !webhook) {
           sellExtraHatchingPotions();
           scriptProperties.deleteProperty("sellExtraHatchingPotions");
           continue;
         }
-        if (scriptProperties.getProperty("sellExtraEggs") !== null && !webhook) {
+        if (properties.hasOwnProperty("sellExtraEggs") && !webhook) {
           sellExtraEggs();
           scriptProperties.deleteProperty("sellExtraEggs");
           continue;
         }
-        if (scriptProperties.getProperty("hatchFeedPets") !== null && !webhook && !installing) {
+        if (properties.hasOwnProperty("hatchFeedPets") && !webhook && !installing) {
           hatchFeedPets();
           scriptProperties.deleteProperty("hatchFeedPets");
           continue;
