@@ -403,7 +403,7 @@ function processQueue() {
     }
   
   } catch (e) {
-    if (!e.stack.includes("There are too many LockService operations against the same script")) {
+    if (!e.stack.includes("There are too many LockService operations against the same script") && !e.stack.includes("We're sorry, a server error occurred. Please wait a bit and try again.")) {
       MailApp.sendEmail(
         Session.getEffectiveUser().getEmail(),
         DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
