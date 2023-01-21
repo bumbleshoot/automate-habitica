@@ -13,7 +13,7 @@
  */
 function inviteRandomQuest() {
 
-  // delete temporary triggers
+  // delete temporary trigger
   for (trigger of ScriptApp.getProjectTriggers()) {
     if (trigger.getHandlerFunction() === "inviteRandomQuest") {
       ScriptApp.deleteTrigger(trigger);
