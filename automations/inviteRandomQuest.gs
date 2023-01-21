@@ -12,41 +12,51 @@
  * Habitica's servers at once.
  */
 function inviteRandomQuest() {
+  try {
 
-  // delete temporary trigger
-  for (trigger of ScriptApp.getProjectTriggers()) {
-    if (trigger.getHandlerFunction() === "inviteRandomQuest") {
-      ScriptApp.deleteTrigger(trigger);
-    }
-  }
-
-  // if not in a party or party is on a quest, return
-  if (typeof getParty(true) === "undefined" || typeof party.quest.key !== "undefined") {
-    return;
-  }
-
-  // for each quest scroll
-  let questScrolls = [];
-  for ([questKey, numScrolls] of Object.entries(getUser().items.quests)) {
-
-    // if not excluded by settings
-    if (!(EXCLUDE_HOURGLASS_QUESTS === true && typeof getContent().quests[questKey].category == "timeTravelers") && !(EXCLUDE_GEM_QUESTS === true && typeof content.quests[questKey].goldValue === "undefined")) {
-
-      // add x number of scrolls to list
-      for (let i=0; i<numScrolls; i++) {
-        questScrolls.push(questKey);
+    // delete temporary trigger
+    for (trigger of ScriptApp.getProjectTriggers()) {
+      if (trigger.getHandlerFunction() === "inviteRandomQuest") {
+        ScriptApp.deleteTrigger(trigger);
       }
     }
-  }
 
-  // if list contains scrolls
-  if (questScrolls.length > 0) {
+    // if not in a party or party is on a quest, return
+    if (typeof getParty(true) === "undefined" || typeof party.quest.key !== "undefined") {
+      return;
+    }
 
-    let randomQuestScroll = questScrolls[Math.floor(Math.random() * (questScrolls.length - 1))];
+    // for each quest scroll
+    let questScrolls = [];
+    for ([questKey, numScrolls] of Object.entries(getUser().items.quests)) {
 
-    console.log("Inviting party to " + content.quests[randomQuestScroll].text);
+      // if not excluded by settings
+      if (!(EXCLUDE_HOURGLASS_QUESTS === true && typeof getContent().quests[questKey].category == "timeTravelers") && !(EXCLUDE_GEM_QUESTS === true && typeof content.quests[questKey].goldValue === "undefined")) {
 
-    // invite party to a random quest scroll
-    fetch("https://habitica.com/api/v3/groups/party/quests/invite/" + randomQuestScroll, POST_PARAMS);
+        // add x number of scrolls to list
+        for (let i=0; i<numScrolls; i++) {
+          questScrolls.push(questKey);
+        }
+      }
+    }
+
+    // if list contains scrolls
+    if (questScrolls.length > 0) {
+
+      let randomQuestScroll = questScrolls[Math.floor(Math.random() * (questScrolls.length - 1))];
+
+      console.log("Inviting party to " + content.quests[randomQuestScroll].text);
+
+      // invite party to a random quest scroll
+      fetch("https://habitica.com/api/v3/groups/party/quests/invite/" + randomQuestScroll, POST_PARAMS);
+    }
+
+  } catch (e) {
+    MailApp.sendEmail(
+      Session.getEffectiveUser().getEmail(),
+      DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
+      e.stack
+    );
+    throw e;
   }
 }
