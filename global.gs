@@ -184,7 +184,7 @@ function processWebhook(webhookData) {
 
   // when a task is scored
   if (webhookData.webhookType == "scored") {
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.taskType == "daily" && webhookData.isDue === true && getUser().preferences.sleep === true) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.taskType == "daily" && webhookData.isDue === true) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
     if (AUTO_PURCHASE_GEMS === true && webhookData.gp >= 20) {
@@ -214,7 +214,7 @@ function processWebhook(webhookData) {
     if (AUTO_ALLOCATE_STAT_POINTS === true && (typeof webhookData.statPoints === "undefined" || webhookData.statPoints > 0) && webhookData.lvl >= 10) {
       scriptProperties.setProperty("allocateStatPoints", JSON.stringify(webhookData));
     }
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.lvl <= 100 && getUser().preferences.sleep === true) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.lvl <= 100) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
 
@@ -236,7 +236,7 @@ function processWebhook(webhookData) {
 
   // when a quest is finished
   } else if (webhookData.webhookType == "questFinished") {
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && getUser().preferences.sleep === true) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
     if (AUTO_PURCHASE_GEMS === true) {
