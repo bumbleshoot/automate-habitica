@@ -146,7 +146,7 @@ function processTrigger() {
   }
 
   if (HIDE_ALL_GUILD_NOTIFICATIONS === true && !installing) {
-    if (user.guilds.join() !== scriptProperties.getProperty("playerGuilds")) {
+    if (user.guilds.join() !== scriptProperties.getProperty("PLAYER_GUILDS")) {
       deleteWebhooks(true);
       createWebhooks(true);
     }

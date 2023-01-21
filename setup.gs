@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.23.6 (beta) by @bumbleshoot
+ * Automate Habitica v0.23.7 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -458,7 +458,7 @@ function createWebhooks(groupChatReceived) {
     });
   }
   if (HIDE_ALL_GUILD_NOTIFICATIONS === true) {
-    scriptProperties.setProperty("playerGuilds", getUser().guilds.join());
+    scriptProperties.setProperty("PLAYER_GUILDS", getUser().guilds.join());
     for (guild of user.guilds) {
       webhooks.push({
         "type": "groupChatReceived",
