@@ -36,7 +36,7 @@ function castProtectiveAura(beforeCron) {
   if (beforeCron) {
     let maxManaAfterCron = ((int - user.stats.buffs.int + Math.min(Math.ceil(user.stats.lvl / 2), 50)) * 2 + 30) * 0.9;
     if (maxManaAfterCron < healPartyMana) {
-      numAuras = Math.ceil((user.stats.mp - maxManaAfterCron) / 30);
+      numAuras = Math.max(Math.ceil((user.stats.mp - maxManaAfterCron) / 30), 0);
       reserveMessage = "Reserving no more than " + maxManaAfterCron + " mana for after cron";
     }
   }
