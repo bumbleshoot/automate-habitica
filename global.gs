@@ -119,7 +119,6 @@ function processTrigger() {
   } else if (AUTO_CRON === true && needsCron === true) {
     scriptProperties.setProperty("runCron", "true");
     if (AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) {
-      scriptProperties.setProperty("LAST_AFTER_CRON", now);
       scriptProperties.deleteProperty("beforeCronSkills");
       if (AUTO_CAST_SKILLS === true) {
         scriptProperties.setProperty("afterCronSkills", "true");

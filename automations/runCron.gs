@@ -11,6 +11,8 @@ function runCron() {
 
   fetch("https://habitica.com/api/v3/cron", POST_PARAMS);
 
+  scriptProperties.setProperty("LAST_AFTER_CRON", new Date());
+
   if (AUTO_PAUSE_RESUME_DAMAGE === true) {
     scriptProperties.setProperty("pauseResumeDamage", "true");
   }
