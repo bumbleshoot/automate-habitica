@@ -562,7 +562,11 @@ function fetch(url, params) {
     let properties = scriptProperties.getProperties();
     let rateLimitRemaining = properties["X-RateLimit-Remaining"];
     let rateLimitReset = properties["X-RateLimit-Reset"];
-    if (typeof rateLimitRemaining !== "undefined") {
+    let spaceOutAPICalls = true;
+    if (properties.hasOwnProperty("hideGuildNotifications") || properties.hasOwnProperty("acceptQuestInvite") || properties.hasOwnProperty("notifyQuestEnded")) {
+      spaceOutAPICalls = false;
+    }
+    if (typeof rateLimitRemaining !== "undefined" && (spaceOutAPICalls || Number(rateLimitRemaining < 1))) {
 
       // space out API calls
       let waitUntil = new Date(rateLimitReset);
