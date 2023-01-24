@@ -37,3 +37,44 @@ function hideNotifications() {
     }
   }
 }
+
+/**
+ * hideNotificationsHandler()
+ * 
+ * Deletes temporary trigger, hides party notifications, 
+ * and emails the user if any errors are thrown.
+ */
+function hideNotificationsHandler() {
+  try {
+
+    // delete temporary trigger
+    for (trigger of ScriptApp.getProjectTriggers()) {
+      if (trigger.getHandlerFunction() === "hideNotificationsHandler") {
+        ScriptApp.deleteTrigger(trigger);
+      }
+    }
+
+    while (true) {
+
+      // hide notifications
+      hideNotifications();
+
+      // check for new trigger
+      for (trigger of ScriptApp.getProjectTriggers()) {
+        if (trigger.getHandlerFunction() === "hideNotificationsHandler") {
+          ScriptApp.deleteTrigger(trigger);
+          continue;
+        }
+      }
+      break;
+    }
+
+  } catch (e) {
+    MailApp.sendEmail(
+      Session.getEffectiveUser().getEmail(),
+      DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
+      e.stack
+    );
+    throw e;
+  }
+}

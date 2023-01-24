@@ -50,6 +50,8 @@ Automatically hatches [pets](https://habitica.fandom.com/wiki/Pets), but only if
 ### Hide Notifications
 Hides [notifications](https://habitica.fandom.com/wiki/Notifications?so=search#Parties_and_Guilds) from groups ([party](https://habitica.fandom.com/wiki/Party) & [guilds](https://habitica.fandom.com/wiki/Guilds)) in the Habitica UI. The player can configure which groups they'd like to hide notifications from. To get the ID of a guild, visit the guild in a web browser and copy the end of the URL in your address bar (everything after the last `/`). Note that if you set `HIDE_ALL_GUILD_NOTIFICATIONS` to `true`, it may take up to 15 mins for Automate Habitica to start hiding notifications from any new guilds you join.
 
+***Note that due to [limitations with Google Apps Script](https://issuetracker.google.com/issues/231411987), Automate Habitica may take up to 2 mins to hide party notifications if `HIDE_PARTY_NOTIFICATIONS` is set to `true`. I can fix this if the issue with Google Apps Script is fixed (see link), or if Automate Habitica is moved to a different platform. I would like to move Automate Habitica to a different platform someday, but it is a large undertaking that I don't have time for right now.***
+
 
 ## Before Installing
 You need to use a desktop computer for this. It will not work on a phone or tablet! First you must uninstall any scripts that do the same thing(s) as Automate Habitica. For example, if you are running the [Auto Accept Quests](https://habitica.fandom.com/wiki/Google_Apps_Script#Auto_Accept_Quests) script, you need to uninstall it, because Automate Habitica also auto accepts quest invites, and these two scripts will conflict with each other. To uninstall a script:

@@ -72,6 +72,10 @@ function doPost(e) {
       Object.assign(webhookData, {
         questKey: postData.quest.key
       });
+    } else if (webhookData.webhookType == "groupChatReceived") {
+      Object.assign(webhookData, {
+        groupId: postData.group.id
+      });
     }
 
     // process webhook
@@ -274,7 +278,23 @@ function processWebhook(webhookData) {
 
   // when a chat notification is received
   } else if (webhookData.webhookType == "groupChatReceived") {
-    scriptProperties.setProperty("hideNotifications", "true");
+    if (webhookData.groupId === scriptProperties.getProperty("PARTY_ID")) {
+      let triggerNeeded = true;
+      for (trigger of ScriptApp.getProjectTriggers()) {
+        if (trigger.getHandlerFunction() === "hideNotificationsHandler") {
+          triggerNeeded = false;
+          break;
+        }
+      }
+      if (triggerNeeded) {
+        ScriptApp.newTrigger("hideNotificationsHandler")
+          .timeBased()
+          .after(1)
+          .create();
+      }
+    } else {
+      scriptProperties.setProperty("hideNotifications", "true");
+    }
   }
 }
 
@@ -297,8 +317,11 @@ function processQueue() {
       while (true) {
         let properties = scriptProperties.getProperties();
         if (properties.hasOwnProperty("hideNotifications")) {
+          scriptProperties.setProperty("hideNotifications", "pending");
           hideNotifications();
-          scriptProperties.deleteProperty("hideNotifications");
+          if (scriptProperties.getProperty("hideNotifications") === "pending") {
+            scriptProperties.deleteProperty("hideNotifications");
+          }
           continue;
         }
         let webhookData = properties["allocateStatPoints"];
@@ -651,6 +674,9 @@ function getUser(updated) {
       user = fetch("https://habitica.com/api/v3/user", GET_PARAMS);
       try {
         user = JSON.parse(user).data;
+        if (typeof user.party?._id !== "undefined") {
+          scriptProperties.setProperty("PARTY_ID", user.party._id);
+        }
         break;
       } catch (e) {
         if (i < 2 && e.stack.includes("Unterminated string in JSON")) {
