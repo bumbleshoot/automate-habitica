@@ -559,9 +559,10 @@ function fetch(url, params) {
   for (let i=0; i<3; i++) {
 
     // get rate limiting data
-    let rateLimitRemaining = scriptProperties.getProperty("X-RateLimit-Remaining");
-    let rateLimitReset = scriptProperties.getProperty("X-RateLimit-Reset");
-    if (rateLimitRemaining != null) {
+    let properties = scriptProperties.getProperties();
+    let rateLimitRemaining = properties["X-RateLimit-Remaining"];
+    let rateLimitReset = properties["X-RateLimit-Reset"];
+    if (typeof rateLimitRemaining !== "undefined") {
 
       // space out API calls
       let waitUntil = new Date(rateLimitReset);
