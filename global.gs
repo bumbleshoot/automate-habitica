@@ -281,19 +281,19 @@ function processWebhook(webhookData) {
     if (webhookData.groupId === scriptProperties.getProperty("PARTY_ID")) {
       let triggerNeeded = true;
       for (trigger of ScriptApp.getProjectTriggers()) {
-        if (trigger.getHandlerFunction() === "hideNotificationsHandler") {
+        if (trigger.getHandlerFunction() === "hidePartyNotification") {
           triggerNeeded = false;
           break;
         }
       }
       if (triggerNeeded) {
-        ScriptApp.newTrigger("hideNotificationsHandler")
+        ScriptApp.newTrigger("hidePartyNotification")
           .timeBased()
           .after(1)
           .create();
       }
     } else {
-      scriptProperties.setProperty("hideNotifications", "true");
+      scriptProperties.setProperty("hideGuildNotifications", "true");
     }
   }
 }
@@ -316,13 +316,14 @@ function processQueue() {
 
       while (true) {
         let properties = scriptProperties.getProperties();
-        if (properties.hasOwnProperty("hideNotifications")) {
-          scriptProperties.setProperty("hideNotifications", "pending");
-          hideNotifications();
-          if (scriptProperties.getProperty("hideNotifications") === "pending") {
-            scriptProperties.deleteProperty("hideNotifications");
+        if (properties.hasOwnProperty("hideGuildNotifications")) {
+          scriptProperties.setProperty("hideGuildNotifications", "pending");
+          hideGuildNotifications();
+          if (scriptProperties.getProperty("hideGuildNotifications") === "pending") {
+            scriptProperties.deleteProperty("hideGuildNotifications");
+          } else {
+            continue;
           }
-          continue;
         }
         let webhookData = properties["allocateStatPoints"];
         if (typeof webhookData !== "undefined") {
