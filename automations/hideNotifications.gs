@@ -37,20 +37,8 @@ function hideNotificationsHandler() {
       }
     }
 
-    while (true) {
-
-      // hide notifications
-      hideNotifications();
-
-      // check for new trigger
-      for (trigger of ScriptApp.getProjectTriggers()) {
-        if (trigger.getHandlerFunction() === "hideNotificationsHandler") {
-          ScriptApp.deleteTrigger(trigger);
-          continue;
-        }
-      }
-      break;
-    }
+    // hide notifications
+    hideNotifications();
 
   } catch (e) {
     MailApp.sendEmail(
