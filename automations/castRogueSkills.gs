@@ -148,14 +148,22 @@ function castToolsOfTheTrade(saveMana) {
  */
 function castStealthAndDumpMana() {
 
-  // get number of stealth casts
-  let numStealths = Math.min(numStealthsNeeded(), Math.floor(getUser(true).stats.mp / 45));
+  // if lvl > 13, cast Stealth
+  if (getUser(true).stats.lvl > 13) {
 
-  console.log("Casting Stealth " + numStealths + " time(s)");
+    // get number of stealth casts
+    var numStealths = Math.min(numStealthsNeeded(), Math.floor(getUser(true).stats.mp / 45));
 
-  // cast stealths
-  for (let i=0; i<numStealths; i++) {
-    fetch("https://habitica.com/api/v3/user/class/cast/stealth", POST_PARAMS);
+    console.log("Casting Stealth " + numStealths + " time(s)");
+
+    // cast stealths
+    for (let i=0; i<numStealths; i++) {
+      fetch("https://habitica.com/api/v3/user/class/cast/stealth", POST_PARAMS);
+    }
+
+  // if lvl < 14, cannot cast Stealth
+  } else {
+    console.log("Player lvl " + user.stats.lvl + ", cannot cast Stealth");
   }
 
   // if sleeping & cast stealth, pause or resume damage
@@ -176,12 +184,6 @@ function castStealthAndDumpMana() {
  */
 function numStealthsNeeded() {
 
-  // if lvl < 14, return 0
-  if (getUser(true).stats.lvl < 14) {
-    console.log("Player lvl " + user.stats.lvl + ", cannot cast Stealth");
-    return 0;
-  }
-
   // count damaging dailies
   let stealth = user.stats.buffs.stealth;
   let numDamagingDailies = 0;
@@ -197,10 +199,18 @@ function numStealthsNeeded() {
 
   console.log("Damaging dailies: " + numDamagingDailies);
 
-  // calculate num dailies dodged per cast
-  let totalPer = getTotalStat("per");
-  let numDodged = Math.ceil(0.64 * getDailies().length * totalPer / (totalPer + 55));
+  // if player has damaging dailies
+  if (numDamagingDailies > 0) {
 
-  // return num stealths needed
-  return Math.ceil(numDamagingDailies / numDodged);
+    // calculate num dailies dodged per cast
+    let totalPer = getTotalStat("per");
+    let numDodged = Math.ceil(0.64 * getDailies().length * totalPer / (totalPer + 55));
+
+    // return num stealths needed
+    return Math.ceil(numDamagingDailies / numDodged);
+
+  // if no damaging dailies, no stealth needed
+  } else {
+    return 0;
+  }
 }
