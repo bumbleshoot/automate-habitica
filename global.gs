@@ -279,18 +279,20 @@ function processWebhook(webhookData) {
   // when a chat notification is received
   } else if (webhookData.webhookType == "groupChatReceived") {
     if (webhookData.groupId === scriptProperties.getProperty("PARTY_ID")) {
-      let triggerNeeded = true;
-      for (trigger of ScriptApp.getProjectTriggers()) {
-        if (trigger.getHandlerFunction() === "hidePartyNotification") {
-          triggerNeeded = false;
-          break;
+      if (HIDE_PARTY_NOTIFICATIONS === true) {
+        let triggerNeeded = true;
+        for (trigger of ScriptApp.getProjectTriggers()) {
+          if (trigger.getHandlerFunction() === "hidePartyNotification") {
+            triggerNeeded = false;
+            break;
+          }
         }
-      }
-      if (triggerNeeded) {
-        ScriptApp.newTrigger("hidePartyNotification")
-          .timeBased()
-          .after(1)
-          .create();
+        if (triggerNeeded) {
+          ScriptApp.newTrigger("hidePartyNotification")
+            .timeBased()
+            .after(1)
+            .create();
+        }
       }
     } else {
       scriptProperties.setProperty("hideGuildNotifications", "true");
