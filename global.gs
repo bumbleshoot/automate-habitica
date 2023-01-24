@@ -558,16 +558,16 @@ function fetch(url, params) {
   // try up to 3 times
   for (let i=0; i<3; i++) {
 
-    // if rate limit reached
+    // get rate limiting data
     let rateLimitRemaining = scriptProperties.getProperty("X-RateLimit-Remaining");
     let rateLimitReset = scriptProperties.getProperty("X-RateLimit-Reset");
-    if (rateLimitRemaining != null && Number(rateLimitRemaining) < 1) {
+    if (rateLimitRemaining != null) {
 
-      // wait until rate limit reset
+      // space out API calls
       let waitUntil = new Date(rateLimitReset);
       waitUntil.setSeconds(waitUntil.getSeconds() + 1);
       let now = new Date();
-      Utilities.sleep(Math.max(waitUntil.getTime() - now.getTime(), 0));
+      Utilities.sleep(Math.max(waitUntil.getTime() - now.getTime(), 0) / (Number(rateLimitRemaining) + 1));
     }
 
     // call API
