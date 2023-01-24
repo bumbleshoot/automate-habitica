@@ -12,6 +12,8 @@ const DELETE_PARAMS = Object.assign({ "method": "delete" }, PARAMS);
 
 const scriptProperties = PropertiesService.getScriptProperties();
 
+const scriptStart = new Date().getTime();
+
 /**
  * onTrigger()
  * 
@@ -115,7 +117,7 @@ function processTrigger() {
   let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
 
   // if just before day start time
-  if (AUTO_CAST_SKILLS === true && nowAdjusted.getHours() == dayStart-1 && 24 <= nowAdjusted.getMinutes() && nowAdjusted.getMinutes() < 54 && (lastBeforeCronAdjusted.toDateString() !== nowAdjusted.toDateString() || lastBeforeCronAdjusted.getHours() !== nowAdjusted.getHours())) {
+  if (AUTO_CAST_SKILLS === true && nowAdjusted.getHours() == dayStart-1 && 39 <= nowAdjusted.getMinutes() && nowAdjusted.getMinutes() < 54 && (lastBeforeCronAdjusted.toDateString() !== nowAdjusted.toDateString() || lastBeforeCronAdjusted.getHours() !== nowAdjusted.getHours())) {
     scriptProperties.setProperty("beforeCronSkills", "true");
     scriptProperties.setProperty("LAST_BEFORE_CRON", now);
 
@@ -333,11 +335,6 @@ function processQueue() {
           scriptProperties.deleteProperty("allocateStatPoints");
           continue;
         }
-        if (properties.hasOwnProperty("healParty")) {
-          healParty();
-          scriptProperties.deleteProperty("healParty");
-          continue;
-        }
         let questKey = properties["pauseResumeDamage"];
         if (typeof questKey !== "undefined") {
           if (questKey === "true") {
@@ -353,14 +350,25 @@ function processQueue() {
           scriptProperties.deleteProperty("acceptQuestInvite");
           continue;
         }
-        if (properties.hasOwnProperty("beforeCronSkills") && !webhook) {
-          beforeCronSkills();
-          scriptProperties.deleteProperty("beforeCronSkills");
+        questKey = properties["notifyQuestEnded"];
+        if (typeof questKey !== "undefined") {
+          notifyQuestEnded(questKey);
+          scriptProperties.deleteProperty("notifyQuestEnded");
+          continue;
+        }
+        if (properties.hasOwnProperty("healParty")) {
+          healParty();
+          scriptProperties.deleteProperty("healParty");
           continue;
         }
         if (properties.hasOwnProperty("runCron")) {
           runCron();
           scriptProperties.deleteProperty("runCron");
+          continue;
+        }
+        if (properties.hasOwnProperty("beforeCronSkills") && !webhook) {
+          beforeCronSkills();
+          scriptProperties.deleteProperty("beforeCronSkills");
           continue;
         }
         if (properties.hasOwnProperty("afterCronSkills") && !webhook) {
@@ -376,12 +384,6 @@ function processQueue() {
         if (properties.hasOwnProperty("forceStartQuest")) {
           forceStartQuest();
           scriptProperties.deleteProperty("forceStartQuest");
-          continue;
-        }
-        questKey = properties["notifyQuestEnded"];
-        if (typeof questKey !== "undefined") {
-          notifyQuestEnded(questKey);
-          scriptProperties.deleteProperty("notifyQuestEnded");
           continue;
         }
         if (properties.hasOwnProperty("useExcessMana") && !webhook && !installing) {
@@ -434,6 +436,51 @@ function processQueue() {
       );
       throw e;
     }
+  }
+}
+
+/**
+ * interruptLoop()
+ * 
+ * Call this function after each iteration of an indefinite 
+ * loop to check for urgent functions that should interrupt 
+ * the loop. Returns true if the loop should stop early to 
+ * avoid timing out or exceeding the URL Fetch limit.
+ */
+function interruptLoop() {
+  while (true) {
+    let properties = scriptProperties.getProperties();
+    if (properties.hasOwnProperty("hideGuildNotifications")) {
+      scriptProperties.setProperty("hideGuildNotifications", "pending");
+      hideGuildNotifications();
+      if (scriptProperties.getProperty("hideGuildNotifications") === "pending") {
+        scriptProperties.deleteProperty("hideGuildNotifications");
+      } else {
+        continue;
+      }
+    }
+    let questKey = properties["pauseResumeDamage"];
+    if (typeof questKey !== "undefined") {
+      if (questKey === "true") {
+        pauseResumeDamage();
+      } else {
+        pauseResumeDamage(questKey);
+      }
+      scriptProperties.deleteProperty("pauseResumeDamage");
+    }
+    if (properties.hasOwnProperty("acceptQuestInvite")) {
+      acceptQuestInvite();
+      scriptProperties.deleteProperty("acceptQuestInvite");
+    }
+    questKey = properties["notifyQuestEnded"];
+    if (typeof questKey !== "undefined") {
+      notifyQuestEnded(questKey);
+      scriptProperties.deleteProperty("notifyQuestEnded");
+    }
+    break;
+  }
+  if (new Date().getTime() - scriptStart > 270000) {
+    return true;
   }
 }
 

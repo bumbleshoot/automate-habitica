@@ -47,6 +47,9 @@ function castProtectiveAura(beforeCron) {
   // cast protective aura
   for (let i=0; i<numAuras; i++) {
     fetch("https://habitica.com/api/v3/user/class/cast/protectAura", POST_PARAMS);
+    if (interruptLoop()) {
+      break;
+    }
   }
 
   // if player is asleep, pause or resume damage

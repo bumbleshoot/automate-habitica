@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.23.19 (beta) by @bumbleshoot
+ * Automate Habitica v0.24.0 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -369,7 +369,7 @@ function createTrigger() {
 
     ScriptApp.newTrigger("onTrigger")
       .timeBased()
-      .everyMinutes(15)
+      .everyMinutes(10)
       .create();
   }
 }

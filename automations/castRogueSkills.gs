@@ -60,6 +60,9 @@ function castToolsOfTheTrade(saveMana) {
 
     for (let i=0; i<numTools; i++) {
       fetch("https://habitica.com/api/v3/user/class/cast/toolsOfTrade", POST_PARAMS);
+      if (interruptLoop()) {
+        break;
+      }
     }
 
   // if lvl 12, cast backstab
@@ -87,6 +90,9 @@ function castToolsOfTheTrade(saveMana) {
       // cast backstabs
       for (let i=0; i<numBackstabs; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/backStab?targetId=" + bluestTask.id, POST_PARAMS);
+        if (interruptLoop()) {
+          break;
+        }
       }
 
     // if player has no non-challenge tasks
@@ -119,6 +125,9 @@ function castToolsOfTheTrade(saveMana) {
       // cast pickpockets
       for (let i=0; i<numPickpockets; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/pickPocket?targetId=" + bluestTask.id, POST_PARAMS);
+        if (interruptLoop()) {
+          break;
+        }
       }
 
     // if player has no non-challenge tasks

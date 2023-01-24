@@ -31,6 +31,9 @@ function purchaseArmoires(gold) {
     // buy armoires
     for (let i=0; i<numArmoires; i++) {
       fetch("https://habitica.com/api/v3/user/buy-armoire", POST_PARAMS);
+      if (interruptLoop()) {
+        break;
+      }
     }
 
     // sell extra food

@@ -53,6 +53,9 @@ function castEarthquake(saveMana) {
 
     for (let i=0; i<numEarthquakes; i++) {
       fetch("https://habitica.com/api/v3/user/class/cast/earth", POST_PARAMS);
+      if (interruptLoop()) {
+        break;
+      }
     }
 
   // if lvl 12 & in a party with other players, cast ethereal surge
@@ -62,6 +65,9 @@ function castEarthquake(saveMana) {
 
     for (let i=0; i<numSurges; i++) {
       fetch("https://habitica.com/api/v3/user/class/cast/mpheal", POST_PARAMS);
+      if (interruptLoop()) {
+        break;
+      }
     }
   }
 }
@@ -161,6 +167,9 @@ function burnBossAndDumpMana() {
         // cast ethereal surge
         for (let i=0; i<numSurges; i++) {
           fetch("https://habitica.com/api/v3/user/class/cast/mpheal", POST_PARAMS);
+          if (interruptLoop()) {
+            break;
+          }
         }
 
       // if lvl < 12, cannot cast ethereal surge
@@ -184,6 +193,9 @@ function burnBossAndDumpMana() {
     // cast earthquake
     for (let i=0; i<numEarthquakes; i++) {
       fetch("https://habitica.com/api/v3/user/class/cast/mpheal", POST_PARAMS);
+      if (interruptLoop()) {
+        break;
+      }
     }
 
   // if lvl < 13, cannot cast earthquake

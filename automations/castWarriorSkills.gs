@@ -52,6 +52,9 @@ function castValorousPresence(saveMana) {
 
       for (let i=0; i<numPresences; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/valorousPresence", POST_PARAMS);
+        if (interruptLoop()) {
+          break;
+        }
       }
 
     // if lvl 12, cast defensive stance
@@ -61,6 +64,9 @@ function castValorousPresence(saveMana) {
 
       for (let i=0; i<numStances; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/defensiveStance", POST_PARAMS);
+        if (interruptLoop()) {
+          break;
+        }
       }
     }
 
@@ -168,6 +174,9 @@ function smashBossAndDumpMana() {
 
       for (let i=0; i<numPresences; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/valorousPresence", POST_PARAMS);
+        if (interruptLoop()) {
+          break;
+        }
       }
     
     // if lvl 12, cast defensive stances
@@ -177,6 +186,9 @@ function smashBossAndDumpMana() {
 
       for (let i=0; i<numStances; i++) {
         fetch("https://habitica.com/api/v3/user/class/cast/defensiveStance", POST_PARAMS);
+        if (interruptLoop()) {
+          break;
+        }
       }
     }
 
