@@ -116,8 +116,8 @@ function processTrigger() {
   let lastBeforeCronAdjusted = new Date(lastBeforeCron.getTime() + timezoneOffset);
   let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
 
-  // if just before day start time
-  if (AUTO_CAST_SKILLS === true && nowAdjusted.getHours() == dayStart-1 && 39 <= nowAdjusted.getMinutes() && nowAdjusted.getMinutes() < 54 && (lastBeforeCronAdjusted.toDateString() !== nowAdjusted.toDateString() || lastBeforeCronAdjusted.getHours() !== nowAdjusted.getHours())) {
+  // if auto cron and just before day start OR no auto cron and just before hour start and needs cron
+  if (AUTO_CAST_SKILLS === true && ((nowAdjusted.getHours() == dayStart-1 && 39 <= nowAdjusted.getMinutes() && nowAdjusted.getMinutes() < 54 && (lastBeforeCronAdjusted.toDateString() !== nowAdjusted.toDateString() || lastBeforeCronAdjusted.getHours() !== nowAdjusted.getHours())) || (AUTO_CRON === false && needsCron === true))) {
     scriptProperties.setProperty("beforeCronSkills", "true");
     scriptProperties.setProperty("LAST_BEFORE_CRON", now);
 
