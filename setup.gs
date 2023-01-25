@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.26.0 (beta) by @bumbleshoot
+ * Automate Habitica v0.26.1 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -92,6 +92,9 @@ function install() {
     });
     processWebhook({ webhookType: "questStarted" });
     processWebhook({ webhookType: "questFinished" });
+    if (HIDE_PARTY_NOTIFICATIONS === true && typeof user.party?._id !== "undefined") {
+      hidePartyNotification();
+    }
     processWebhook({ webhookType: "groupChatReceived" });
 
     // process queue
