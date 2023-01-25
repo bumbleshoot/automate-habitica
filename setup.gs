@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.27.0 (beta) by @bumbleshoot
+ * Automate Habitica v0.27.1 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -9,7 +9,7 @@ const USER_ID = "";
 const API_TOKEN = "";
 const WEB_APP_URL = "";
 
-const AUTO_CRON = true; // true or false
+const AUTO_CRON = false; // true or false
 
 const AUTO_ACCEPT_QUEST_INVITES = true;
 
