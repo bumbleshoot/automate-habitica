@@ -550,8 +550,8 @@ function useExcessMana() {
  * Wrapper for Google Apps Script's UrlFetchApp.fetch(url, params):
  * https://developers.google.com/apps-script/reference/url-fetch/url-fetch-app#fetchurl,-params
  * 
- * Retries failed API calls up to 2 times & handles Habitica's rate 
- * limiting.
+ * Retries failed API calls up to 2 times, retries for up to 1 min if 
+ * Habitica's servers are down, & handles Habitica's rate limiting.
  */
 function fetch(url, params) {
 
