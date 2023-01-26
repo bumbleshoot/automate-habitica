@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.27.2 (beta) by @bumbleshoot
+ * Automate Habitica v0.27.3 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -326,7 +326,7 @@ function validateConstants() {
 
     } else {
       let inGuilds = true;
-      for (guildId of HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS) {
+      for (let guildId of HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS) {
         if (typeof guildId !== "string" || (guildId !== "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" && guildId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/) === null)) {
           console.log("ERROR: HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS must equal an array (list) of guild IDs.\n\neg. const HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS = [\n      \"f2db2a7f-13c5-454d-b3ee-ea1f5089e601\",\n      \"5481ccf3-5d2d-48a9-a871-70a7380cee5a\",\n      \"694b15e1-19b0-4ea8-ac71-ce9f27031330\"\n    ]");
           valid = false;
@@ -357,7 +357,7 @@ function deleteTriggers() {
 
     console.log("Deleting triggers");
 
-    for (trigger of triggers) {
+    for (let trigger of triggers) {
       ScriptApp.deleteTrigger(trigger);
     }
   }
@@ -387,7 +387,7 @@ function deleteWebhooks(groupChatReceived) {
       console.log("Deleting groupChatReceived webhooks");
     }
 
-    for (webhook of webhooks) {
+    for (let webhook of webhooks) {
       if (webhook.url == WEB_APP_URL && (!groupChatReceived || webhook.type == "groupChatReceived")) {
         fetch("https://habitica.com/api/v3/user/webhook/" + webhook.id, DELETE_PARAMS);
       }
@@ -462,7 +462,7 @@ function createWebhooks(groupChatReceived) {
   }
   if (HIDE_ALL_GUILD_NOTIFICATIONS === true) {
     scriptProperties.setProperty("PLAYER_GUILDS", getUser().guilds.join());
-    for (guild of user.guilds) {
+    for (let guild of user.guilds) {
       webhooks.push({
         "type": "groupChatReceived",
         "options": {
@@ -471,7 +471,7 @@ function createWebhooks(groupChatReceived) {
       });
     }
   } else {
-    for (guild of HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS) {
+    for (let guild of HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS) {
       if (guild !== "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx") {
         webhooks.push({
           "type": "groupChatReceived",
@@ -492,7 +492,7 @@ function createWebhooks(groupChatReceived) {
       console.log("Creating groupChatReceived webhooks");
     }
 
-    for (webhook of webhooks) {
+    for (let webhook of webhooks) {
       webhook = Object.assign({
         "url": WEB_APP_URL,
         "label": DriveApp.getFileById(ScriptApp.getScriptId()).getName()

@@ -86,7 +86,7 @@ function healParty() {
 
     // get lowest party member health (excluding player)
     let lowestMemberHealth = 50;
-    for (member of members) {
+    for (let member of members) {
       if (member._id !== USER_ID && member.stats.hp < lowestMemberHealth) {
         lowestMemberHealth = member.stats.hp;
       }

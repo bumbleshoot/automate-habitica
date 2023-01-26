@@ -17,7 +17,7 @@ function sellExtraEggs() {
   let logged = false;
 
   // for each egg in the player's inventory
-  for ([egg, amount] of Object.entries(getUser(true).items.eggs)) {
+  for (let [egg, amount] of Object.entries(getUser(true).items.eggs)) {
 
     // if player has more than RESERVE_EGGS
     if (amount > RESERVE_EGGS) {
@@ -58,7 +58,7 @@ function sellExtraHatchingPotions() {
   let logged = false;
 
   // for each hatching potion in the player's inventory
-  for ([potion, amount] of Object.entries(getUser(true).items.hatchingPotions)) {
+  for (let [potion, amount] of Object.entries(getUser(true).items.hatchingPotions)) {
 
     // if player has more than RESERVE_HATCHING_POTIONS
     if (amount > RESERVE_HATCHING_POTIONS) {
@@ -99,7 +99,7 @@ function sellExtraFood() {
   let logged = false;
 
   // for each food in the player's inventory
-  for ([food, amount] of Object.entries(getUser(true).items.food)) {
+  for (let [food, amount] of Object.entries(getUser(true).items.food)) {
 
     // if player has more than RESERVE_FOOD
     if (food != "Saddle" && amount > RESERVE_FOOD) {

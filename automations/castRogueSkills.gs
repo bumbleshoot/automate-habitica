@@ -187,7 +187,7 @@ function numStealthsNeeded() {
   // count damaging dailies
   let stealth = user.stats.buffs.stealth;
   let numDamagingDailies = 0;
-  for (daily of getDailies()) {
+  for (let daily of getDailies()) {
     if (daily.isDue && !daily.completed) {
       if (stealth > 0) {
         stealth--;

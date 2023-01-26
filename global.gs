@@ -251,7 +251,7 @@ function processWebhook(webhookData) {
       scriptProperties.setProperty("notifyQuestEnded", webhookData.questKey);
     }
     if (AUTO_INVITE_QUESTS === true) {
-      for (trigger of ScriptApp.getProjectTriggers()) {
+      for (let trigger of ScriptApp.getProjectTriggers()) {
         if (trigger.getHandlerFunction() === "inviteRandomQuest") {
           ScriptApp.deleteTrigger(trigger);
         }
@@ -283,7 +283,7 @@ function processWebhook(webhookData) {
     if (webhookData.groupId === scriptProperties.getProperty("PARTY_ID")) {
       if (HIDE_PARTY_NOTIFICATIONS === true) {
         let triggerNeeded = true;
-        for (trigger of ScriptApp.getProjectTriggers()) {
+        for (let trigger of ScriptApp.getProjectTriggers()) {
           if (trigger.getHandlerFunction() === "hidePartyNotification") {
             triggerNeeded = false;
             break;
@@ -686,7 +686,7 @@ function getTotalStat(stat) {
   let allocatedStat = user.stats[stat];
 
   // calculate stat from equipment
-  for (equipped of Object.values(user.items.gear.equipped)) {
+  for (let equipped of Object.values(user.items.gear.equipped)) {
     let equipment = getContent().gear.flat[equipped];
     if (typeof equipment !== "undefined") {
       equipmentStat += equipment[stat];
@@ -707,7 +707,7 @@ function getTotalStat(stat) {
  * https://habitica.fandom.com/wiki/Perfect_Day
  */
 function calculatePerfectDayBuff() {
-  for (daily of getDailies()) {
+  for (let daily of getDailies()) {
     if (daily.isDue && !daily.completed) {
       return 0;
     }

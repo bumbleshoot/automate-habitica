@@ -33,7 +33,7 @@ function pauseResumeDamage(questKey) {
   let con = getTotalStat("con");
 
   // for each daily
-  for (daily of getDailies()) {
+  for (let daily of getDailies()) {
 
     // if due & incomplete
     if (daily.isDue && !daily.completed) {
@@ -51,7 +51,7 @@ function pauseResumeDamage(questKey) {
       let delta = Math.abs(Math.pow(0.9747, taskValue));
       if (daily.checklist.length > 0) {
         let subtasksDone = 0;
-        for (subtask of daily.checklist) {
+        for (let subtask of daily.checklist) {
           if (subtask.completed) {
             subtasksDone++;
           }
@@ -93,7 +93,7 @@ function pauseResumeDamage(questKey) {
 
     // get lowest party member health
     let lowestHealth = 50;
-    for (member of members || []) {
+    for (let member of members || []) {
       if (member.stats.hp < lowestHealth) {
         lowestHealth = member.stats.hp;
       }

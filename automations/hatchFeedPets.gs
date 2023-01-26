@@ -23,7 +23,7 @@ function hatchFeedPets() {
   let numEachEggNeededTotal = {};
   let numEachPotionNeededTotal = {};
   let nonWackyNonSpecialPets = Object.keys(getContent().pets).concat(Object.keys(content.premiumPets)).concat(Object.keys(content.questPets));
-  for (pet of nonWackyNonSpecialPets) {
+  for (let pet of nonWackyNonSpecialPets) {
     pet = pet.split("-");
     let species = pet[0];
     let color = pet[1];
@@ -39,7 +39,7 @@ function hatchFeedPets() {
     }
   }
   let wackyPets = Object.keys(content.wackyPets);
-  for (pet of wackyPets) {
+  for (let pet of wackyPets) {
     pet = pet.split("-");
     let species = pet[0];
     let color = pet[1];
@@ -59,7 +59,7 @@ function hatchFeedPets() {
   let numEachEggOwnedUsed = getUser(true).items.eggs;
   let numEachPotionOwnedUsed = user.items.hatchingPotions;
   let petsOwned = [];
-  for ([pet, amount] of Object.entries(user.items.pets)) {
+  for (let [pet, amount] of Object.entries(user.items.pets)) {
     if (amount > 0) { // 5 = newly hatched pet, >5 = fed pet, -1 = mount but no pet
       petsOwned.push(pet);
       pet = pet.split("-");
@@ -81,11 +81,11 @@ function hatchFeedPets() {
   let numEachFoodTypeNeededTotal = Object.keys(numEachEggNeededTotal).length * 9;
   let basicColors = Object.keys(content.dropHatchingPotions);
   let numEachFoodTypeNeeded = {};
-  for (color of basicColors) {
+  for (let color of basicColors) {
     numEachFoodTypeNeeded[color] = numEachFoodTypeNeededTotal;
   }
   let numExtraFoodNeeded = Object.keys(content.premiumHatchingPotions).length * Object.keys(content.dropEggs).length * 9;
-  for (mount of mountsOwned) {
+  for (let mount of mountsOwned) {
     mount = mount.split("-");
     let species = mount[0];
     let color = mount[1];
@@ -108,7 +108,7 @@ function hatchFeedPets() {
 
   // get # each food type owned
   let numEachFoodTypeOwned = {};
-  for ([food, amount] of Object.entries(user.items.food)) {
+  for (let [food, amount] of Object.entries(user.items.food)) {
     if (!(ONLY_USE_DROP_FOOD === true && !content.food[food].canDrop)) {
       let target = content.food[food].target;
       if (typeof target !== "undefined") { // ignore saddle
@@ -124,7 +124,7 @@ function hatchFeedPets() {
   // get # extra food owned, # extra extra food needed/owned
   let numExtraFoodOwned = 0;
   let numExtraExtraFoodNeeded = 0;
-  for ([food, amount] of Object.entries(numEachFoodTypeOwned)) {
+  for (let [food, amount] of Object.entries(numEachFoodTypeOwned)) {
     let extra = amount - numEachFoodTypeNeeded[food];
     if (extra > 0) {
       numExtraFoodOwned += extra;
@@ -137,7 +137,7 @@ function hatchFeedPets() {
 
   // for each non-special pet in content
   let nonSpecialPets = nonWackyNonSpecialPets.concat(wackyPets);
-  for (pet of nonSpecialPets) {
+  for (let pet of nonSpecialPets) {
     let petSplit = pet.split("-");
     let species = petSplit[0];
     let color = petSplit[1];
@@ -177,7 +177,7 @@ function hatchFeedPets() {
             let feedingsNeeded = Math.ceil(hunger / 5);
 
             // for each food in inventory
-            for ([foodType, amount] of Object.entries(user.items.food)) {
+            for (let [foodType, amount] of Object.entries(user.items.food)) {
 
               // if player has more than 0 & not special food/not saving special food
               if (amount > 0 && !(ONLY_USE_DROP_FOOD === true && !content.food[foodType].canDrop)) {
@@ -239,7 +239,7 @@ function hatchFeedPets() {
   function feedExtraFood(pet, feedingsNeeded) {
 
     // for each food in inventory
-    for ([foodType, amount] of Object.entries(user.items.food)) {
+    for (let [foodType, amount] of Object.entries(user.items.food)) {
 
       // if player has more than 0 & not special food/not saving special food
       if (amount > 0 && !(ONLY_USE_DROP_FOOD === true && !content.food[foodType].canDrop)) {

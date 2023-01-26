@@ -15,7 +15,7 @@ function inviteRandomQuest() {
   try {
 
     // delete temporary trigger
-    for (trigger of ScriptApp.getProjectTriggers()) {
+    for (let trigger of ScriptApp.getProjectTriggers()) {
       if (trigger.getHandlerFunction() === "inviteRandomQuest") {
         ScriptApp.deleteTrigger(trigger);
       }
@@ -28,7 +28,7 @@ function inviteRandomQuest() {
 
     // for each quest scroll
     let questScrolls = [];
-    for ([questKey, numScrolls] of Object.entries(getUser().items.quests)) {
+    for (let [questKey, numScrolls] of Object.entries(getUser().items.quests)) {
 
       // if not excluded by settings
       if (!(EXCLUDE_HOURGLASS_QUESTS === true && typeof getContent().quests[questKey].category == "timeTravelers") && !(EXCLUDE_GEM_QUESTS === true && typeof content.quests[questKey].goldValue === "undefined")) {

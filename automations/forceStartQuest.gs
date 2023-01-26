@@ -36,9 +36,9 @@ function forceStartQuest() {
 
           // get list of members who failed to join the quest
           let membersMissingQuest = [];
-          for ([id, joined] of Object.entries(party.quest.members)) {
+          for (let [id, joined] of Object.entries(party.quest.members)) {
             if (!joined) {
-              for (member of getMembers()) {
+              for (let member of getMembers()) {
                 if (member._id === id) {
                   membersMissingQuest.push(member.auth.local.username);
                   break;
