@@ -107,14 +107,15 @@ function processTrigger() {
 
   // get times
   let now = new Date();
+  let properties = scriptProperties.getProperties();
   let timezoneOffset = now.getTimezoneOffset() * 60 * 1000 - getUser().preferences.timezoneOffset * 60 * 1000;
   let nowAdjusted = new Date(now.getTime() + timezoneOffset);
   let dayStart = user.preferences.dayStart;
   let needsCron = user.needsCron;
   let lastCron = new Date(user.auth.timestamps.loggedin);
-  let lastBeforeCron = new Date(scriptProperties.getProperty("LAST_BEFORE_CRON"));
+  let lastBeforeCron = new Date(properties["LAST_BEFORE_CRON"]);
   let lastBeforeCronAdjusted = new Date(lastBeforeCron.getTime() + timezoneOffset);
-  let lastAfterCron = new Date(scriptProperties.getProperty("LAST_AFTER_CRON"));
+  let lastAfterCron = new Date(properties["LAST_AFTER_CRON"]);
 
   // if auto cron and just before day start OR no auto cron and just before hour start and needs cron
   if (AUTO_CAST_SKILLS === true && ((nowAdjusted.getHours() == dayStart-1 && 39 <= nowAdjusted.getMinutes() && nowAdjusted.getMinutes() < 54 && (lastBeforeCronAdjusted.toDateString() !== nowAdjusted.toDateString() || lastBeforeCronAdjusted.getHours() !== nowAdjusted.getHours())) || (AUTO_CRON === false && needsCron === true))) {
@@ -149,7 +150,7 @@ function processTrigger() {
   }
 
   if (HIDE_ALL_GUILD_NOTIFICATIONS === true && !installing) {
-    if (user.guilds.join() !== scriptProperties.getProperty("PLAYER_GUILDS")) {
+    if (user.guilds.join() !== properties["PLAYER_GUILDS"]) {
       deleteWebhooks(true);
       createWebhooks(true);
     }
