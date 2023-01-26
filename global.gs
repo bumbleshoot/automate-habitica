@@ -124,26 +124,24 @@ function processTrigger() {
   // if auto cron and player hasn't cronned today
   } else if (AUTO_CRON === true && needsCron === true) {
     scriptProperties.setProperty("runCron", "true");
-    if (AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) {
-      scriptProperties.deleteProperty("beforeCronSkills");
-      if (AUTO_CAST_SKILLS === true) {
-        scriptProperties.setProperty("afterCronSkills", "true");
-      }
-      if (AUTO_PURCHASE_GEMS === true) {
-        scriptProperties.setProperty("purchaseGems", "true");
-      }
-    }
-
-  // if player has cronned today and after cron hasn't run since cron
-  } else if ((AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
-    scriptProperties.setProperty("LAST_AFTER_CRON", now);
-    scriptProperties.deleteProperty("beforeCronSkills");
     if (AUTO_CAST_SKILLS === true) {
+      scriptProperties.deleteProperty("beforeCronSkills");
       scriptProperties.setProperty("afterCronSkills", "true");
     }
     if (AUTO_PURCHASE_GEMS === true) {
       scriptProperties.setProperty("purchaseGems", "true");
     }
+
+  // if player has cronned today and after cron hasn't run since cron
+  } else if ((AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
+    if (AUTO_CAST_SKILLS === true) {
+      scriptProperties.deleteProperty("beforeCronSkills");
+      scriptProperties.setProperty("afterCronSkills", "true");
+    }
+    if (AUTO_PURCHASE_GEMS === true) {
+      scriptProperties.setProperty("purchaseGems", "true");
+    }
+    scriptProperties.setProperty("LAST_AFTER_CRON", now);
 
   // in case GAS execution time limit was reached
   } else if (AUTO_CAST_SKILLS === true) {
