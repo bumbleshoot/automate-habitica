@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.27.5 (beta) by @bumbleshoot
+ * Automate Habitica v0.27.6 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -71,6 +71,13 @@ function install() {
     // delete triggers & webhooks
     deleteTriggers();
     deleteWebhooks();
+
+    // empty queue
+    for (let property of Object.keys(scriptProperties.getProperties())) {
+      if (property.match(/^[a-z]/) !== null) {
+        scriptProperties.deleteProperty(property);
+      }
+    }
 
     // queue enabled automations
     processTrigger();
