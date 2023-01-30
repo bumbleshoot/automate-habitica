@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.28.0 (beta) by @bumbleshoot
+ * Automate Habitica v0.28.1 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -14,7 +14,7 @@ const AUTO_CRON = false; // true or false
 const AUTO_ACCEPT_QUEST_INVITES = true;
 
 const FORCE_START_QUESTS = false; // party leaders only
-const FORCE_START_QUESTS_AFTER_HOURS_MIN = 4; // eg. if set to 1, quests will force start in 1-2 hours
+const FORCE_START_QUESTS_AFTER_HOURS = 1; // eg. if set to 1, quests will force start after 1h
 const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = true;
 
 const AUTO_INVITE_QUESTS = false;
@@ -179,8 +179,8 @@ function validateConstants() {
       valid = false;
     }
 
-    if (typeof FORCE_START_QUESTS_AFTER_HOURS_MIN !== "number" || !Number.isInteger(FORCE_START_QUESTS_AFTER_HOURS_MIN) || FORCE_START_QUESTS_AFTER_HOURS_MIN < 1) {
-      console.log("ERROR: FORCE_START_QUESTS_AFTER_HOURS_MIN must be a whole number greater than 0.\n\neg. const FORCE_START_QUESTS_AFTER_HOURS_MIN = 1;\n    const FORCE_START_QUESTS_AFTER_HOURS_MIN = 8;");
+    if (typeof FORCE_START_QUESTS_AFTER_HOURS !== "number" || !Number.isInteger(FORCE_START_QUESTS_AFTER_HOURS) || FORCE_START_QUESTS_AFTER_HOURS < 1) {
+      console.log("ERROR: FORCE_START_QUESTS_AFTER_HOURS must be a whole number greater than 0.\n\neg. const FORCE_START_QUESTS_AFTER_HOURS = 1;\n    const FORCE_START_QUESTS_AFTER_HOURS = 8;");
       valid = false;
     }
 
