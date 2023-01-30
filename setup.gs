@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.27.6 (beta) by @bumbleshoot
+ * Automate Habitica v0.28.0 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -20,6 +20,7 @@ const NOTIFY_MEMBERS_EXCLUDED_FROM_QUEST = true;
 const AUTO_INVITE_QUESTS = false;
 const EXCLUDE_GEM_QUESTS = true;
 const EXCLUDE_HOURGLASS_QUESTS = true;
+const PM_WHEN_OUT_OF_QUEST_SCROLLS = true;
 
 const NOTIFY_ON_QUEST_END = true;
 
@@ -201,6 +202,11 @@ function validateConstants() {
 
     if (EXCLUDE_HOURGLASS_QUESTS !== true && EXCLUDE_HOURGLASS_QUESTS !== false) {
       console.log("ERROR: EXCLUDE_HOURGLASS_QUESTS must equal either true or false.\n\neg. const EXCLUDE_HOURGLASS_QUESTS = true;\n    const EXCLUDE_HOURGLASS_QUESTS = false;");
+      valid = false;
+    }
+
+    if (PM_WHEN_OUT_OF_QUEST_SCROLLS !== true && PM_WHEN_OUT_OF_QUEST_SCROLLS !== false) {
+      console.log("ERROR: PM_WHEN_OUT_OF_QUEST_SCROLLS must equal either true or false.\n\neg. const PM_WHEN_OUT_OF_QUEST_SCROLLS = true;\n    const PM_WHEN_OUT_OF_QUEST_SCROLLS = false;");
       valid = false;
     }
   }

@@ -49,6 +49,25 @@ function inviteRandomQuest() {
 
       // invite party to a random quest scroll
       fetch("https://habitica.com/api/v3/groups/party/quests/invite/" + randomQuestScroll, POST_PARAMS);
+
+      scriptProperties.deleteProperty("QUEST_SCROLL_PM_SENT");
+    }
+    
+    // send player a PM if they are out of usable quest scrolls
+    if (PM_WHEN_OUT_OF_QUEST_SCROLLS === true && questScrolls.length <= 1 && scriptProperties.getProperty("QUEST_SCROLL_PM_SENT") === null) {
+
+      console.log("No more usable quest scrolls, sending PM to player");
+
+      let params = Object.assign({
+        "contentType": "application/json",
+        "payload": JSON.stringify({
+          "message": "You have no more usable quest scrolls!",
+          "toUserId": USER_ID
+        })
+      }, POST_PARAMS);
+      fetch("https://habitica.com/api/v3/members/send-private-message", params);
+
+      scriptProperties.setProperty("QUEST_SCROLL_PM_SENT", "true");
     }
 
   } catch (e) {
