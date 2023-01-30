@@ -11,7 +11,7 @@
 function forceStartQuest() {
 
   // if pending quest
-  if (typeof getParty(true) !== "undefined" && typeof party.quest.key !== "undefined" && !party.quest.active) {
+  if (typeof getParty(true) !== "undefined" && party.quest.key && !party.quest.active) {
 
     // if key matches
     if (scriptProperties.getProperty("PENDING_QUEST_KEY") === party.quest.key) {
