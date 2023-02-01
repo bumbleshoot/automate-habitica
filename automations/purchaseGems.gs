@@ -11,21 +11,26 @@
  */
 function purchaseGems() {
 
-  // calculate number of gems to buy
   let plan = getUser(true).purchased.plan;
-  let gemsToBuy = Math.min(25 + plan.consecutive.gemCapExtra - plan.gemsBought, Math.floor(user.stats.gp / 20));
 
-  // buy gems
-  if (gemsToBuy > 0) {
+  // if still subscribed
+  if (typeof plan.dateTerminated !== "undefined" && new Date(plan.dateTerminated).getTime() > new Date().getTime()) {
 
-    console.log("Buying " + gemsToBuy + " gems");
+    // calculate number of gems to buy
+    let gemsToBuy = Math.min(25 + plan.consecutive.gemCapExtra - plan.gemsBought, Math.floor(user.stats.gp / 20));
 
-    let params = Object.assign({
-      "contentType": "application/json",
-      "payload": JSON.stringify({
-        "quantity": gemsToBuy
-      })
-    }, POST_PARAMS);
-    fetch("https://habitica.com/api/v3/user/purchase/gems/gem", params);
+    // buy gems
+    if (gemsToBuy > 0) {
+
+      console.log("Buying " + gemsToBuy + " gems");
+
+      let params = Object.assign({
+        "contentType": "application/json",
+        "payload": JSON.stringify({
+          "quantity": gemsToBuy
+        })
+      }, POST_PARAMS);
+      fetch("https://habitica.com/api/v3/user/purchase/gems/gem", params);
+    }
   }
 }

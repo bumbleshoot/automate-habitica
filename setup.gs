@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.28.3 (beta) by @bumbleshoot
+ * Automate Habitica v0.28.4 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -256,7 +256,7 @@ function validateConstants() {
   }
 
   if (AUTO_PURCHASE_GEMS === true) {
-    if (getUser().purchased.plan.consecutive.count === 0) {
+    if (typeof getUser().purchased.plan.dateTerminated === "undefined" || new Date(user.purchased.plan.dateTerminated).getTime() <= new Date().getTime()) {
       console.log("ERROR: Only subscribers can purchase gems with gold. Since you are not a subscriber, you should set AUTO_PURCHASE_GEMS to false.\n\neg. const AUTO_PURCHASE_GEMS = false;");
       valid = false;
     }
