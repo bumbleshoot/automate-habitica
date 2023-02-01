@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.28.4 (beta) by @bumbleshoot
+ * Automate Habitica v0.28.5 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -239,13 +239,13 @@ function validateConstants() {
   }
 
   if (AUTO_PAUSE_RESUME_DAMAGE === true) {
-    if (typeof MAX_PLAYER_DAMAGE !== "number" || MAX_PLAYER_DAMAGE < 0 || MAX_PLAYER_DAMAGE >= 50) {
-      console.log("ERROR: MAX_PLAYER_DAMAGE must be a positive number less than 50.\n\neg. const MAX_PLAYER_DAMAGE = 0;\n    const MAX_PLAYER_DAMAGE = 22.5;");
+    if (typeof MAX_PLAYER_DAMAGE !== "number" || MAX_PLAYER_DAMAGE < 0 || MAX_PLAYER_DAMAGE > 50) {
+      console.log("ERROR: MAX_PLAYER_DAMAGE must be a number between 0 and 50.\n\neg. const MAX_PLAYER_DAMAGE = 0;\n    const MAX_PLAYER_DAMAGE = 22.5;\n    const MAX_PLAYER_DAMAGE = 50;");
       valid = false;
     }
 
-    if (typeof MAX_PARTY_DAMAGE !== "number" || MAX_PARTY_DAMAGE < 0 || MAX_PARTY_DAMAGE >= 50) {
-      console.log("ERROR: MAX_PARTY_DAMAGE must be a positive number less than 50.\n\neg. const MAX_PARTY_DAMAGE = 0;\n    const MAX_PARTY_DAMAGE = 22.5;");
+    if (typeof MAX_PARTY_DAMAGE !== "number" || MAX_PARTY_DAMAGE < 0 || MAX_PARTY_DAMAGE > 50) {
+      console.log("ERROR: MAX_PARTY_DAMAGE must be a number between 0 and 50.\n\neg. const MAX_PARTY_DAMAGE = 0;\n    const MAX_PARTY_DAMAGE = 22.5;\n    const MAX_PARTY_DAMAGE = 50;");
       valid = false;
     }
   }
