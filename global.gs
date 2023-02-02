@@ -547,6 +547,8 @@ function useExcessMana() {
  * Retries failed API calls up to 2 times, retries for up to 1 min if 
  * Habitica's servers are down, & handles Habitica's rate limiting.
  */
+let rateLimitRemaining;
+let rateLimitReset;
 function fetch(url, params) {
 
   // try up to 3 times
@@ -554,8 +556,6 @@ function fetch(url, params) {
 
     // get rate limiting data
     let properties = scriptProperties.getProperties();
-    let rateLimitRemaining = properties["X-RateLimit-Remaining"];
-    let rateLimitReset = properties["X-RateLimit-Reset"];
     let spaceOutAPICalls = true;
     if (properties.hasOwnProperty("hideGuildNotifications") || properties.hasOwnProperty("acceptQuestInvite") || properties.hasOwnProperty("notifyQuestEnded")) {
       spaceOutAPICalls = false;
@@ -589,10 +589,8 @@ function fetch(url, params) {
     }
 
     // store rate limiting data
-    scriptProperties.setProperties({
-      "X-RateLimit-Reset": response.getHeaders()["x-ratelimit-reset"],
-      "X-RateLimit-Remaining": response.getHeaders()["x-ratelimit-remaining"]
-    });
+    rateLimitRemaining = response.getHeaders()["x-ratelimit-remaining"];
+    rateLimitReset = response.getHeaders()["x-ratelimit-reset"];
 
     // if success, return response
     if (response.getResponseCode() < 300 || (response.getResponseCode() === 404 && (url === "https://habitica.com/api/v3/groups/party" || url.startsWith("https://habitica.com/api/v3/groups/party/members")))) {
