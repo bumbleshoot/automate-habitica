@@ -29,13 +29,16 @@ function inviteRandomQuest() {
     // for each quest scroll
     let questScrolls = [];
     for (let [questKey, numScrolls] of Object.entries(getUser().items.quests)) {
+      if (numScrolls > 0) {
 
-      // if not excluded by settings
-      if (!(EXCLUDE_HOURGLASS_QUESTS === true && typeof getContent().quests[questKey].category == "timeTravelers") && !(EXCLUDE_GEM_QUESTS === true && typeof content.quests[questKey].goldValue === "undefined")) {
+        // if not excluded by settings
+        let category = getContent().quests[questKey].category;
+        if ((AUTO_INVITE_HOURGLASS_QUESTS === true && category === "timeTravelers") || (category != "timeTravelers" && ((AUTO_INVITE_GOLD_QUESTS === true && typeof content.quests[questKey].goldValue !== "undefined") || (AUTO_INVITE_UNLOCKABLE_QUESTS === true && category === "unlockable") || (AUTO_INVITE_PET_QUESTS === true && ["pet", "hatchingPotion"].includes(category))))) {
 
-        // add x number of scrolls to list
-        for (let i=0; i<numScrolls; i++) {
-          questScrolls.push(questKey);
+          // add x number of scrolls to list
+          for (let i=0; i<numScrolls; i++) {
+            questScrolls.push(questKey);
+          }
         }
       }
     }

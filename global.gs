@@ -249,7 +249,7 @@ function processWebhook(webhookData) {
     if (NOTIFY_ON_QUEST_END === true && typeof webhookData.questKey !== "undefined") {
       scriptProperties.setProperty("notifyQuestEnded", webhookData.questKey);
     }
-    if (AUTO_INVITE_QUESTS === true) {
+    if (AUTO_INVITE_GOLD_QUESTS === true || AUTO_INVITE_UNLOCKABLE_QUESTS === true || AUTO_INVITE_HOURGLASS_QUESTS === true || AUTO_INVITE_PET_QUESTS === true) {
       for (let trigger of ScriptApp.getProjectTriggers()) {
         if (trigger.getHandlerFunction() === "inviteRandomQuest") {
           ScriptApp.deleteTrigger(trigger);
