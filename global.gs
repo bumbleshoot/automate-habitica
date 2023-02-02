@@ -113,14 +113,11 @@ function processTrigger() {
   let dayStart = user.preferences.dayStart;
   let needsCron = user.needsCron;
   let lastCron = new Date(user.auth.timestamps.loggedin);
-  let lastBeforeCron = new Date(properties["LAST_BEFORE_CRON"]);
-  let lastBeforeCronAdjusted = new Date(lastBeforeCron.getTime() + timezoneOffset);
   let lastAfterCron = new Date(properties["LAST_AFTER_CRON"]);
 
   // if auto cron and just before day start OR no auto cron and just before hour start and needs cron
-  if (AUTO_CAST_SKILLS === true && ((nowAdjusted.getHours() == dayStart-1 && 39 <= nowAdjusted.getMinutes() && nowAdjusted.getMinutes() < 54 && (lastBeforeCronAdjusted.toDateString() !== nowAdjusted.toDateString() || lastBeforeCronAdjusted.getHours() !== nowAdjusted.getHours())) || (AUTO_CRON === false && needsCron === true))) {
+  if (AUTO_CAST_SKILLS === true && ((nowAdjusted.getHours() == dayStart-1 && 39 <= nowAdjusted.getMinutes() && nowAdjusted.getMinutes() < 54) || (AUTO_CRON === false && needsCron === true))) {
     scriptProperties.setProperty("beforeCronSkills", "true");
-    scriptProperties.setProperty("LAST_BEFORE_CRON", now);
 
   // if auto cron and player hasn't cronned today
   } else if (AUTO_CRON === true && needsCron === true) {
