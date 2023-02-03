@@ -19,9 +19,6 @@ Whenever your party completes a quest, automatically selects a random quest scro
 ### Notify On Quest End
 Sends a [private message](https://habitica.fandom.com/wiki/Private_Messaging) to you on Habitica to notify you whenever your [party](https://habitica.fandom.com/wiki/Party) completes a [quest](https://habitica.fandom.com/wiki/Quests).
 
-### Auto Allocate Stat Points
-Stat points are automatically allocated to your chosen [stat](https://habitica.fandom.com/wiki/Character_Stats).
-
 ### Auto Cast Skills
 Strategically casts your [skills](https://habitica.fandom.com/wiki/Skills) for you. Ensures no [mana](https://habitica.fandom.com/wiki/Mana_Points) is wasted, and no mana is lost at [cron](https://habitica.fandom.com/wiki/Cron). In order from highest to lowest priority:
 1. Heals you and your [party](https://habitica.fandom.com/wiki/Party) as needed ([healer](https://habitica.fandom.com/wiki/Healer))
@@ -33,6 +30,9 @@ Strategically casts your [skills](https://habitica.fandom.com/wiki/Skills) for y
 
 ### Auto Pause/Resume Damage
 Automatically checks you into the [inn](https://habitica.fandom.com/wiki/Rest_in_the_Inn) if the current [boss](https://habitica.fandom.com/wiki/Boss) will do more than `MAX_PLAYER_DAMAGE` to you, or `MAX_PARTY_DAMAGE` to your [party](https://habitica.fandom.com/wiki/Party), or enough damage to [kill](https://habitica.fandom.com/wiki/Death_Mechanics) you or one of your party members. Checks you out of the inn otherwise.
+
+### Auto Allocate Stat Points
+Stat points are automatically allocated to your chosen [stat](https://habitica.fandom.com/wiki/Character_Stats).
 
 ### Auto Purchase Gems
 Automatically purchases [gems](https://habitica.fandom.com/wiki/Gems) with [gold](https://habitica.fandom.com/wiki/Gold_Points) each month. Note that you must [cron](https://habitica.fandom.com/wiki/Cron) at least once during a month in order to buy gems for that month. Only [subscribers](https://habitica.fandom.com/wiki/Subscription) can run this automation.

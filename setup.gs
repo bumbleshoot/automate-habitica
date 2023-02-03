@@ -25,14 +25,14 @@ const PM_WHEN_OUT_OF_QUEST_SCROLLS = true;
 
 const NOTIFY_ON_QUEST_END = true;
 
-const AUTO_ALLOCATE_STAT_POINTS = false;
-const STAT_TO_ALLOCATE = "int"; // str, int, con, per
-
 const AUTO_CAST_SKILLS = false;
 
 const AUTO_PAUSE_RESUME_DAMAGE = true;
 const MAX_PLAYER_DAMAGE = 20;
 const MAX_PARTY_DAMAGE = 5;
+
+const AUTO_ALLOCATE_STAT_POINTS = false;
+const STAT_TO_ALLOCATE = "int"; // str, int, con, per
 
 const AUTO_PURCHASE_GEMS = false; // subscribers only
 
@@ -222,18 +222,6 @@ function validateConstants() {
     valid = false;
   }
 
-  if (AUTO_ALLOCATE_STAT_POINTS !== true && AUTO_ALLOCATE_STAT_POINTS !== false) {
-    console.log("ERROR: AUTO_ALLOCATE_STAT_POINTS must equal either true or false.\n\neg. const AUTO_ALLOCATE_STAT_POINTS = true;\n    const AUTO_ALLOCATE_STAT_POINTS = false;");
-    valid = false;
-  }
-
-  if (AUTO_ALLOCATE_STAT_POINTS === true) {
-    if (!["str", "int", "con", "per"].includes(STAT_TO_ALLOCATE)) {
-      console.log("ERROR: STAT_TO_ALLOCATE must be one of either \"str\", \"int\", \"con\", or \"per\".\n\neg. const STAT_TO_ALLOCATE = \"int\";\n    const STAT_TO_ALLOCATE = \"per\";");
-      valid = false;
-    }
-  }
-
   if (AUTO_CAST_SKILLS !== true && AUTO_CAST_SKILLS !== false) {
     console.log("ERROR: AUTO_CAST_SKILLS must equal either true or false.\n\neg. const AUTO_CAST_SKILLS = true;\n    const AUTO_CAST_SKILLS = false;");
     valid = false;
@@ -252,6 +240,18 @@ function validateConstants() {
 
     if (typeof MAX_PARTY_DAMAGE !== "number" || MAX_PARTY_DAMAGE < 0 || MAX_PARTY_DAMAGE > 50) {
       console.log("ERROR: MAX_PARTY_DAMAGE must be a number between 0 and 50.\n\neg. const MAX_PARTY_DAMAGE = 0;\n    const MAX_PARTY_DAMAGE = 22.5;\n    const MAX_PARTY_DAMAGE = 50;");
+      valid = false;
+    }
+  }
+
+  if (AUTO_ALLOCATE_STAT_POINTS !== true && AUTO_ALLOCATE_STAT_POINTS !== false) {
+    console.log("ERROR: AUTO_ALLOCATE_STAT_POINTS must equal either true or false.\n\neg. const AUTO_ALLOCATE_STAT_POINTS = true;\n    const AUTO_ALLOCATE_STAT_POINTS = false;");
+    valid = false;
+  }
+
+  if (AUTO_ALLOCATE_STAT_POINTS === true) {
+    if (!["str", "int", "con", "per"].includes(STAT_TO_ALLOCATE)) {
+      console.log("ERROR: STAT_TO_ALLOCATE must be one of either \"str\", \"int\", \"con\", or \"per\".\n\neg. const STAT_TO_ALLOCATE = \"int\";\n    const STAT_TO_ALLOCATE = \"per\";");
       valid = false;
     }
   }
@@ -385,7 +385,7 @@ function deleteTriggers() {
 function createTrigger() {
 
   // create trigger if needed for enabled automations
-  if (AUTO_CRON === true || AUTO_CAST_SKILLS === true || AUTO_ACCEPT_QUEST_INVITES === true || FORCE_START_QUESTS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true) {
+  if (AUTO_CRON === true || AUTO_ACCEPT_QUEST_INVITES === true || FORCE_START_QUESTS === true || AUTO_CAST_SKILLS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true) {
 
     console.log("Creating trigger");
 
@@ -421,7 +421,7 @@ function createWebhooks(groupChatReceived) {
   if (!groupChatReceived) {
 
     // task scored
-    if (AUTO_ALLOCATE_STAT_POINTS === true || AUTO_CAST_SKILLS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
+    if (AUTO_CAST_SKILLS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_ALLOCATE_STAT_POINTS === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true || AUTO_SELL_EGGS === true || AUTO_SELL_HATCHING_POTIONS === true || AUTO_SELL_FOOD === true || AUTO_HATCH_FEED_PETS === true) {
       webhooks.push({
         "type": "taskActivity",
         "options": {
@@ -431,7 +431,7 @@ function createWebhooks(groupChatReceived) {
     }
 
     // level up
-    if (AUTO_ALLOCATE_STAT_POINTS === true || AUTO_PAUSE_RESUME_DAMAGE === true) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_ALLOCATE_STAT_POINTS === true) {
       webhooks.push({
         "type": "userActivity",
         "options": {
