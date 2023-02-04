@@ -77,7 +77,12 @@ function hatchFeedPets() {
       }
     }
   }
-  let mountsOwned = Object.keys(user.items.mounts);
+  let mountsOwned = [];
+  for (let [mount, owned] of Object.entries(user.items.mounts)) {
+    if (owned) {
+      mountsOwned.push(mount);
+    }
+  }
   let numEachFoodTypeNeededTotal = Object.keys(numEachEggNeededTotal).length * 9;
   let basicColors = Object.keys(content.dropHatchingPotions);
   let numEachFoodTypeNeeded = {};
