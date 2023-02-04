@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.29.6 (beta) by @bumbleshoot
+ * Automate Habitica v0.29.7 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica

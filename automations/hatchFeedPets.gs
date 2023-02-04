@@ -184,8 +184,8 @@ function hatchFeedPets() {
             // for each food in inventory
             for (let [foodType, amount] of Object.entries(user.items.food)) {
 
-              // if player has more than 0 & not special food/not saving special food
-              if (amount > 0 && !(ONLY_USE_DROP_FOOD === true && !content.food[foodType].canDrop)) {
+              // if not saddle & player has more than 0 & not special food/not saving special food
+              if (foodType != "Saddle" && amount > 0 && !(ONLY_USE_DROP_FOOD === true && !content.food[foodType].canDrop)) {
 
                 // if correct food type
                 if (content.food[foodType].target == color) {
@@ -198,6 +198,7 @@ function hatchFeedPets() {
                   fetch("https://habitica.com/api/v3/user/feed/" + pet + "/" + foodType + "?amount=" + feedings, POST_PARAMS);
                   feedingsNeeded -= feedings;
                   user.items.food[foodType] -= feedings;
+                  numEachFoodTypeOwned[content.food[foodType].target] -= feedings;
 
                   // stop feeding if full
                   if (feedingsNeeded <= 0) {
@@ -246,8 +247,8 @@ function hatchFeedPets() {
     // for each food in inventory
     for (let [foodType, amount] of Object.entries(user.items.food)) {
 
-      // if player has more than 0 & not special food/not saving special food
-      if (amount > 0 && !(ONLY_USE_DROP_FOOD === true && !content.food[foodType].canDrop)) {
+      // if not saddle & player has more than 0 & not special food/not saving special food
+      if (foodType != "Saddle" && amount > 0 && !(ONLY_USE_DROP_FOOD === true && !content.food[foodType].canDrop)) {
 
         // if extra
         let extra = numEachFoodTypeOwned[content.food[foodType].target] - numEachFoodTypeNeeded[content.food[foodType].target];
