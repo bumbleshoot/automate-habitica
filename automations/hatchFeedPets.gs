@@ -58,10 +58,11 @@ function hatchFeedPets() {
   // get # each egg & hatching potion owned/used, pets & mounts owned, # each food type needed, # extra food needed
   let numEachEggOwnedUsed = getUser(true).items.eggs;
   let numEachPotionOwnedUsed = user.items.hatchingPotions;
-  let petsOwned = [];
+  let nonSpecialPetsOwned = [];
+  let nonSpecialPets = nonWackyNonSpecialPets.concat(wackyPets);
   for (let [pet, amount] of Object.entries(user.items.pets)) {
-    if (amount > 0) { // 5 = newly hatched pet, >5 = fed pet, -1 = mount but no pet
-      petsOwned.push(pet);
+    if (amount > 0 && nonSpecialPets.includes(pet)) { // 5 = newly hatched pet, >5 = fed pet, -1 = mount but no pet
+      nonSpecialPetsOwned.push(pet);
       pet = pet.split("-");
       let species = pet[0];
       let color = pet[1];
@@ -77,10 +78,10 @@ function hatchFeedPets() {
       }
     }
   }
-  let mountsOwned = [];
+  let nonSpecialMountsOwned = [];
   for (let [mount, owned] of Object.entries(user.items.mounts)) {
-    if (owned) {
-      mountsOwned.push(mount);
+    if (owned && nonSpecialPets.includes(mount)) {
+      nonSpecialMountsOwned.push(mount);
     }
   }
   let numEachFoodTypeNeededTotal = Object.keys(numEachEggNeededTotal).length * 9;
@@ -90,7 +91,7 @@ function hatchFeedPets() {
     numEachFoodTypeNeeded[color] = numEachFoodTypeNeededTotal;
   }
   let numExtraFoodNeeded = Object.keys(content.premiumHatchingPotions).length * Object.keys(content.dropEggs).length * 9;
-  for (let mount of mountsOwned) {
+  for (let mount of nonSpecialMountsOwned) {
     mount = mount.split("-");
     let species = mount[0];
     let color = mount[1];
@@ -141,7 +142,6 @@ function hatchFeedPets() {
   let numExtraExtraFoodOwned = Math.max(0, numExtraFoodOwned - numExtraFoodNeeded);
 
   // for each non-special pet in content
-  let nonSpecialPets = nonWackyNonSpecialPets.concat(wackyPets);
   for (let pet of nonSpecialPets) {
     let petSplit = pet.split("-");
     let species = petSplit[0];
@@ -152,7 +152,7 @@ function hatchFeedPets() {
     if (numEachEggOwnedUsed[species] - numEachEggNeededTotal[species] >= 0 && numEachPotionOwnedUsed[color] - numEachPotionNeededTotal[color] >= 0) {
 
       // if player doesn't have pet
-      if (!petsOwned.includes(pet)) {
+      if (!nonSpecialPetsOwned.includes(pet)) {
 
         // hatch pet
         console.log("Hatching " + pet);
@@ -161,7 +161,7 @@ function hatchFeedPets() {
       }
 
       // if non-wacky & player doesn't have mount
-      if (!wackyPets.includes(pet) && !mountsOwned.includes(pet)) {
+      if (!wackyPets.includes(pet) && !nonSpecialMountsOwned.includes(pet)) {
 
         // get pet hunger
         if (hunger == 50) {
