@@ -1,9 +1,9 @@
 /**
- * hideGuildNotifications()
+ * hideAllNotifications()
  * 
  * Hides notifications from all guilds enabled in the settings.
  */
-function hideGuildNotifications(noLogging) {
+function hideAllNotifications(noLogging) {
 
   // for each notification
   let message = "Hiding notifications from ";
@@ -11,7 +11,7 @@ function hideGuildNotifications(noLogging) {
   for (let notification of getUser(true).notifications) {
 
     // if chat message & user wants to hide
-    if (notification.type == "NEW_CHAT_MESSAGE" && ((HIDE_ALL_GUILD_NOTIFICATIONS === true && notification.data.group.id !== user.party._id) || (HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS.includes(notification.data.group.id)))) {
+    if (notification.type == "NEW_CHAT_MESSAGE" && ((HIDE_PARTY_NOTIFICATIONS === true && notification.data.group.id === user.party._id) || (HIDE_ALL_GUILD_NOTIFICATIONS === true && notification.data.group.id !== user.party._id) || (HIDE_NOTIFICATIONS_FROM_SPECIFIC_GUILDS.includes(notification.data.group.id)))) {
 
       // add to list
       message += notification.data.group.name + ", ";
@@ -37,7 +37,7 @@ function hideGuildNotifications(noLogging) {
     } catch (e) {
       if (e.stack.includes("Notification not found")) {
         if (notificationIds.length > 1) {
-          hideGuildNotifications(true);
+          hideAllNotifications(true);
         }
       } else {
         throw e;

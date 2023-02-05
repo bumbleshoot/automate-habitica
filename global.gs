@@ -295,7 +295,7 @@ function processWebhook(webhookData) {
         }
       }
     } else {
-      scriptProperties.setProperty("hideGuildNotifications", "true");
+      scriptProperties.setProperty("hideAllNotifications", "true");
     }
   }
 }
@@ -318,11 +318,11 @@ function processQueue() {
 
       while (true) {
         let properties = scriptProperties.getProperties();
-        if (properties.hasOwnProperty("hideGuildNotifications")) {
-          scriptProperties.setProperty("hideGuildNotifications", "pending");
-          hideGuildNotifications();
-          if (scriptProperties.getProperty("hideGuildNotifications") === "pending") {
-            scriptProperties.deleteProperty("hideGuildNotifications");
+        if (properties.hasOwnProperty("hideAllNotifications")) {
+          scriptProperties.setProperty("hideAllNotifications", "pending");
+          hideAllNotifications();
+          if (scriptProperties.getProperty("hideAllNotifications") === "pending") {
+            scriptProperties.deleteProperty("hideAllNotifications");
           } else {
             continue;
           }
@@ -443,11 +443,11 @@ function processQueue() {
 function interruptLoop() {
   while (true) {
     let properties = scriptProperties.getProperties();
-    if (properties.hasOwnProperty("hideGuildNotifications")) {
-      scriptProperties.setProperty("hideGuildNotifications", "pending");
-      hideGuildNotifications();
-      if (scriptProperties.getProperty("hideGuildNotifications") === "pending") {
-        scriptProperties.deleteProperty("hideGuildNotifications");
+    if (properties.hasOwnProperty("hideAllNotifications")) {
+      scriptProperties.setProperty("hideAllNotifications", "pending");
+      hideAllNotifications();
+      if (scriptProperties.getProperty("hideAllNotifications") === "pending") {
+        scriptProperties.deleteProperty("hideAllNotifications");
       } else {
         continue;
       }
@@ -556,7 +556,7 @@ function fetch(url, params) {
     // get rate limiting data
     let properties = scriptProperties.getProperties();
     let spaceOutAPICalls = true;
-    if (properties.hasOwnProperty("hideGuildNotifications") || properties.hasOwnProperty("acceptQuestInvite") || properties.hasOwnProperty("notifyQuestEnded")) {
+    if (properties.hasOwnProperty("hideAllNotifications") || properties.hasOwnProperty("acceptQuestInvite") || properties.hasOwnProperty("notifyQuestEnded")) {
       spaceOutAPICalls = false;
     }
     if (typeof rateLimitRemaining !== "undefined" && (spaceOutAPICalls || Number(rateLimitRemaining < 1))) {
