@@ -79,6 +79,7 @@ function inviteRandomQuest() {
       DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
       e.stack
     );
+    console.error(e.stack);
     throw e;
   }
 }

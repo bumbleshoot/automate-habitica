@@ -32,6 +32,7 @@ function onTrigger() {
       DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
       e.stack
     );
+    console.error(e.stack);
     throw e;
   }
 }
@@ -92,6 +93,7 @@ function doPost(e) {
       DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
       e.stack
     );
+    console.error(e.stack);
     throw e;
   }
 }
