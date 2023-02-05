@@ -6,7 +6,8 @@
  * potions for all pets/mounts of that color.
  * 
  * Automatically feeds pets, but only if the player has enough 
- * food to feed all pets of that color with their favorite food.
+ * of the pet's favorite food(s) to feed all pets with the same 
+ * favorite food(s).
  * 
  * Run this function whenever the player gets eggs, hatching 
  * potions, or food: whenever a task is scored, and whenever a 
