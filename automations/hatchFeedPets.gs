@@ -245,29 +245,47 @@ function hatchFeedPets() {
   function feedExtraFood(pet, feedingsNeeded) {
 
     // for each food in inventory
+    let foodsOwnedSorted = [];
     for (let [foodType, amount] of Object.entries(user.items.food)) {
 
       // if not saddle & player has more than 0 & not special food/not saving special food
-      if (foodType != "Saddle" && amount > 0 && !(ONLY_USE_DROP_FOOD === true && !content.food[foodType].canDrop)) {
+      if (foodType != "Saddle" && amount > 0 && (ONLY_USE_DROP_FOOD === false || content.food[foodType].canDrop)) {
 
-        // if extra
-        let extra = numEachFoodTypeOwned[content.food[foodType].target] - numEachFoodTypeNeeded[content.food[foodType].target];
-        if (extra > 0) {
-
-          // calculate feedings
-          let feedings = Math.min(feedingsNeeded, amount, extra);
-
-          // feed this food
-          console.log("Feeding " + pet + " " + feedings + " " + foodType);
-          fetch("https://habitica.com/api/v3/user/feed/" + pet + "/" + foodType + "?amount=" + feedings, POST_PARAMS);
-          feedingsNeeded -= feedings;
-          user.items.food[foodType] -= feedings;
-          numEachFoodTypeOwned[content.food[foodType].target] -= feedings;
-
-          // stop feeding if full
-          if (feedingsNeeded <= 0) {
-            return true;
+        // add to sorted food list
+        let low = 0;
+        let high = foodsOwnedSorted.length;
+        while (low < high) {
+          let mid = Math.floor((low + high) / 2);
+          if (foodsOwnedSorted[mid][1] > amount) {
+            low = mid + 1;
+          } else {
+            high = mid;
           }
+        }
+        foodsOwnedSorted.splice(low, 0, [foodType, amount]);
+      }
+    }
+
+    // for each food in sorted list
+    for (let [foodType, amount] of foodsOwnedSorted) {
+
+      // if extra
+      let extra = numEachFoodTypeOwned[content.food[foodType].target] - numEachFoodTypeNeeded[content.food[foodType].target];
+      if (extra > 0) {
+
+        // calculate feedings
+        let feedings = Math.min(feedingsNeeded, amount, extra);
+
+        // feed this food
+        console.log("Feeding " + pet + " " + feedings + " " + foodType);
+        fetch("https://habitica.com/api/v3/user/feed/" + pet + "/" + foodType + "?amount=" + feedings, POST_PARAMS);
+        feedingsNeeded -= feedings;
+        user.items.food[foodType] -= feedings;
+        numEachFoodTypeOwned[content.food[foodType].target] -= feedings;
+
+        // stop feeding if full
+        if (feedingsNeeded <= 0) {
+          return true;
         }
       }
     }
