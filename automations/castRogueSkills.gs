@@ -14,7 +14,7 @@
  * Run this function with saveMana set to false just after 
  * cron.
  */
-function castToolsOfTheTrade(saveMana, numStealthsNeeded) {
+function castToolsOfTheTrade(saveMana, stealthsNeeded) {
 
   // if time limit or lvl < 11, return
   if (webhook || installing) {
@@ -34,10 +34,10 @@ function castToolsOfTheTrade(saveMana, numStealthsNeeded) {
   if (saveMana) {
 
     // calculate number of stealths needed
-    if (typeof numStealthsNeeded === "undefined") {
-      numStealthsNeeded = numStealthsNeeded();
+    if (typeof stealthsNeeded === "undefined") {
+      stealthsNeeded = numStealthsNeeded();
     }
-    let stealthMana = numStealthsNeeded * 45;
+    let stealthMana = stealthsNeeded * 45;
 
     // calculate mana reserve
     let int = getTotalStat("int");
@@ -152,20 +152,20 @@ function castToolsOfTheTrade(saveMana, numStealthsNeeded) {
 function castStealthAndDumpMana() {
 
   // if lvl > 13, cast Stealth
-  let numStealthsNeeded;
+  let stealthsNeeded;
   let numStealths = 0;
   if (getUser(true).stats.lvl > 13) {
 
     // get number of stealth casts
-    numStealthsNeeded = numStealthsNeeded();
-    numStealths = Math.min(numStealthsNeeded, Math.floor(getUser(true).stats.mp / 45));
+    stealthsNeeded = numStealthsNeeded();
+    numStealths = Math.min(stealthsNeeded, Math.floor(getUser(true).stats.mp / 45));
 
     console.log("Casting Stealth " + numStealths + " time(s)");
 
     // cast stealths
     for (let i=0; i<numStealths; i++) {
       fetch("https://habitica.com/api/v3/user/class/cast/stealth", POST_PARAMS);
-      numStealthsNeeded--;
+      stealthsNeeded--;
     }
 
   // if lvl < 14, cannot cast Stealth
@@ -179,7 +179,7 @@ function castStealthAndDumpMana() {
   }
 
   // cast tools of the trades
-  castToolsOfTheTrade(true, numStealthsNeeded);
+  castToolsOfTheTrade(true, stealthsNeeded);
 }
 
 /**
