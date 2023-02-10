@@ -548,6 +548,7 @@ function useExcessMana() {
  */
 let rateLimitRemaining;
 let rateLimitReset;
+let apiResponseTime;
 function fetch(url, params) {
 
   // try up to 3 times
@@ -565,7 +566,7 @@ function fetch(url, params) {
       let waitUntil = new Date(rateLimitReset);
       waitUntil.setSeconds(waitUntil.getSeconds() + 1);
       let now = new Date();
-      Utilities.sleep(Math.max(waitUntil.getTime() - now.getTime(), 0) / (Number(rateLimitRemaining) + 1));
+      Utilities.sleep(Math.max(Math.max(waitUntil.getTime() - now.getTime(), 0) / (Number(rateLimitRemaining) + 1) - apiResponseTime, 0));
     }
 
     // call API
@@ -573,7 +574,9 @@ function fetch(url, params) {
     let addressUnavailable = 0;
     while (true) {
       try {
+        let beforeCalling = new Date();
         response = UrlFetchApp.fetch(url, params);
+        apiResponseTime = new Date().getTime() - beforeCalling.getTime();
         break;
 
       // if address unavailable, wait 5 seconds & try again
