@@ -565,8 +565,7 @@ function fetch(url, params) {
       // space out API calls
       let waitUntil = new Date(rateLimitReset);
       waitUntil.setSeconds(waitUntil.getSeconds() + 1);
-      let now = new Date();
-      Utilities.sleep(Math.max(Math.max(waitUntil.getTime() - now.getTime(), 0) / (Number(rateLimitRemaining) + 1) - apiResponseTime, 0));
+      Utilities.sleep(Math.max(Math.max(waitUntil.getTime() - new Date().getTime(), 0) / (Number(rateLimitRemaining) + 1) - apiResponseTime, 0));
     }
 
     // call API
