@@ -148,11 +148,9 @@ function processTrigger() {
     scriptProperties.setProperty("useExcessMana", "true");
   }
 
-  if (HIDE_ALL_GUILD_NOTIFICATIONS === true && !installing) {
-    if (user.guilds.join() !== properties["PLAYER_GUILDS"]) {
-      deleteWebhooks(true);
-      createWebhooks(true);
-    }
+  if (!installing && ((HIDE_PARTY_NOTIFICATIONS === true && user.party._id !== properties["HIDE_NOTIFICATIONS_PARTY"]) || (HIDE_ALL_GUILD_NOTIFICATIONS === true && user.guilds.join() !== properties["HIDE_NOTIFICATIONS_GUILDS"]))) {
+    deleteWebhooks(true);
+    createWebhooks(true);
   }
   if (AUTO_CAST_SKILLS === true && getPlayerClass() == "healer") {
     scriptProperties.setProperty("healParty", "true");
