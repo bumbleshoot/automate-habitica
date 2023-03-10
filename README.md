@@ -17,7 +17,7 @@ Forces pending [quests](https://habitica.fandom.com/wiki/Quests) to start after 
 Whenever your party completes a quest, automatically selects a random quest scroll from your inventory and invites your party to that quest. There is a randomized 5-15 min delay between quest ending and using the quest scroll, to give other party members a chance to run their quests too, and to prevent multiple simultaneous quest invitations. If `AUTO_INVITE_HOURGLASS_QUESTS` is set to `false`, the script will not use *any* hourglass quest scrolls, even if they match the other quest categories.
 
 ### Notify On Quest End
-Sends a [private message](https://habitica.fandom.com/wiki/Private_Messaging) to you on Habitica to notify you whenever your [party](https://habitica.fandom.com/wiki/Party) completes a [quest](https://habitica.fandom.com/wiki/Quests).
+Sends a [private message](https://habitica.fandom.com/wiki/Private_Messaging) to you on Habitica to notify you whenever your [party](https://habitica.fandom.com/wiki/Party) completes a [quest](https://habitica.fandom.com/wiki/Quests). The message includes the name of the quest that was completed.
 
 ### Auto Cast Skills
 Strategically casts your [skills](https://habitica.fandom.com/wiki/Skills) for you. Ensures no [mana](https://habitica.fandom.com/wiki/Mana_Points) is wasted, and no mana is lost at [cron](https://habitica.fandom.com/wiki/Cron). In order from highest to lowest priority:
