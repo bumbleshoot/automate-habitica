@@ -62,7 +62,7 @@ function hatchFeedPets() {
   let nonSpecialPetsOwned = [];
   let nonSpecialPets = nonWackyNonSpecialPets.concat(wackyPets);
   for (let [pet, amount] of Object.entries(user.items.pets)) {
-    if (amount > 0 && nonSpecialPets.includes(pet)) { // 5 = newly hatched pet, >5 = fed pet, -1 = mount but no pet
+    if (amount > 0 && nonSpecialPets.includes(pet)) { // 0 = released pet, 5 = newly hatched pet, >5 = fed pet, -1 = mount but no pet
       nonSpecialPetsOwned.push(pet);
       pet = pet.split("-");
       let species = pet[0];
