@@ -725,7 +725,7 @@ function getUser(updated) {
         }
         break;
       } catch (e) {
-        if (i < 2 && e.stack.includes("Unterminated string in JSON")) {
+        if (i < 2 && (e.stack.includes("Unterminated string in JSON") || e.stack.includes("Expected ',' or '}' after property value in JSON at position"))) {
           continue;
         } else {
           throw e;
@@ -812,7 +812,7 @@ function getMembers(updated) {
         members = JSON.parse(members).data;
         break;
       } catch (e) {
-        if (i < 2 && e.stack.includes("Unterminated string in JSON")) {
+        if (i < 2 && (e.stack.includes("Unterminated string in JSON") || e.stack.includes("Expected ',' or '}' after property value in JSON at position"))) {
           continue;
         } else {
           throw e;
@@ -839,7 +839,7 @@ function getContent(updated) {
         content = JSON.parse(content).data;
         break;
       } catch (e) {
-        if (i < 2 && e.stack.includes("Unterminated string in JSON")) {
+        if (i < 2 && (e.stack.includes("Unterminated string in JSON") || e.stack.includes("Expected ',' or '}' after property value in JSON at position"))) {
           continue;
         } else {
           throw e;
