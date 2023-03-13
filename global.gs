@@ -88,13 +88,15 @@ function doPost(e) {
     processQueue();
 
   } catch (e) {
-    MailApp.sendEmail(
-      Session.getEffectiveUser().getEmail(),
-      DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
-      e.stack
-    );
-    console.error(e.stack);
-    throw e;
+    if (!e.stack.includes("Address unavailable")) {
+      MailApp.sendEmail(
+        Session.getEffectiveUser().getEmail(),
+        DriveApp.getFileById(ScriptApp.getScriptId()).getName() + " failed!",
+        e.stack
+      );
+      console.error(e.stack);
+      throw e;
+    }
   }
 }
 
@@ -568,7 +570,6 @@ function fetch(url, params) {
 
     // call API
     let response;
-    let addressUnavailable = 0;
     while (true) {
       try {
         let beforeCalling = new Date();
@@ -578,8 +579,7 @@ function fetch(url, params) {
 
       // if address unavailable, wait 5 seconds & try again
       } catch (e) {
-        if (addressUnavailable < 12 && e.stack.includes("Address unavailable")) {
-          addressUnavailable++;
+        if (!webhook && e.stack.includes("Address unavailable")) {
           Utilities.sleep(5000);
         } else {
           throw e;
