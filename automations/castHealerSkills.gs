@@ -78,8 +78,6 @@ function healParty() {
   let con = getTotalStat("con");
   let int = getTotalStat("int");
 
-  console.log("Mana: " + user.stats.mp);
-
   // if lvl >= 14 & in a party with other players
   let numBlessings = 0;
   if (user.stats.lvl >= 14 && typeof getMembers() !== "undefined" && members.length > 1) {
@@ -99,6 +97,7 @@ function healParty() {
     // cast blessing
     if (numBlessings > 0) {
 
+      console.log("Mana: " + user.stats.mp);
       console.log("Lowest party member health: " + lowestMemberHealth);
       console.log("Casting Blessing " + numBlessings + " time(s)");
 
@@ -108,9 +107,6 @@ function healParty() {
         user.stats.hp += healthPerBlessing;
       }
       user.stats.hp = Math.min(user.stats.hp, 50);
-
-      console.log("Mana remaining: " + user.stats.mp);
-
     }
 
   // if lvl < 14 or not in a party, nothing to cast
@@ -124,6 +120,7 @@ function healParty() {
   // cast healing light
   if (numLights > 0) {
 
+    console.log("Mana: " + user.stats.mp);
     console.log("Player health: " + user.stats.hp);
     console.log("Casting Healing Light " + numLights + " time(s)");
 
