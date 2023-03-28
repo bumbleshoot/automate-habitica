@@ -148,7 +148,9 @@ function hatchFeedPets() {
   for (let pet of nonSpecialPets) {
     let petSplit = pet.split("-");
     let species = petSplit[0];
+    let speciesReadable = species.replaceAll(/(?<!^)([A-Z])/g, " $1");
     let color = petSplit[1];
+    let colorReadable = color.replaceAll(/(?<!^)([A-Z])/g, " $1");
     let hunger = 50;
 
     // if player has all needed eggs & potions for that species & color
@@ -158,7 +160,7 @@ function hatchFeedPets() {
       if (!nonSpecialPetsOwned.includes(pet)) {
 
         // hatch pet
-        console.log("Hatching " + pet);
+        console.log("Hatching " + colorReadable + " " + speciesReadable);
         fetch("https://habitica.com/api/v3/user/hatch/" + species + "/" + color, POST_PARAMS);
         hunger = 45;
       }
@@ -194,7 +196,7 @@ function hatchFeedPets() {
                 let feedings = Math.min(feedingsNeeded, amount);
 
                 // feed this food
-                console.log("Feeding " + pet + " " + feedings + " " + food);
+                console.log("Feeding " + colorReadable + " " + speciesReadable + " " + feedings + " " + food);
                 fetch("https://habitica.com/api/v3/user/feed/" + pet + "/" + food + "?amount=" + feedings, POST_PARAMS);
 
                 // update data
@@ -222,7 +224,11 @@ function hatchFeedPets() {
             let feedingsNeeded = Math.ceil(hunger / 2);
 
             // feed until mount
-            grewToMount = feedExtraFood(pet, feedingsNeeded);
+            grewToMount = feedExtraFood(feedingsNeeded);
+
+          // not enough food to feed basic mount
+          } else {
+            console.log("Cannot feed " + colorReadable + " " + speciesReadable + ": not enough preferred food (need " + numEachFoodTypeNeeded[color] + ")");
           }
 
         // if premium color mount
@@ -235,67 +241,85 @@ function hatchFeedPets() {
             let feedingsNeeded = Math.ceil(hunger / 5);
 
             // feed until mount
-            grewToMount = feedExtraFood(pet, feedingsNeeded);
+            grewToMount = feedExtraFood(feedingsNeeded);
+
+          // not enough food to feed premium color mount
+          } else {
+            console.log("Cannot feed " + colorReadable + " " + speciesReadable + ": not enough extra food (need " + numExtraFoodNeeded + " extra food, ie. food that would be left over when all unowned basic color mounts are fed their favorite foods)");
           }
         }
 
         // if grew to mount, hatch another pet
         if (grewToMount) {
-          console.log("Hatching " + pet);
+          console.log("Hatching " + colorReadable + " " + speciesReadable);
           fetch("https://habitica.com/api/v3/user/hatch/" + species + "/" + color, POST_PARAMS);
         }
       }
+
+    // if not enough eggs and/or not enough hatching potions
+    } else {
+      let message = "Cannot hatch or feed " + colorReadable + " " + speciesReadable + ": not enough ";
+      if (numEachEggOwnedUsed[species] - numEachEggNeededTotal[species] < 0) {
+        message += speciesReadable + " eggs (need " + (numEachEggNeededTotal[species] - numEachEggOwnedUsed[species] + user.items.eggs[species]) + ")";
+      }
+      if (numEachPotionOwnedUsed[color] - numEachPotionNeededTotal[color] < 0) {
+        if (message.endsWith(")")) {
+          message += " or";
+        }
+        message += colorReadable + " hatching potions (need " + (numEachPotionNeededTotal[color] - numEachPotionOwnedUsed[color] + user.items.hatchingPotions[color]) + ")";
+      }
+      console.log(message);
     }
-  }
 
-  function feedExtraFood(pet, feedingsNeeded) {
+    function feedExtraFood(feedingsNeeded) {
 
-    // for each usable food owned
-    let foodsOwnedSorted = [];
-    for (let [food, amount] of Object.entries(numEachUsableFoodOwned)) {
+      // for each usable food owned
+      let foodsOwnedSorted = [];
+      for (let [food, amount] of Object.entries(numEachUsableFoodOwned)) {
 
-      // add to sorted food list
-      let low = 0;
-      let high = foodsOwnedSorted.length;
-      while (low < high) {
-        let mid = Math.floor((low + high) / 2);
-        if (foodsOwnedSorted[mid][1] > amount) {
-          low = mid + 1;
-        } else {
-          high = mid;
+        // add to sorted food list
+        let low = 0;
+        let high = foodsOwnedSorted.length;
+        while (low < high) {
+          let mid = Math.floor((low + high) / 2);
+          if (foodsOwnedSorted[mid][1] > amount) {
+            low = mid + 1;
+          } else {
+            high = mid;
+          }
+        }
+        foodsOwnedSorted.splice(low, 0, [food, amount]);
+      }
+
+      // for each food in sorted list
+      for (let [food, amount] of foodsOwnedSorted) {
+  
+        // if extra
+        let extra = numEachFoodTypeOwned[content.food[food].target] - numEachFoodTypeNeeded[content.food[food].target];
+        if (extra > 0) {
+  
+          // calculate feedings
+          let feedings = Math.min(feedingsNeeded, amount, extra);
+  
+          // feed this food
+          console.log("Feeding " + colorReadable + " " + speciesReadable + " " + feedings + " " + food);
+          fetch("https://habitica.com/api/v3/user/feed/" + pet + "/" + food + "?amount=" + feedings, POST_PARAMS);
+  
+          // update data
+          feedingsNeeded -= feedings;
+          numEachUsableFoodOwned[food] -= feedings;
+          if (numEachUsableFoodOwned[food] <= 0) {
+            delete numEachUsableFoodOwned[food];
+          }
+          numEachFoodTypeOwned[content.food[food].target] -= feedings;
+  
+          // stop feeding if full
+          if (feedingsNeeded <= 0) {
+            return true;
+          }
         }
       }
-      foodsOwnedSorted.splice(low, 0, [food, amount]);
+      return false;
     }
-
-    // for each food in sorted list
-    for (let [food, amount] of foodsOwnedSorted) {
-
-      // if extra
-      let extra = numEachFoodTypeOwned[content.food[food].target] - numEachFoodTypeNeeded[content.food[food].target];
-      if (extra > 0) {
-
-        // calculate feedings
-        let feedings = Math.min(feedingsNeeded, amount, extra);
-
-        // feed this food
-        console.log("Feeding " + pet + " " + feedings + " " + food);
-        fetch("https://habitica.com/api/v3/user/feed/" + pet + "/" + food + "?amount=" + feedings, POST_PARAMS);
-
-        // update data
-        feedingsNeeded -= feedings;
-        numEachUsableFoodOwned[food] -= feedings;
-        if (numEachUsableFoodOwned[food] <= 0) {
-          delete numEachUsableFoodOwned[food];
-        }
-        numEachFoodTypeOwned[content.food[food].target] -= feedings;
-
-        // stop feeding if full
-        if (feedingsNeeded <= 0) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 }
