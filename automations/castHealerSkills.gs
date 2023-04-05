@@ -125,7 +125,13 @@ function healParty() {
     console.log("Casting Healing Light " + numLights + " time(s)");
 
     for (let i=0; i<numLights; i++) {
-      fetch("https://habitica.com/api/v3/user/class/cast/heal", POST_PARAMS);
+      try {
+        fetch("https://habitica.com/api/v3/user/class/cast/heal", POST_PARAMS);
+      } catch (e) {
+        if (!e.stack.includes("You already have maximum health")) {
+          throw e
+        }
+      }
     }
   }
 
