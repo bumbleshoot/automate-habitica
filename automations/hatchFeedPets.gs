@@ -57,7 +57,7 @@ function hatchFeedPets() {
   }
 
   // get # each egg & hatching potion owned/used, pets & mounts owned, # each food type needed, # extra food needed
-  let numEachEggOwnedUsed = getUser(true).items.eggs;
+  let numEachEggOwnedUsed = JSON.parse(JSON.stringify(getUser(true).items.eggs));
   let numEachPotionOwnedUsed = JSON.parse(JSON.stringify(user.items.hatchingPotions));
   let nonSpecialPetsOwned = [];
   let nonSpecialPets = nonWackyNonSpecialPets.concat(wackyPets);
