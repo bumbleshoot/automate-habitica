@@ -747,7 +747,19 @@ function getUser(updated) {
 let tasks;
 function getTasks() {
   if (typeof tasks === "undefined") {
-    tasks = JSON.parse(fetch("https://habitica.com/api/v3/tasks/user", GET_PARAMS)).data;
+    for (let i=0; i<3; i++) {
+      tasks = fetch("https://habitica.com/api/v3/tasks/user", GET_PARAMS);
+      try {
+        tasks = JSON.parse(tasks).data;
+        break;
+      } catch (e) {
+        if (i < 2 && (e.stack.includes("Unterminated string in JSON") || e.stack.includes("Expected ',' or '}' after property value in JSON at position"))) {
+          continue;
+        } else {
+          throw e;
+        }
+      }
+    }
     dailies = [];
     for (let i=0; i<tasks.length; i++) {
       if (tasks[i].type == "reward") {
