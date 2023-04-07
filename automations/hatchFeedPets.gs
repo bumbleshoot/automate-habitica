@@ -58,7 +58,7 @@ function hatchFeedPets() {
 
   // get # each egg & hatching potion owned/used, pets & mounts owned, # each food type needed, # extra food needed
   let numEachEggOwnedUsed = getUser(true).items.eggs;
-  let numEachPotionOwnedUsed = user.items.hatchingPotions;
+  let numEachPotionOwnedUsed = JSON.parse(JSON.stringify(user.items.hatchingPotions));
   let nonSpecialPetsOwned = [];
   let nonSpecialPets = nonWackyNonSpecialPets.concat(wackyPets);
   for (let [pet, amount] of Object.entries(user.items.pets)) {
@@ -257,14 +257,14 @@ function hatchFeedPets() {
       }
 
     // if not enough eggs and/or not enough hatching potions
-    } else {
+    } else if (!nonSpecialPetsOwned.includes(pet) || (!wackyPets.includes(pet) && !nonSpecialMountsOwned.includes(pet))) {
       let message = "Cannot hatch or feed " + colorReadable + " " + speciesReadable + ": not enough ";
       if (numEachEggOwnedUsed[species] - numEachEggNeededTotal[species] < 0) {
         message += speciesReadable + " eggs (need " + (numEachEggNeededTotal[species] - numEachEggOwnedUsed[species] + user.items.eggs[species]) + ")";
       }
       if (numEachPotionOwnedUsed[color] - numEachPotionNeededTotal[color] < 0) {
         if (message.endsWith(")")) {
-          message += " or";
+          message += " or ";
         }
         message += colorReadable + " hatching potions (need " + (numEachPotionNeededTotal[color] - numEachPotionOwnedUsed[color] + user.items.hatchingPotions[color]) + ")";
       }
