@@ -154,7 +154,7 @@ function processTrigger() {
     deleteWebhooks(true);
     createWebhooks(true);
   }
-  if (AUTO_CAST_SKILLS === true && getPlayerClass() == "healer") {
+  if (AUTO_CAST_SKILLS === true && user.stats.class == "healer") {
     scriptProperties.setProperty("healParty", "true");
   }
   if (AUTO_PAUSE_RESUME_DAMAGE === true) {
@@ -485,16 +485,27 @@ function interruptLoop() {
  * at least 6 mins before day start (max Google Apps Script 
  * run time).
  */
-function beforeCronSkills() {
-  let playerClass = getPlayerClass();
-  if (playerClass == "warrior") {
-    smashBossAndDumpMana();
-  } else if (playerClass == "mage") {
-    burnBossAndDumpMana();
-  } else if (playerClass == "healer") {
-    castProtectiveAura(true);
-  } else if (playerClass == "rogue") {
-    castStealthAndDumpMana();
+function beforeCronSkills(retry) {
+  try {
+
+    let playerClass = getUser().stats.class;
+    if (playerClass == "warrior") {
+      smashBossAndDumpMana();
+    } else if (playerClass == "wizard") {
+      burnBossAndDumpMana();
+    } else if (playerClass == "healer") {
+      castProtectiveAura(true);
+    } else if (playerClass == "rogue") {
+      castStealthAndDumpMana();
+    }
+
+  } catch (e) {
+    if (!retry && e.stack.match(/Skill \\"[A-Za-z]+\\" not found/) !== null) {
+      getUser(true);
+      beforeCronSkills(true);
+    } else {
+      throw e;
+    }
   }
 }
 
@@ -504,16 +515,27 @@ function beforeCronSkills() {
  * Cast buffs until all mana is used up. Run this function 
  * just after the player's cron.
  */
-function afterCronSkills() {
-  let playerClass = getPlayerClass();
-  if (playerClass == "warrior") {
-    castValorousPresence(false);
-  } else if (playerClass == "mage") {
-    castEarthquake(false);
-  } else if (playerClass == "healer") {
-    castProtectiveAura(false);
-  } else if (playerClass == "rogue") {
-    castToolsOfTheTrade(false);
+function afterCronSkills(retry) {
+  try {
+
+    let playerClass = getUser().stats.class;
+    if (playerClass == "warrior") {
+      castValorousPresence(false);
+    } else if (playerClass == "wizard") {
+      castEarthquake(false);
+    } else if (playerClass == "healer") {
+      castProtectiveAura(false);
+    } else if (playerClass == "rogue") {
+      castToolsOfTheTrade(false);
+    }
+
+  } catch (e) {
+    if (!retry && e.stack.match(/Skill \\"[A-Za-z]+\\" not found/) !== null) {
+      getUser(true);
+      afterCronSkills(true);
+    } else {
+      throw e;
+    }
   }
 }
 
@@ -524,16 +546,27 @@ function afterCronSkills() {
  * will remain after cron, plus enough mana to do 3000 
  * damage to the quest boss.
  */
-function useExcessMana() {
-  let playerClass = getPlayerClass();
-  if (playerClass == "warrior") {
-    castValorousPresence(true);
-  } else if (playerClass == "mage") {
-    castEarthquake(true);
-  } else if (playerClass == "healer") {
-    castProtectiveAura(false);
-  } else if (playerClass == "rogue") {
-    castToolsOfTheTrade(true);
+function useExcessMana(retry) {
+  try {
+
+    let playerClass = getUser().stats.class;
+    if (playerClass == "warrior") {
+      castValorousPresence(true);
+    } else if (playerClass == "wizard") {
+      castEarthquake(true);
+    } else if (playerClass == "healer") {
+      castProtectiveAura(false);
+    } else if (playerClass == "rogue") {
+      castToolsOfTheTrade(true);
+    }
+
+  } catch (e) {
+    if (!retry && e.stack.match(/Skill \\"[A-Za-z]+\\" not found/) !== null) {
+      getUser(true);
+      useExcessMana(true);
+    } else {
+      throw e;
+    }
   }
 }
 
@@ -607,50 +640,6 @@ function fetch(url, params) {
 }
 
 /**
- * getPlayerClass()
- * 
- * Returns the player's current class. If the player's class has 
- * changed since the last time getPlayerClass() was called, saves 
- * the new class and allocates stat points.
- */
-let playerClass;
-function getPlayerClass() {
-
-  // return player class if already checked during this instance
-  if (typeof playerClass !== "undefined") {
-    return playerClass;
-  }
-
-  // get saved player class
-  let savedPlayerClass = scriptProperties.getProperty("PLAYER_CLASS");
-
-  // get current player class
-  playerClass = getUser().stats.class;
-  if (playerClass == "wizard") {
-    playerClass = "mage";
-  }
-
-  // if player class has changed
-  if (playerClass != savedPlayerClass) {
-
-    if (savedPlayerClass !== null) {
-      console.log("Player class changed to " + playerClass + ", saving new class");
-    }
-
-    // save current player class
-    scriptProperties.setProperty("PLAYER_CLASS", playerClass);
-
-    // allocate stat points
-    if (AUTO_ALLOCATE_STAT_POINTS === true) {
-      allocateStatPoints();
-    }
-  }
-
-  // return current player class
-  return playerClass;
-}
-
-/**
  * getTotalStat(stat)
  * 
  * Returns the total value of a stat, including level, buffs, allocated,
@@ -664,12 +653,6 @@ function getTotalStat(stat) {
     return (getUser(true).stats.maxMP - 30) / 2;
   }
 
-  // get player class
-  let playerClass = getPlayerClass();
-  if (playerClass == "mage") {
-    playerClass = "wizard";
-  }
-
   // calculate stat from level, buffs, allocated
   let levelStat = Math.min(Math.floor(getUser(true).stats.lvl / 2), 50);
   let equipmentStat = 0;
@@ -681,7 +664,7 @@ function getTotalStat(stat) {
     let equipment = getContent().gear.flat[equipped];
     if (typeof equipment !== "undefined") {
       equipmentStat += equipment[stat];
-      if (equipment.klass == playerClass || ((equipment.klass == "special") && (equipment.specialClass == playerClass))) {
+      if (equipment.klass == user.stats.class || ((equipment.klass == "special") && (equipment.specialClass == user.stats.class))) {
         equipmentStat += equipment[stat] / 2;
       }
     }
@@ -730,6 +713,20 @@ function getUser(updated) {
         } else {
           throw e;
         }
+      }
+    }
+    let savedPlayerClass = scriptProperties.getProperty("PLAYER_CLASS");
+    playerClass = user.stats.class;
+    if (playerClass == "wizard") {
+      playerClass = "mage";
+    }
+    if (playerClass != savedPlayerClass) {
+      if (savedPlayerClass !== null) {
+        console.log("Player class changed to " + playerClass + ", saving new class");
+      }
+      scriptProperties.setProperty("PLAYER_CLASS", playerClass);
+      if (AUTO_ALLOCATE_STAT_POINTS === true) {
+        allocateStatPoints();
       }
     }
   }
