@@ -57,8 +57,16 @@ function hatchFeedPets() {
   }
 
   // get # each egg & hatching potion owned/used, pets & mounts owned, # each food type needed, # extra food needed
-  let numEachEggOwnedUsed = JSON.parse(JSON.stringify(getUser(true).items.eggs));
-  let numEachPotionOwnedUsed = JSON.parse(JSON.stringify(user.items.hatchingPotions));
+  let numEachEggOwnedUsed = JSON.parse(JSON.stringify(content.eggs));
+  let eggsOwned = getUser(true).items.eggs;
+  for (let egg of Object.keys(numEachEggOwnedUsed)) {
+    numEachEggOwnedUsed[egg] = eggsOwned[egg] ? eggsOwned[egg] : 0;
+  }
+  let numEachPotionOwnedUsed = JSON.parse(JSON.stringify(content.hatchingPotions));
+  let potionsOwned = user.items.hatchingPotions;
+  for (let potion of Object.keys(numEachPotionOwnedUsed)) {
+    numEachPotionOwnedUsed[potion] = potionsOwned[potion] ? potionsOwned[potion] : 0;
+  }
   let nonSpecialPetsOwned = [];
   let nonSpecialPets = nonWackyNonSpecialPets.concat(wackyPets);
   for (let [pet, amount] of Object.entries(user.items.pets)) {
@@ -260,13 +268,13 @@ function hatchFeedPets() {
     } else if (!nonSpecialPetsOwned.includes(pet) || (!wackyPets.includes(pet) && !nonSpecialMountsOwned.includes(pet))) {
       let message = "Cannot hatch or feed " + colorReadable + " " + speciesReadable + ": not enough ";
       if (numEachEggOwnedUsed[species] - numEachEggNeededTotal[species] < 0) {
-        message += speciesReadable + " eggs (need " + (numEachEggNeededTotal[species] - numEachEggOwnedUsed[species] + user.items.eggs[species]) + ")";
+        message += speciesReadable + " eggs (need " + (numEachEggNeededTotal[species] - numEachEggOwnedUsed[species] + (user.items.eggs[species] || 0)) + ")";
       }
       if (numEachPotionOwnedUsed[color] - numEachPotionNeededTotal[color] < 0) {
         if (message.endsWith(")")) {
           message += " or ";
         }
-        message += colorReadable + " hatching potions (need " + (numEachPotionNeededTotal[color] - numEachPotionOwnedUsed[color] + user.items.hatchingPotions[color]) + ")";
+        message += colorReadable + " hatching potions (need " + (numEachPotionNeededTotal[color] - numEachPotionOwnedUsed[color] + (user.items.hatchingPotions[color] || 0)) + ")";
       }
       console.log(message);
     }
