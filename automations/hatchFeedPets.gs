@@ -236,7 +236,7 @@ function hatchFeedPets() {
 
           // not enough food to feed basic mount
           } else {
-            console.log("Cannot feed " + colorReadable + " " + speciesReadable + ": not enough preferred food (need " + numEachFoodTypeNeeded[color] + ")");
+            console.log("Cannot feed " + colorReadable + " " + speciesReadable + ": not enough preferred food (need " + numEachFoodTypeNeeded[color] + ", have " + numEachFoodTypeOwned[color] + ")");
           }
 
         // if premium color mount
@@ -253,7 +253,7 @@ function hatchFeedPets() {
 
           // not enough food to feed premium color mount
           } else {
-            console.log("Cannot feed " + colorReadable + " " + speciesReadable + ": not enough extra food (need " + numExtraFoodNeeded + " extra food, ie. food that would be left over when all unowned basic color mounts are fed their favorite foods)");
+            console.log("Cannot feed " + colorReadable + " " + speciesReadable + ": not enough extra food (need " + numExtraFoodNeeded + " extra food, ie. food that would be left over when all unowned basic color mounts are fed their favorite foods; have " + numExtraFoodOwned + ")");
           }
         }
 
@@ -268,13 +268,13 @@ function hatchFeedPets() {
     } else if (!nonSpecialPetsOwned.includes(pet) || (!wackyPets.includes(pet) && !nonSpecialMountsOwned.includes(pet))) {
       let message = "Cannot hatch or feed " + colorReadable + " " + speciesReadable + ": not enough ";
       if (numEachEggOwnedUsed[species] - numEachEggNeededTotal[species] < 0) {
-        message += speciesReadable + " eggs (need " + (numEachEggNeededTotal[species] - numEachEggOwnedUsed[species] + (user.items.eggs[species] || 0)) + ")";
+        message += speciesReadable + " eggs (need " + (numEachEggNeededTotal[species] - numEachEggOwnedUsed[species] + (user.items.eggs[species] || 0)) + ", have " + (user.items.eggs[species] || 0) + ")";
       }
       if (numEachPotionOwnedUsed[color] - numEachPotionNeededTotal[color] < 0) {
         if (message.endsWith(")")) {
           message += " or ";
         }
-        message += colorReadable + " hatching potions (need " + (numEachPotionNeededTotal[color] - numEachPotionOwnedUsed[color] + (user.items.hatchingPotions[color] || 0)) + ")";
+        message += colorReadable + " hatching potions (need " + (numEachPotionNeededTotal[color] - numEachPotionOwnedUsed[color] + (user.items.hatchingPotions[color] || 0)) + ", have " + (user.items.hatchingPotions[color] || 0) + ")";
       }
       console.log(message);
     }
