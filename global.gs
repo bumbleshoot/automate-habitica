@@ -738,8 +738,8 @@ function getUser(updated) {
  * 
  * Fetches task data from the Habitica API if it hasn't 
  * already been fetched during this execution. Removes 
- * challenge tasks and rewards from the task list, and 
- * stores daily data in a separate object.
+ * challenge tasks, group tasks, and rewards from the 
+ * task list, and stores daily data in a separate object.
  */
 let tasks;
 function getTasks() {
@@ -766,7 +766,7 @@ function getTasks() {
         if (tasks[i].type == "daily") {
           dailies.push(tasks[i]);
         }
-        if (typeof tasks[i].challenge.id !== "undefined") {
+        if (typeof tasks[i].challenge.id !== "undefined" || typeof tasks[i].group.id !== "undefined") {
           tasks.splice(i, 1);
           i--;
         }
