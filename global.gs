@@ -389,16 +389,6 @@ function processQueue() {
           scriptProperties.deleteProperty("useExcessMana");
           continue;
         }
-        let gold = properties["purchaseArmoires"];
-        if (typeof gold !== "undefined" && !webhook && !installing) {
-          if (gold === "true") {
-            purchaseArmoires();
-          } else {
-            purchaseArmoires(Number(gold));
-          }
-          scriptProperties.deleteProperty("purchaseArmoires");
-          continue;
-        }
         if (properties.hasOwnProperty("sellExtraFood") && !webhook) {
           sellExtraFood();
           scriptProperties.deleteProperty("sellExtraFood");
@@ -417,6 +407,16 @@ function processQueue() {
         if (properties.hasOwnProperty("hatchFeedPets") && !webhook && !installing) {
           hatchFeedPets();
           scriptProperties.deleteProperty("hatchFeedPets");
+          continue;
+        }
+        let gold = properties["purchaseArmoires"];
+        if (typeof gold !== "undefined" && !webhook && !installing) {
+          if (gold === "true") {
+            purchaseArmoires();
+          } else {
+            purchaseArmoires(Number(gold));
+          }
+          scriptProperties.deleteProperty("purchaseArmoires");
           continue;
         }
         break;
