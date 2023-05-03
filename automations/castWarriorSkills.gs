@@ -99,9 +99,9 @@ function smashBossAndDumpMana() {
   if (typeof user.party._id !== "undefined") {
 
     // get boss hp
-    let bossHP = 3000;
-    if (AUTO_CRON === true) {
-      bossHP = getParty(true).quest.progress.hp;
+    let bossHP = getParty(true).quest.progress.hp;
+    if (!bossHP) {
+      bossHP = 3000;
     }
 
     // if boss hp and user has non-challenge tasks
