@@ -20,6 +20,6 @@ Please provide your best estimate. eg. Only once? Several times a day? A couple 
 Please open your copy of the script, copy the version number (it should be at the very top), and paste it here. This should be the version of the script that was running when the bug/error occurred.
 
 **Script settings**
-```
+```javascript
 Please copy & paste your script settings (consts) here (between the ```), but be sure to delete your `USER_ID`, `API_TOKEN`, and `WEBHOOK_URL`!
 ```
