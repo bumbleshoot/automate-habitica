@@ -118,7 +118,7 @@ function processTrigger() {
   let dayStartAdjusted = dayStart === 0 ? 24 : dayStart;
   let needsCron = user.needsCron;
   let lastCron = new Date(user.auth.timestamps.loggedin);
-  let lastAfterCron = new Date(properties["LAST_AFTER_CRON"]);
+  let lastAfterCron = new Date(properties["LAST_AFTER_CRON"] || null);
 
   // if auto cron and just before day start OR no auto cron and just before hour start and needs cron
   if (AUTO_CAST_SKILLS === true && ((nowAdjusted.getHours() == dayStartAdjusted-1 && 39 <= nowAdjusted.getMinutes() && nowAdjusted.getMinutes() < 54) || (AUTO_CRON === false && needsCron === true))) {
