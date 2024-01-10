@@ -1,5 +1,5 @@
 /**
- * Automate Habitica v0.29.35 (beta) by @bumbleshoot
+ * Automate Habitica v0.29.36 (beta) by @bumbleshoot
  *
  * See GitHub page for info & setup instructions:
  * https://github.com/bumbleshoot/automate-habitica
@@ -384,16 +384,12 @@ function deleteTriggers() {
 
 function createTrigger() {
 
-  // create trigger if needed for enabled automations
-  if (AUTO_CRON === true || AUTO_ACCEPT_QUEST_INVITES === true || FORCE_START_QUESTS === true || AUTO_CAST_SKILLS === true || AUTO_PAUSE_RESUME_DAMAGE === true || AUTO_PURCHASE_GEMS === true || AUTO_PURCHASE_ARMOIRES === true) {
+  console.log("Creating trigger");
 
-    console.log("Creating trigger");
-
-    ScriptApp.newTrigger("onTrigger")
-      .timeBased()
-      .everyMinutes(10)
-      .create();
-  }
+  ScriptApp.newTrigger("onTrigger")
+    .timeBased()
+    .everyMinutes(10)
+    .create();
 }
 
 function deleteWebhooks(groupChatReceived) {

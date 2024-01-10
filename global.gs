@@ -8,6 +8,7 @@ const PARAMS = {
 };
 const GET_PARAMS = Object.assign({ "method": "get" }, PARAMS);
 const POST_PARAMS = Object.assign({ "method": "post" }, PARAMS);
+const PUT_PARAMS = Object.assign({ "method": "put" }, PARAMS);
 const DELETE_PARAMS = Object.assign({ "method": "delete" }, PARAMS);
 
 const scriptProperties = PropertiesService.getScriptProperties();
@@ -21,6 +22,9 @@ const scriptStart = new Date().getTime();
  */
 function onTrigger() {
   try {
+
+    // re-enable disabled webhooks
+    reenableWebhooks();
 
     // process trigger & queue
     processTrigger();
@@ -182,43 +186,43 @@ function processTrigger() {
 function processWebhook(webhookData) {
 
   // log webhook type
-  if (!installing) {
+  if (!installing && !reenabling) {
     console.log("Webhook type: " + webhookData.webhookType);
   }
 
   // when a task is scored
   if (webhookData.webhookType == "scored") {
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.taskType == "daily" && webhookData.isDue === true) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && (typeof webhookData.taskType === "undefined" || (webhookData.taskType == "daily" && webhookData.isDue === true))) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
-    if (AUTO_PURCHASE_GEMS === true && webhookData.gp >= 20) {
+    if (AUTO_PURCHASE_GEMS === true && (typeof webhookData.gp === "undefined" || webhookData.gp >= 20)) {
       scriptProperties.setProperty("purchaseGems", "true");
     }
     if (AUTO_CAST_SKILLS === true) {
       scriptProperties.setProperty("useExcessMana", "true");
     }
-    if (AUTO_PURCHASE_ARMOIRES === true && webhookData.gp >= RESERVE_GOLD + 100) {
-      scriptProperties.setProperty("purchaseArmoires", webhookData.gp);
+    if (AUTO_PURCHASE_ARMOIRES === true && (typeof webhookData.gp === "undefined" || webhookData.gp >= RESERVE_GOLD + 100)) {
+      scriptProperties.setProperty("purchaseArmoires", webhookData.gp || "true");
     }
-    if (AUTO_SELL_EGGS === true && (webhookData.dropType === "Egg" || webhookData.dropType === "All")) {
+    if (AUTO_SELL_EGGS === true && (typeof webhookData.dropType === "undefined" || (webhookData.dropType === "Egg" || webhookData.dropType === "All"))) {
       scriptProperties.setProperty("sellExtraEggs", "true");
     }
-    if (AUTO_SELL_HATCHING_POTIONS === true && (webhookData.dropType === "HatchingPotion" || webhookData.dropType === "All")) {
+    if (AUTO_SELL_HATCHING_POTIONS === true && (typeof webhookData.dropType === "undefined" || (webhookData.dropType === "HatchingPotion" || webhookData.dropType === "All"))) {
       scriptProperties.setProperty("sellExtraHatchingPotions", "true");
     }
-    if (AUTO_SELL_FOOD === true && (webhookData.dropType === "Food" || webhookData.dropType === "All")) {
+    if (AUTO_SELL_FOOD === true && (typeof webhookData.dropType === "undefined" || (webhookData.dropType === "Food" || webhookData.dropType === "All"))) {
       scriptProperties.setProperty("sellExtraFood", "true");
     }
-    if (AUTO_HATCH_FEED_PETS === true && ["Egg", "HatchingPotion", "Food", "All"].includes(webhookData.dropType)) {
+    if (AUTO_HATCH_FEED_PETS === true && (webhookData.dropType === "undefined" || ["Egg", "HatchingPotion", "Food", "All"].includes(webhookData.dropType))) {
       scriptProperties.setProperty("hatchFeedPets", "true");
     }
 
   // when player levels up
   } else if (webhookData.webhookType == "leveledUp") {
-    if (AUTO_ALLOCATE_STAT_POINTS === true && (typeof webhookData.statPoints === "undefined" || webhookData.statPoints > 0) && webhookData.lvl >= 10) {
+    if (AUTO_ALLOCATE_STAT_POINTS === true && (typeof webhookData.lvl === "undefined" || (typeof webhookData.statPoints === "undefined" || webhookData.statPoints > 0) && webhookData.lvl >= 10)) {
       scriptProperties.setProperty("allocateStatPoints", JSON.stringify(webhookData));
     }
-    if (AUTO_PAUSE_RESUME_DAMAGE === true && webhookData.lvl <= 100) {
+    if (AUTO_PAUSE_RESUME_DAMAGE === true && (typeof webhookData.lvl === "undefined" || webhookData.lvl <= 100)) {
       scriptProperties.setProperty("pauseResumeDamage", "true");
     }
 
@@ -858,4 +862,60 @@ function getContent(updated) {
     }
   }
   return content;
+}
+
+/**
+ * reenableWebhooks()
+ * 
+ * Checks the script's webhooks and re-enables any that have 
+ * been disabled. Temporary, until Google updates Google Apps 
+ * Script to allow sending API responses manually.
+ */
+let reenabling;
+function reenableWebhooks() {
+
+  // for each Automate Habitica webhook
+  for (let webhook of JSON.parse(fetch("https://habitica.com/api/v3/user/webhook", GET_PARAMS)).data) {
+    if (webhook.url === WEB_APP_URL) {
+
+      // if disabled
+      if (!webhook.enabled) {
+        reenabling = true;
+
+        console.log(webhook.type + " webhook disabled, re-enabling...");
+
+        // re-enable webhook
+        let params = Object.assign({
+          "contentType": "application/json",
+          "payload": JSON.stringify({
+            "enabled": true
+          })
+        }, PUT_PARAMS);
+        fetch("https://habitica.com/api/v3/user/webhook/" + webhook.id, params);
+
+        // add webhook tasks to the queue
+        let enabledTypes = [];
+        if (webhook.hasOwnProperty("options")) {
+          for ([option, enabled] of Object.entries(webhook.options)) {
+            if (enabled === true) {
+              enabledTypes.push(option);
+            }
+          }
+        }
+        if (enabledTypes.length === 0) {
+          enabledTypes.push(webhook.type);
+        }
+        if (enabledTypes.includes("scored") && !enabledTypes.includes("leveledUp")) {
+          enabledTypes.push("leveledUp");
+        }
+        for (type of enabledTypes) {
+
+          console.log("Adding " + type + " webhook tasks to the queue...");
+
+          processWebhook({ webhookType: type });
+        }
+        reenabling = false;
+      }
+    }
+  }
 }
