@@ -108,20 +108,47 @@ function doPost(e) {
  * periodically.
  */
 function processTrigger() {
-
-  // get times
-  let now = new Date();
   let properties = scriptProperties.getProperties();
-  let timezoneOffset = now.getTimezoneOffset() * 60 * 1000 - getUser().preferences.timezoneOffset * 60 * 1000;
-  let nowAdjusted = new Date(now.getTime() + timezoneOffset);
-  let dayStart = user.preferences.dayStart;
-  let dayStartAdjusted = dayStart === 0 ? 24 : dayStart;
-  let needsCron = user.needsCron;
-  let lastCron = new Date(user.auth.timestamps.loggedin);
-  let lastAfterCron = new Date(properties["LAST_AFTER_CRON"] || null);
 
-  // if auto cron and just before day start OR no auto cron and just before hour start and needs cron
-  if (AUTO_CAST_SKILLS === true && ((nowAdjusted.getHours() == dayStartAdjusted-1 && 39 <= nowAdjusted.getMinutes() && nowAdjusted.getMinutes() < 54) || (AUTO_CRON === false && needsCron === true))) {
+  getUser();
+
+  // get now in user timezone
+  let now = new Date();
+  let timezoneOffset = now.getTimezoneOffset() * 60 * 1000 - user.preferences.timezoneOffset * 60 * 1000;
+  now = new Date(now.getTime() + timezoneOffset);
+
+  // set dayStart to the user specified hour on the current day
+  let dayStart = new Date(now);
+  dayStart.setHours(user.preferences.dayStart, 0, 0, 0);
+  // if dayStart already passed
+  if (dayStart < now) {
+    // increase dayStart by one day
+    dayStart.setDate(dayStart.getDate() + 1);
+  }
+
+  let minutesToDayStart = (dayStart.getTime() - now.getTime()) / (60 * 1000);
+  let justBeforeDayStart = (21 >= minutesToDayStart && minutesToDayStart > 6);
+
+  // get lastCron in user timezone
+  let needsCron = user.needsCron;
+  let lastCron = new Date(user.auth.timestamps.loggedin)
+  lastCron = new Date(lastCron.getTime() + timezoneOffset);
+
+  let lastAfterCron;
+  if (properties.hasOwnProperty("LAST_AFTER_CRON")) {
+    lastAfterCron = new Date(properties["LAST_AFTER_CRON"]);
+  }
+  else {
+    // set lastAfterCron to the beginning of today
+    lastAfterCron = new Date(now);
+    lastAfterCron.setHours(0, 0, 0, 0);
+    scriptProperties.setProperty("LAST_AFTER_CRON", lastAfterCron);
+  }
+
+  let afterCronHasAlreadyRun = (lastAfterCron > lastCron);
+
+  // if auto cron and needs cron OR just before day start
+  if (AUTO_CAST_SKILLS === true && ((AUTO_CRON === false && needsCron === true) || justBeforeDayStart)) {
     scriptProperties.setProperty("beforeCronSkills", "true");
 
   // if auto cron and player hasn't cronned today
@@ -136,7 +163,7 @@ function processTrigger() {
     }
 
   // if player has cronned today and after cron hasn't run since cron
-  } else if ((AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) && needsCron === false && lastCron.getTime() - lastAfterCron.getTime() > 0) {
+  } else if ((AUTO_CAST_SKILLS === true || AUTO_PURCHASE_GEMS === true) && needsCron === false && !afterCronHasAlreadyRun) {
     if (AUTO_CAST_SKILLS === true) {
       scriptProperties.deleteProperty("beforeCronSkills");
       scriptProperties.setProperty("afterCronSkills", "true");
