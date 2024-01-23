@@ -32,7 +32,7 @@ const MAX_PLAYER_DAMAGE = 20;
 const MAX_PARTY_DAMAGE = 5;
 
 const AUTO_ALLOCATE_STAT_POINTS = false;
-const STAT_TO_ALLOCATE = "int"; // str, int, con, per
+const STAT_TO_ALLOCATE = "int"; // str, int, con, per, auto
 
 const AUTO_PURCHASE_GEMS = false; // subscribers only
 
@@ -250,8 +250,8 @@ function validateConstants() {
   }
 
   if (AUTO_ALLOCATE_STAT_POINTS === true) {
-    if (!["str", "int", "con", "per"].includes(STAT_TO_ALLOCATE)) {
-      console.log("ERROR: STAT_TO_ALLOCATE must be one of either \"str\", \"int\", \"con\", or \"per\".\n\neg. const STAT_TO_ALLOCATE = \"int\";\n    const STAT_TO_ALLOCATE = \"per\";");
+    if (!["str", "int", "con", "per", "auto"].includes(STAT_TO_ALLOCATE)) {
+      console.log("ERROR: STAT_TO_ALLOCATE must be one of either \"str\", \"int\", \"con\", \"per\" or \"auto\".\n\neg. const STAT_TO_ALLOCATE = \"int\";\n    const STAT_TO_ALLOCATE = \"per\";");
       valid = false;
     }
   }
