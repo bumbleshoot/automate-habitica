@@ -14,7 +14,7 @@ function purchaseGems() {
   let plan = getUser(true).purchased.plan;
 
   // if still subscribed
-  if ((plan.dateTerminated && new Date(plan.dateTerminated).getTime() > new Date().getTime()) || (plan.dateTerminated === null && plan.customerId === "group-plan")) {
+  if ((plan.dateTerminated && new Date(plan.dateTerminated).getTime() > new Date().getTime()) || plan.dateTerminated === null) {
 
     // calculate number of gems to buy
     let gemsToBuy = Math.min(25 + plan.consecutive.gemCapExtra - plan.gemsBought, Math.floor(user.stats.gp / 20));
