@@ -83,20 +83,19 @@ It is highly recommended that you use a desktop computer for this, as some of th
 
 ## Setup Instructions
 It is highly recommended that you use a desktop computer for this, as some of the steps don't work well on mobile. Make sure you read the [Before Installing](#before-installing) section above, and follow the instructions there if applicable!
-1. Click [here](https://script.google.com/d/1y5jBYAWqi0Lrd5Oo40q9GYu8KIltzas2hxUOS3ecUUjZP35L-EP3j28N/edit?usp=sharing) to go to the Automate Habitica script. If you're not already signed into your Google account, you will be asked to sign in.
-2. In the main menu on the left, click on "Overview" (looks like a lowercase letter i inside a circle).
-3. Click the "Make a copy" button (looks like two pages of paper).
-4. At the top of your screen, click on "Copy of Automate Habitica". Rename it "Automate Habitica" and click the "Rename" button.
-5. Click [here](https://habitica.com/user/settings/api) to open your API Settings. Highlight and copy your User ID (it looks something like this: `35c3fb6f-fb98-4bc3-b57a-ac01137d0847`). In the Automate Habitica script, paste your User ID between the quotations where it says `const USER_ID = "";`. It should now look something like this: `const USER_ID = "35c3fb6f-fb98-4bc3-b57a-ac01137d0847";`
-6. On the same page where you copied your User ID, click the "Show API Token" button, and copy your API Token. In the Automate Habitica script, paste your API Token between the quotations where it says `const API_TOKEN = "";`. It should now look something like this: `const API_TOKEN = "35c3fb6f-fb98-4bc3-b57a-ac01137d0847";`
-7. Skip the line that says `const WEB_APP_URL = "";`. We will come back to that later. Edit all the other settings (`const`s) in the script to your liking. Only edit in between the `=` and the `;`. If there are quotations `""` in between the `=` and the `;`, just type in between the quotations.
-8. Click the "Save project" button near the top of the page (looks like a floppy disk).
-9. Click the blue "Deploy" button near the top of the page, then click "New deployment", then click the "Deploy" button.
-10. Click the "Authorize access" button and select your Google account. Click on "Advanced", then "Go to Automate Habitica (unsafe)". (Don't worry, it is safe!) Then click the "Allow" button.
-11. Under "Web app", click the "Copy" button to copy the Web App URL. Then click the "Done" button.
-12. Paste your Web App URL inside the quotations where it says `const WEB_APP_URL = "";`.
-13. Click the drop-down menu to the right of the "Debug" button, near the top of the page. Select "install" from the drop-down.
-14. Click the "Run" button to the left of the "Debug" button. Wait for it to say "Execution completed".
+1. Click [here](https://script.google.com/d/1y5jBYAWqi0Lrd5Oo40q9GYu8KIltzas2hxUOS3ecUUjZP35L-EP3j28N?usp=sharing) to go to the Automate Habitica script. If you're not already signed into your Google account, you will be asked to sign in.
+2. Click the "Make a copy" button (looks like two pages of paper).
+3. At the top of your screen, click on "Copy of Automate Habitica". Rename it "Automate Habitica" and click the "Rename" button.
+4. Click [here](https://habitica.com/user/settings/api) to open your API Settings. Highlight and copy your User ID (it looks something like this: `35c3fb6f-fb98-4bc3-b57a-ac01137d0847`). In the Automate Habitica script, paste your User ID between the quotations where it says `const USER_ID = "";`. It should now look something like this: `const USER_ID = "35c3fb6f-fb98-4bc3-b57a-ac01137d0847";`
+5. On the same page where you copied your User ID, click the "Show API Token" button, and copy your API Token. In the Automate Habitica script, paste your API Token between the quotations where it says `const API_TOKEN = "";`. It should now look something like this: `const API_TOKEN = "35c3fb6f-fb98-4bc3-b57a-ac01137d0847";`
+6. Skip the line that says `const WEB_APP_URL = "";`. We will come back to that later. Edit all the other settings (`const`s) in the script to your liking. Only edit in between the `=` and the `;`. If there are quotations `""` in between the `=` and the `;`, just type in between the quotations.
+7. Click the "Save project" button near the top of the page (looks like a floppy disk).
+8. Click the blue "Deploy" button near the top of the page, then click "New deployment", then click the "Deploy" button.
+9. Click the "Authorize access" button and select your Google account. Click on "Advanced", then "Go to Automate Habitica (unsafe)". (Don't worry, it is safe!) Then click the "Allow" button.
+10. Under "Web app", click the "Copy" button to copy the Web App URL. Then click the "Done" button.
+11. Paste your Web App URL inside the quotations where it says `const WEB_APP_URL = "";`.
+12. Click the drop-down menu to the right of the "Debug" button, near the top of the page. Select "install" from the drop-down.
+13. Click the "Run" button to the left of the "Debug" button. Wait for it to say "Execution completed".
 
 You're all done! If you need to change the settings or uninstall the script at some point, follow the steps below.
 
