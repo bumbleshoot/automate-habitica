@@ -91,7 +91,7 @@ It is highly recommended that you use a desktop computer for this, as some of th
 6. Skip the line that says `const WEB_APP_URL = "";`. We will come back to that later. Edit all the other settings (`const`s) in the script to your liking. Only edit in between the `=` and the `;`. If there are quotations `""` in between the `=` and the `;`, just type in between the quotations.
 7. Click the "Save project" button near the top of the page (looks like a floppy disk).
 8. Click the blue "Deploy" button near the top of the page, then click "New deployment", then click the "Deploy" button.
-9. Click the "Authorize access" button and select your Google account. Click on "Advanced", then "Go to Automate Habitica (unsafe)". (Don't worry, it is safe!) Then click the "Allow" button.
+9. (If this is your first time deploying) Click the "Review permissions" button and select your Google account. Click on "Advanced", then "Go to Automate Habitica (unsafe)". (Don't worry, it is safe!) Then click "Continue", then "Allow".
 10. Under "Web app", click the "Copy" button to copy the Web App URL. Then click the "Done" button.
 11. Paste your Web App URL inside the quotations where it says `const WEB_APP_URL = "";`.
 12. Click the drop-down menu to the right of the "Debug" button, near the top of the page. Select "install" from the drop-down.
