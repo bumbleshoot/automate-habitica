@@ -82,7 +82,7 @@ It is highly recommended that you use a desktop computer for this, as some of th
 13. Repeat the above steps for every script you need to uninstall.
 
 ## Setup Instructions
-It is highly recommended that you use a desktop computer for this, as some of the steps don't work well on mobile. Make sure you read the [Before Installing](#before-installing) section above, and follow the instructions there if applicable!
+It is highly recommended that you use a desktop computer for this, as some of the steps don't work well on mobile. Make sure you read the [Before Installing](#before-installing) section above, and follow the instructions there if applicable! Make sure you only install one copy of Automate Habitica per Google account, otherwise you will exceed the [limit for URL Fetch calls](https://developers.google.com/apps-script/guides/services/quotas) and the script will not work.
 1. Click [here](https://script.google.com/d/1y5jBYAWqi0Lrd5Oo40q9GYu8KIltzas2hxUOS3ecUUjZP35L-EP3j28N?usp=sharing) to go to the Automate Habitica script. If you're not already signed into your Google account, you will be asked to sign in.
 2. Click the "Make a copy" button (looks like two pages of paper).
 3. At the top of your screen, click on "Copy of Automate Habitica". Rename it "Automate Habitica" and click the "Rename" button.
