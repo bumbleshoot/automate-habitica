@@ -83,7 +83,7 @@ It is highly recommended that you use a desktop computer for this, as some of th
 
 ## Setup Instructions
 It is highly recommended that you use a desktop computer for this, as some of the steps don't work well on mobile. Make sure you read the [Before Installing](#before-installing) section above, and follow the instructions there if applicable! Make sure you only install one copy of Automate Habitica per Google account, otherwise you will exceed the [limit for URL Fetch calls](https://developers.google.com/apps-script/guides/services/quotas) and the script will not work.
-1. Click [here](https://script.google.com/d/1y5jBYAWqi0Lrd5Oo40q9GYu8KIltzas2hxUOS3ecUUjZP35L-EP3j28N?usp=sharing) to go to the Automate Habitica script. If you're not already signed into your Google account, you will be asked to sign in.
+1. Click [here](https://script.google.com/home/projects/1y5jBYAWqi0Lrd5Oo40q9GYu8KIltzas2hxUOS3ecUUjZP35L-EP3j28N/) to go to the Automate Habitica script. If you're not signed into your Google account, click on "Start Scripting", then sign in, then click on the script link again.
 2. Click the "Make a copy" button (looks like two pages of paper).
 3. At the top of your screen, click on "Copy of Automate Habitica". Rename it "Automate Habitica" and click the "Rename" button.
 4. Click [here](https://habitica.com/user/settings/api) to open your API Settings. Highlight and copy your User ID (it looks something like this: `35c3fb6f-fb98-4bc3-b57a-ac01137d0847`). In the Automate Habitica script, paste your User ID between the quotations where it says `const USER_ID = "";`. It should now look something like this: `const USER_ID = "35c3fb6f-fb98-4bc3-b57a-ac01137d0847";`
