@@ -1,5 +1,3 @@
-***Automate Habitica is currently in beta. It is mostly bug-free at this point, but there are still some edge cases that haven't been tested yet, so it may not work perfectly for you. If you're not okay with this, best to wait until Version 1 is released! If you get an error while running this script or it doesn't do what you expect, please submit a bug report [here](https://github.com/bumbleshoot/automate-habitica/issues)!***
-
 ## Summary
 Automate Habitica is a suite of automation tools for Habitica, allowing you to focus on your tasks instead of managing gameplay. Each tool can be enabled, disabled, and configured to suit your needs.
 
